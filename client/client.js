@@ -135,8 +135,9 @@ circles = [];
 
 Template.leafletMapTemp.rendered = function() {
   var self = this;
+  defaultCoord = [37.35024, -121.95751];
   
-  map = L.map('leaflet-map').setView([44.53,-123.262911], 13);
+  map = L.map('leaflet-map').setView(defaultCoord, 13);
   L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 18,
       attribution : 'Tiles: &copy; Esri, National Geographic'
