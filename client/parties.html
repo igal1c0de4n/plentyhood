@@ -1,5 +1,5 @@
 <head>
-  <title>All Tomorrow's Parties</title>
+  <title>Plentyhood locations</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
@@ -26,7 +26,7 @@
       <div class="span10">
         <div class="header row">
           <div class="span5">
-            <h3 style="margin-bottom: 0px">All Tomorrow's Parties</h3>
+            <h3 style="margin-bottom: 0px">Plentyhood locations</h3>
           </div>
           <div class="span5">
             <div style="float: right">
@@ -37,10 +37,10 @@
 
         <div class="row">
           <div class="span6">
-            {{> leafletMapTemp}}
+            {{> leafletMap}}
             {{#if currentUser}}
             <div class="pagination-centered">
-              <em><small>Ctrl click the map to post a party!</small></em>
+              <em><small>Ctrl click the map to post a new location!</small></em>
             </div>
             {{/if}}
           </div>
@@ -67,13 +67,12 @@
     {{/constant}}
     <div>
       <small class="attribution muted">&copy;
-        <a href="http://www.openstreetmap.org/?lat=37.78212&lon=-122.40146&zoom=15&layers=M"
-           target="_blank">OpenStreetMap</a> contributors</small>
+        <a target="_blank">OpenStreetMap</a> contributors</small>
     </div>
   </div>
 </template>
 
-<template name="leafletMapTemp">
+<template name="leafletMap">
   <div id="leaflet-map">test</div>
 </template>
 
@@ -112,9 +111,9 @@
     {{else}}
       <h1 class="muted pagination-centered">
         {{#if anyParties}}
-          Click a party to select it
+          Click a place to select it
         {{else}}
-          Sign in and Ctrl click the map to post a party
+          Sign in and Ctrl click the map to post a new location
         {{/if}}
       </h1>
     {{/if}}
@@ -188,13 +187,13 @@
 
       <label class="checkbox">
         <input type="checkbox" class="private">
-        Private party &mdash; invitees only
+        Private place &mdash; friends only
       </label>
     </div>
 
     <div class="modal-footer">
       <a href="#" class="btn cancel">Cancel</a>
-      <a href="#" class="btn btn-primary save">Add party</a>
+      <a href="#" class="btn btn-primary save">Add place</a>
     </div>
   </div>
 </template>

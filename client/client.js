@@ -102,69 +102,73 @@ Template.attendance.canInvite = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // Map display
 
-// Use jquery to get the position clicked relative to the map element.
-var coordsRelativeToElement = function (element, event) {
-  var offset = $(element).offset();
-  var x = event.pageX - offset.left;
-  var y = event.pageY - offset.top;
-  return { x: x, y: y };
-};
+var llmap = null;
+var mapViewLast = null;
+var circles = [];
+var mapViewDefault = { center: [37.35024, -121.95751], zoom: 13 }; // santa clara :)
+var initDone = false;
 
-Template.map.events({
-  'mousedown circle, mousedown text': function (event, template) {
-    Session.set("selected", event.currentTarget.id);
-  },
-  'dblclick .map': function (event, template) {
-    if (! Meteor.userId()) // must be logged in to create events
-      return;
-    var coords = coordsRelativeToElement(event.currentTarget, event);
-    openCreateDialog(coords.x / 500, coords.y / 500);
-  }
-});
 
-x = 0.025;
-y = 0.025;
-fakeCoord = function (){
-  x += 0.08;
-  y += 0.08;
-  return {x:x.toPrecision(5),y:y.toPrecision(5)};
-}
+Template.leafletMap.rendered = function() {
 
-map = null;
-circles = [];
-
-Template.leafletMapTemp.rendered = function() {
   var self = this;
-  defaultCoord = [37.35024, -121.95751];
-  
-  map = L.map('leaflet-map').setView(defaultCoord, 13);
+  if (!initDone) {
+    renderCount = 0;
+    initDone = true;
+    llmap = null;
+  }
+  console.log("rerendered called " + renderCount++);
+
+  var mapView;
+  if (mapViewLast) {
+    mapView = mapViewLast
+    console.log("map centered at last location");
+  }
+  else {
+    mapView = mapViewDefault;
+    console.log("map centered at default location");
+  }
+  var center = mapView.center;
+  var zoom = mapView.zoom;
+  console.log("map: center=" + mapView.center + 
+                ",zoom=" + mapView.zoom +")");
+  llmap = L.map('leaflet-map').setView(center, zoom);
   L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 18,
-      attribution : 'Tiles: &copy; Esri, National Geographic'
-  }).addTo(map);
+    maxZoom: 18,
+    attribution : 'Tiles: &copy; Esri, National Geographic'
+  }).addTo(llmap);
 
   var selectedCircleStyle = {
-      stroke: true,
-      color: 'yellow',
-      fillColor: '#fb4e00',
-      fillOpacity: 0.75,
-      opacity: 0.9
-    };
+    stroke: true,
+    color: 'yellow',
+    fillColor: '#fb4e00',
+    fillOpacity: 0.75,
+    opacity: 0.9
+  };
   var circleStyle = {
     stroke: false,
     fillColor: '#fb4e00',
     fillOpacity: 0.8
   };
 
-  map.on('click', function(e) {
+  llmap.on('moveend', function(e) {
+    mapViewLast = {};
+    mapViewLast.center = llmap.getCenter();
+    mapViewLast.zoom = llmap.getZoom();
+    console.log('last map center ' + mapViewLast.center.toString() + 
+                " zoom=" + mapViewLast.zoom);
+  });
+
+  llmap.on('click', function(e) {
     console.log('clicked at latlong: ' + e.latlng);
 
     // ctrl is meta key to add a new party
     if (e.originalEvent.ctrlKey === true) {
-      if (! Meteor.userId()) // must be logged in to create events
+      if (! Meteor.userId()) {
+        console.log("must be logged in to create events");
         return;
-      var fake = fakeCoord();
-      openCreateDialog(fake.x, fake.y, e.latlng.lat, e.latlng.lng);
+      }
+      openCreateDialog(e.latlng.lat, e.latlng.lng);
     }
   });  
 
@@ -174,11 +178,11 @@ Template.leafletMapTemp.rendered = function() {
       var selected = Session.get('selected');
 
       //before redawing circles, we want to delete the current ones
-      for (i in circles) {
-        map.removeLayer(circles[i]);
-      }
-      for (i in parties) {
-        var party = parties[i];
+      _.each(circles, function (c) {
+        llmap.removeLayer(c);
+      });
+      console.log("zoom level=" + llmap.getZoom() + " center=" + llmap.getCenter());
+      _.each(parties, function (party) {
         var circle;
         if (party._id === selected) {
           circle = L.circle([party.lat, party.lng], 120, selectedCircleStyle);
@@ -186,91 +190,21 @@ Template.leafletMapTemp.rendered = function() {
           circle = L.circle([party.lat, party.lng], 120, circleStyle);
         }
         circle.partyId = party._id; 
-        circle.addTo(map);
+        circle.addTo(llmap);
         circles.push(circle);
         circle.on('click', function(e) {
           Session.set("selected", this.partyId);
         });
-      }
+      });
     }
   });
 }
 
-Template.map.rendered = function () {
-  var self = this;
-  self.node = self.find("svg");
-
-  if (! self.handle) {
-    self.handle = Deps.autorun(function () {
-      var selected = Session.get('selected');
-      var selectedParty = selected && Parties.findOne(selected);
-      var radius = function (party) {
-        return 10 + Math.sqrt(attending(party)) * 10;
-      };
-
-      // Draw a circle for each party
-      var updateCircles = function (group) {
-        group.attr("id", function (party) { return party._id; })
-        .attr("cx", function (party) { return party.x * 500; })
-        .attr("cy", function (party) { return party.y * 500; })
-        .attr("r", radius)
-        .attr("class", function (party) {
-          return party.public ? "public" : "private";
-        })
-        .style('opacity', function (party) {
-          return selected === party._id ? 1 : 0.6;
-        });
-      };
-
-      var circles = d3.select(self.node).select(".circles").selectAll("circle")
-        .data(Parties.find().fetch(), function (party) { return party._id; });
-
-      updateCircles(circles.enter().append("circle"));
-      updateCircles(circles.transition().duration(250).ease("cubic-out"));
-      circles.exit().transition().duration(250).attr("r", 0).remove();
-
-      // Label each with the current attendance count
-      var updateLabels = function (group) {
-        group.attr("id", function (party) { return party._id; })
-        .text(function (party) {return attending(party) || '';})
-        .attr("x", function (party) { return party.x * 500; })
-        .attr("y", function (party) { return party.y * 500 + radius(party)/2 })
-        .style('font-size', function (party) {
-          return radius(party) * 1.25 + "px";
-        });
-      };
-
-      var labels = d3.select(self.node).select(".labels").selectAll("text")
-        .data(Parties.find().fetch(), function (party) { return party._id; });
-
-      updateLabels(labels.enter().append("text"));
-      updateLabels(labels.transition().duration(250).ease("cubic-out"));
-      labels.exit().remove();
-
-      // Draw a dashed circle around the currently selected party, if any
-      var callout = d3.select(self.node).select("circle.callout")
-        .transition().duration(250).ease("cubic-out");
-      if (selectedParty)
-        callout.attr("cx", selectedParty.x * 500)
-        .attr("cy", selectedParty.y * 500)
-        .attr("r", radius(selectedParty) + 10)
-        .attr("class", "callout")
-        .attr("display", '');
-      else
-        callout.attr("display", 'none');
-    });
-  }
-};
-
-Template.map.destroyed = function () {
-  this.handle && this.handle.stop();
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 // Create Party dialog
 
-var openCreateDialog = function (x, y, lat, lng) {
-  Session.set("createCoords", {x: x, y: y, lat: lat, lng: lng});
+var openCreateDialog = function (lat, lng) {
+  Session.set("createCoords", {lat: lat, lng: lng});
   Session.set("createError", null);
   Session.set("showCreateDialog", true);
 };
@@ -290,8 +224,6 @@ Template.createDialog.events({
       Meteor.call('createParty', {
         title: title,
         description: description,
-        x: coords.x,
-        y: coords.y,
         lat: coords.lat,
         lng: coords.lng,
         public: public
