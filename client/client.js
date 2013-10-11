@@ -102,37 +102,34 @@ Template.attendance.canInvite = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // Map display
 
-var llmap = null;
-var mapViewLast = null;
-var circles = [];
-var mapViewDefault = { center: [37.35024, -121.95751], zoom: 13 }; // santa clara :)
-var initDone = false;
+Template.leafletMap.created = function() {
+  var mapViewDefault = { 
+    center: [37.35024, -121.95751], 
+    zoom: 13 
+  }; // santa clara :) TBD: replace with auto-locate
 
+  console.log("template leafletMap created");
+  Session.set('mapView', mapViewDefault);
+  this.renderCount = 0;
+};
 
 Template.leafletMap.rendered = function() {
 
   var self = this;
-  if (!initDone) {
-    renderCount = 0;
-    initDone = true;
-    llmap = null;
-  }
-  console.log("rerendered called " + renderCount++);
+  var last = {};
 
-  var mapView;
-  if (mapViewLast) {
-    mapView = mapViewLast
-    console.log("map centered at last location");
-  }
-  else {
-    mapView = mapViewDefault;
-    console.log("map centered at default location");
-  }
-  var center = mapView.center;
-  var zoom = mapView.zoom;
-  console.log("map: center=" + mapView.center + 
-                ",zoom=" + mapView.zoom +")");
-  llmap = L.map('leaflet-map').setView(center, zoom);
+  console.log("render iteration " + this.renderCount);
+  // workaround in case the meteor decides to call rerender more than once
+  if (this.renderCount > 0)
+    return;
+  this.renderCount++;
+  var view = Session.get('mapView');
+  console.log("view: center=" + view.center.toString() + ",zoom=" + view.zoom +")");
+  var llmap = L.map('leaflet-map', {maxZoom: 16, minZoom: 3, noWrap: true}).
+    setView(view.center, view.zoom).
+    locate({maximumAge : 1000 * 3600}).
+    whenReady(function () { console.log("llmap ready!")});
+
   L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 18,
     attribution : 'Tiles: &copy; Esri, National Geographic'
@@ -141,22 +138,25 @@ Template.leafletMap.rendered = function() {
   var selectedCircleStyle = {
     stroke: true,
     color: 'yellow',
-    fillColor: '#fb4e00',
-    fillOpacity: 0.75,
-    opacity: 0.9
+    fillColor: 'yellow',
+    fillOpacity: 0.8,
+    opacity: 0.2,
   };
   var circleStyle = {
-    stroke: false,
-    fillColor: '#fb4e00',
-    fillOpacity: 0.8
+    stroke: true,
+    color: 'green',
+    fillColor: 'green',
+    fillOpacity: 0.6,
+    opacity: 0.2,
   };
 
   llmap.on('moveend', function(e) {
-    mapViewLast = {};
-    mapViewLast.center = llmap.getCenter();
-    mapViewLast.zoom = llmap.getZoom();
-    console.log('last map center ' + mapViewLast.center.toString() + 
-                " zoom=" + mapViewLast.zoom);
+    var view = {};
+    view.center = llmap.getCenter();
+    view.zoom = llmap.getZoom();
+    console.log('moveend: center=' + view.center.toString() + 
+                " zoom=" + view.zoom);
+    Session.set('mapView', view);
   });
 
   llmap.on('click', function(e) {
@@ -172,33 +172,50 @@ Template.leafletMap.rendered = function() {
     }
   });  
 
-  self.handle = Deps.autorun(function () {
-    var parties = Parties.find().fetch();
-    if (parties.length) {
-      var selected = Session.get('selected');
+  // closure vars
+  var circles = [];
 
-      //before redawing circles, we want to delete the current ones
-      _.each(circles, function (c) {
-        llmap.removeLayer(c);
-      });
-      console.log("zoom level=" + llmap.getZoom() + " center=" + llmap.getCenter());
-      _.each(parties, function (party) {
-        var circle;
-        if (party._id === selected) {
-          circle = L.circle([party.lat, party.lng], 120, selectedCircleStyle);
-        } else {
-          circle = L.circle([party.lat, party.lng], 120, circleStyle);
-        }
-        circle.partyId = party._id; 
-        circle.addTo(llmap);
-        circles.push(circle);
-        circle.on('click', function(e) {
-          Session.set("selected", this.partyId);
-        });
-      });
+  this.handle = Deps.autorun(function () {
+    var parties = Parties.find().fetch();
+    var selected = Session.get('selected');
+    var view = Session.get('mapView');
+
+    var statStr = " locations=" + parties.length +
+                  " zoom=" + view.zoom + 
+                  " last.zoom=" + last.zoom +
+                  " selected=" + selected;
+    if (parties.length === 0 || 
+        (view.zoom === last.zoom && selected == last.selected)) {
+      console.log("llmh: skipping update." + statStr);
+      return;
     }
+    last.zoom = view.zoom;
+    last.selected = selected;
+
+    var radius = 1.5 * Math.pow(2,20) / Math.pow(2, view.zoom);
+    console.log("llmh: updating." + statStr + " rad=" + radius);
+    //before redawing circles, we want to delete the current ones
+    // TBD: just update the circles which change
+    _.each(circles, function (c) {
+      llmap.removeLayer(c);
+    });
+    circles = [];
+    _.each(parties, function (party) {
+      var circle;
+      circle = L.circle([party.lat, party.lng], 
+                        radius, 
+                        party._id === selected ? 
+                          selectedCircleStyle : circleStyle);
+      circle.partyId = party._id; 
+      circle.addTo(llmap);
+      circles.push(circle);
+      //      console.log(circle);
+      circle.on('click', function(e) {
+        Session.set("selected", this.partyId);
+      });
+    });
   });
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Create Party dialog
@@ -209,7 +226,7 @@ var openCreateDialog = function (lat, lng) {
   Session.set("showCreateDialog", true);
 };
 
-Template.page.showCreateDialog = function () {
+Template.pageHeader.showCreateDialog = function () {
   return Session.get("showCreateDialog");
 };
 
@@ -257,7 +274,7 @@ var openInviteDialog = function () {
   Session.set("showInviteDialog", true);
 };
 
-Template.page.showInviteDialog = function () {
+Template.pageHeader.showInviteDialog = function () {
   return Session.get("showInviteDialog");
 };
 

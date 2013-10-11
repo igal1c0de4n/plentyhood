@@ -6,81 +6,76 @@
 
 <body>
 
-  {{> page}}
+  {{> pageHeader}}
+  {{> leafletMap}}
+  {{> placeInfo}}
 
 </body>
 
-<template name="page">
-  {{#if showCreateDialog}}
-    {{> createDialog}}
-  {{/if}}
+<template name="pageHeader">
 
-  {{#if showInviteDialog}}
-    {{> inviteDialog}}
-  {{/if}}
+{{#if showCreateDialog}}
+{{> createDialog}}
+{{/if}}
 
-  <div class="container">
-    <div class="row">
-      <div class="span1"> </div>
+{{#if showInviteDialog}}
+{{> inviteDialog}}
+{{/if}}
 
-      <div class="span10">
-        <div class="header row">
-          <div class="span5">
-            <h3 style="margin-bottom: 0px">Plentyhood locations</h3>
-          </div>
-          <div class="span5">
-            <div style="float: right">
-              {{loginButtons align="right"}}
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="span6">
-            {{> leafletMap}}
-            {{#if currentUser}}
-            <div class="pagination-centered">
-              <em><small>Ctrl click the map to post a new location!</small></em>
-            </div>
-            {{/if}}
-          </div>
-          <div class="span4">
-            {{> details}}
-          </div>
-        </div>
-        
+<div class="row">
+  <div class="span1"> </div>
+  <div class="span11">
+    <div class="header row">
+      <div class="span5">
+        <h1 style="margin: 0px">Plentyhood</h1>
       </div>
-
-      <div class="span1"> </div>
+      <div class="span6">
+        <div style="float: right">
+          {{loginButtons align="right"}}
+        </div>
+      </div>
     </div>
   </div>
+</div>
 </template>
 
-<template name="map">
-  <div class="map">
-    {{#constant}}
-      <svg width="500" height="500">
-        <circle class="callout" cx=-100 cy=-100></circle>
-        <g class="circles"></g>
-        <g class="labels"></g>
-      </svg>
-    {{/constant}}
-    <div>
-      <small class="attribution muted">&copy;
-        <a target="_blank">OpenStreetMap</a> contributors</small>
+<template name="placeInfo">
+<div class="row">
+  <div class="span1"> </div>
+  <div class="span10">
+    <div class="row">
+    </div>
+    <div class="row">
+      <div class="span4">
+        {{#if currentUser}}
+        {{> details}}
+        {{/if}}
+      </div>
+      <div class="span6">
+        <h3>Shared Items (TBD, this is a placeholder)</h3>
+      </div>
     </div>
   </div>
+  <div class="span1"> </div>
+</div>
 </template>
 
 <template name="leafletMap">
-  <div id="leaflet-map">test</div>
+  {{#if currentUser}}
+  <div class="pagination-right" style="margin-right: 20px">
+    <em><small>Ctrl click the map to post a new location!</small></em>
+  </div>
+  {{/if}}
+  {{#constant}}
+    <div id="leaflet-map" class="leflet-map" style="margin-bottom: 20px"></div>
+  {{/constant}}
 </template>
 
 <template name="details">
   <div class="details">
     {{#if party}}
       {{#with party}}
-        <h1>{{title}}</h1>
+        <h2>{{title}}</h2>
 
         <div class="description">{{description}}</div>
 
