@@ -119,9 +119,10 @@ Template.leafletMap.rendered = function() {
   var last = {};
 
   console.log("render iteration " + this.renderCount);
-  // workaround in case the meteor decides to call rerender more than once
-  if (this.renderCount > 0)
+  if (this.renderCount > 0) {
+    console.log("workaround for leaflet rerender call #" + this.renderCount);
     return;
+  }
   this.renderCount++;
   var view = Session.get('mapView');
   console.log("view: center=" + view.center.toString() + ",zoom=" + view.zoom +")");
@@ -138,9 +139,8 @@ Template.leafletMap.rendered = function() {
   var selectedCircleStyle = {
     stroke: true,
     color: 'yellow',
-    fillColor: 'yellow',
-    fillOpacity: 0.8,
-    opacity: 0.2,
+    opacity: 1,
+    radius: 15
   };
   var circleStyle = {
     stroke: true,
@@ -148,14 +148,13 @@ Template.leafletMap.rendered = function() {
     fillColor: 'green',
     fillOpacity: 0.6,
     opacity: 0.2,
+    radius: 10
   };
 
   llmap.on('moveend', function(e) {
     var view = {};
     view.center = llmap.getCenter();
-    view.zoom = llmap.getZoom();
-    console.log('moveend: center=' + view.center.toString() + 
-                " zoom=" + view.zoom);
+    console.log('moveend: center=' + view.center.toString());
     Session.set('mapView', view);
   });
 
@@ -174,6 +173,65 @@ Template.leafletMap.rendered = function() {
 
   // closure vars
   var circles = [];
+  var locGroup = L.layerGroup(circles).addTo(llmap);
+
+  function drawLocations() {
+    var selected = Session.get('selected');
+    //     before redawing circles, delete the current ones
+    //  TBD: just update the circles which change
+      _.each(circles, function (c) {
+        locGroup.removeLayer(c);
+      });
+    //      locGroup.clearLayers();
+    var parties = Parties.find().fetch();
+    console.log("parties.length=" + parties.length);
+    circles = [];
+    _.each(parties, function (party) {
+      var circle = L.circleMarker([party.lat, party.lng], 
+                         party._id === selected ? 
+                           selectedCircleStyle : circleStyle);
+      circle.partyId = party._id;
+      //      console.log(circle);
+      circle.on('click', function(e) {
+        Session.set("selected", this.partyId);
+        self.newlyClickedCircle = this;
+      });
+      circles.push(circle);
+      locGroup.addLayer(circle);
+    });
+  }
+
+  /*
+  function replaceCircle(c, isSelected) {
+      if (!c) {
+        return;
+      }
+      console.log("replacing circle " + c.partyId + " " +
+                  (isSelected ? "(selected)" : "(unselected)"));
+
+      locGroup.removeLayer(c);
+      if (found_cir) {
+        console.log("ok - found c in getLayers! at index " + found_idx);
+        locGroup.removeLayer(c); // not working ! WTFF????????
+      }
+      else {
+        console.log("did not find c in getLayers!");
+      }
+      circles.splice(circles.indexOf(c), 1);
+      var circle = L.circleMarker(c.getLatLng(), isSelected ? 
+                                  selectedCircleStyle : circleStyle);
+      circle.partyId = c.partyId;
+      if (!isSelected) {
+        circle.on('click', function(e) {
+          Session.set("selected", this.partyId);
+          self.newlyClickedCircle = this;
+        });
+      }
+      circles.push(circle);
+      locGroup.addLayer(circle);
+      //       circle.addTo(locGroup);
+  }
+ */
 
   this.handle = Deps.autorun(function () {
     var parties = Parties.find().fetch();
@@ -181,39 +239,39 @@ Template.leafletMap.rendered = function() {
     var view = Session.get('mapView');
 
     var statStr = " locations=" + parties.length +
-                  " zoom=" + view.zoom + 
-                  " last.zoom=" + last.zoom +
                   " selected=" + selected;
-    if (parties.length === 0 || 
-        (view.zoom === last.zoom && selected == last.selected)) {
+    console.log("llmh: " + statStr);
+
+    if (parties.length == 0 || selected == last.selected) {
       console.log("llmh: skipping update." + statStr);
       return;
     }
-    last.zoom = view.zoom;
+    //    ugly workaround 
+    drawLocations(); return;
+
+    /*
+    if (!self.drawDone) {
+      drawLocations();
+      self.drawDone = true;
+    }
+
+    if (last.selectedCircle) {
+      // convert last selected to to unselected style
+      replaceCircle(last.selectedCircle, false);
+    } else if (selected) {
+      console.log("first time selection");
+      self.newlyClickedCircle = 
+        _.find(circles, function (c) { return c.partyId == selected; }); 
+    }
     last.selected = selected;
 
-    var radius = 1.5 * Math.pow(2,20) / Math.pow(2, view.zoom);
-    console.log("llmh: updating." + statStr + " rad=" + radius);
-    //before redawing circles, we want to delete the current ones
-    // TBD: just update the circles which change
-    _.each(circles, function (c) {
-      llmap.removeLayer(c);
-    });
-    circles = [];
-    _.each(parties, function (party) {
-      var circle;
-      circle = L.circle([party.lat, party.lng], 
-                        radius, 
-                        party._id === selected ? 
-                          selectedCircleStyle : circleStyle);
-      circle.partyId = party._id; 
-      circle.addTo(llmap);
-      circles.push(circle);
-      //      console.log(circle);
-      circle.on('click', function(e) {
-        Session.set("selected", this.partyId);
-      });
-    });
+    if (self.newlyClickedCircle) {
+      // render new circle
+      replaceCircle(self.newlyClickedCircle, true);
+      last.selectedCircle = self.newlyClickedCircle;
+    }
+   */
+
   });
 };
 
