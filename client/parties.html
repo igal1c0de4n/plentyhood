@@ -6,9 +6,11 @@
 
 <body>
 
+<div class="container">
   {{> pageHeader}}
   {{> leafletMap}}
   {{> placeInfo}}
+</div>
 
 </body>
 
@@ -22,53 +24,42 @@
 {{> inviteDialog}}
 {{/if}}
 
-<div class="row">
-  <div class="span1"> </div>
-  <div class="span11">
-    <div class="header row">
-      <div class="span5">
-        <h1 style="margin: 0px">Plentyhood</h1>
-      </div>
-      <div class="span6">
-        <div style="float: right">
-          {{loginButtons align="right"}}
-        </div>
+  <div class="header row">
+    <div class="span6">
+      <h1 style="margin: 0px">Plentyhood</h1>
+    </div>
+    <div class="span6">
+      <div style="float: right">
+        {{loginButtons align="right"}}
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <template name="placeInfo">
 <div class="row">
-  <div class="span1"> </div>
-  <div class="span10">
-    <div class="row">
-    </div>
-    <div class="row">
-      <div class="span4">
-        {{#if currentUser}}
-        {{> details}}
-        {{/if}}
-      </div>
-      <div class="span6">
-        <h3>Shared Items (TBD, this is a placeholder)</h3>
-      </div>
-    </div>
+  <div class="span4">
+    {{#if currentUser}}
+    {{> details}}
+    {{/if}}
   </div>
-  <div class="span1"> </div>
+  <div class="span6">
+    <h2>Shared Items</h2>
+    <div class="description">Content placeholder</div>
+  </div>
 </div>
 </template>
 
 <template name="leafletMap">
-  {{#if currentUser}}
-  <div class="pagination-right" style="margin-right: 20px">
-    <em><small>Ctrl click the map to post a new location!</small></em>
-  </div>
-  {{/if}}
-  {{#constant}}
-    <div id="leaflet-map" class="leflet-map" style="margin-bottom: 20px"></div>
-  {{/constant}}
+    {{#if currentUser}}
+    <div class="pagination-right" style="margin-right: 10px">
+      <em><small>Ctrl click the map to post a new location!</small></em>
+    </div>
+    {{/if}}
+    {{#constant}}
+    <div id="leaflet-map" class="leflet-map" 
+      style="margin-bottom: 20px"></div>
+    {{/constant}}
 </template>
 
 <template name="details">
