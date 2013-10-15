@@ -1,28 +1,28 @@
-// All Tomorrow's Parties -- client
+// Places -- client
 
 Meteor.subscribe("directory");
-Meteor.subscribe("parties");
+Meteor.subscribe("places");
 
-// If no party selected, select one.
+// If no place selected, select one.
 Meteor.startup(function () {
   Deps.autorun(function () {
     if (! Session.get("selected")) {
-      var party = Parties.findOne();
-      if (party)
-        Session.set("selected", party._id);
+      var place = Places.findOne();
+      if (place)
+        Session.set("selected", place._id);
     }
   });
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// Party details sidebar
+// Place details sidebar
 
-Template.details.party = function () {
-  return Parties.findOne(Session.get("selected"));
+Template.details.place = function () {
+  return Places.findOne(Session.get("selected"));
 };
 
-Template.details.anyParties = function () {
-  return Parties.find().count() > 0;
+Template.details.anyPlaces = function () {
+  return Places.find().count() > 0;
 };
 
 Template.details.creatorName = function () {
@@ -62,13 +62,13 @@ Template.details.events({
     return false;
   },
   'click .remove': function () {
-    Parties.remove(this._id);
+    Places.remove(this._id);
     return false;
   }
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// Party attendance widget
+// Place attendance widget
 
 Template.attendance.rsvpName = function () {
   var user = Meteor.users.findOne(this.user);
@@ -76,10 +76,10 @@ Template.attendance.rsvpName = function () {
 };
 
 Template.attendance.outstandingInvitations = function () {
-  var party = Parties.findOne(this._id);
+  var place = Places.findOne(this._id);
   return Meteor.users.find({$and: [
-    {_id: {$in: party.invited}}, // they're invited
-    {_id: {$nin: _.pluck(party.rsvps, 'user')}} // but haven't RSVP'd
+    {_id: {$in: place.invited}}, // they're invited
+    {_id: {$nin: _.pluck(place.rsvps, 'user')}} // but haven't RSVP'd
   ]});
 };
 
@@ -161,7 +161,7 @@ Template.leafletMap.rendered = function() {
   llmap.on('click', function(e) {
     console.log('clicked at latlong: ' + e.latlng);
 
-    // ctrl is meta key to add a new party
+    // ctrl is meta key to add a new place
     if (e.originalEvent.ctrlKey === true) {
       if (! Meteor.userId()) {
         console.log("must be logged in to create events");
@@ -200,34 +200,34 @@ Template.leafletMap.rendered = function() {
     _.each(circles, function (c) {
       markerLayer.removeLayer(c);
     });
-    var parties = Parties.find().fetch();
+    var places = Places.find().fetch();
     circles = [];
     var selected = Session.get('selected');
-    _.each(parties, function (party) {
-      var latlng = [party.lat, party.lng];
+    _.each(places, function (place) {
+      var latlng = [place.lat, place.lng];
 
-      var style = selected == party._id ? 
+      var style = selected == place._id ? 
         markerSelectedStyle : markerUnselectedStyle;
 
       var circle = L.marker(latlng, style).addTo(markerLayer);
-      circle.partyId = party._id;
+      circle.placeId = place._id;
       circle.on('click', function(e) {
-        Session.set("selected", this.partyId);
+        Session.set("selected", this.placeId);
       });
       circles.push(circle);
     });
   }
 
   this.handle = Deps.autorun(function () {
-    var parties = Parties.find().fetch();
+    var places = Places.find().fetch();
     var selected = Session.get('selected');
     var view = Session.get('mapView');
 
-    var statStr = " locations=" + parties.length +
+    var statStr = " locations=" + places.length +
                   " selected=" + selected;
     console.log("llmh: " + statStr);
 
-    if (parties.length == 0 || selected == last.selected) {
+    if (places.length == 0 || selected == last.selected) {
       console.log("llmh: skipping update." + statStr);
       return;
     }
@@ -236,7 +236,7 @@ Template.leafletMap.rendered = function() {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Create Party dialog
+// Create Place dialog
 
 var openCreateDialog = function (lat, lng) {
   Session.set("createCoords", {lat: lat, lng: lng});
@@ -256,15 +256,15 @@ Template.createDialog.events({
     var coords = Session.get("createCoords");
 
     if (title.length && description.length) {
-      Meteor.call('createParty', {
+      Meteor.call('createPlace', {
         title: title,
         description: description,
         lat: coords.lat,
         lng: coords.lng,
         public: public
-      }, function (error, party) {
+      }, function (error, place) {
         if (! error) {
-          Session.set("selected", party);
+          Session.set("selected", place);
           if (! public && Meteor.users.find().count() > 1)
             openInviteDialog();
         }
@@ -307,11 +307,11 @@ Template.inviteDialog.events({
 });
 
 Template.inviteDialog.uninvited = function () {
-  var party = Parties.findOne(Session.get("selected"));
-  if (! party)
-    return []; // party hasn't loaded yet
-  return Meteor.users.find({$nor: [{_id: {$in: party.invited}},
-                                   {_id: party.owner}]});
+  var place = Places.findOne(Session.get("selected"));
+  if (! place)
+    return []; // place hasn't loaded yet
+  return Meteor.users.find({$nor: [{_id: {$in: place.invited}},
+                                   {_id: place.owner}]});
 };
 
 Template.inviteDialog.displayName = function () {

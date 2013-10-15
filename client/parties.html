@@ -1,5 +1,5 @@
 <head>
-  <title>Plentyhood locations</title>
+  <title>Plentyhood places</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
@@ -52,11 +52,13 @@
 
 <template name="leafletMap">
 <div class="pagination-right" style="margin-right: 10px">
-  {{#if currentUser}}
-  <em><small>Ctrl click the map to post a new location</small></em>
-  {{else}}
-  <em><small>Sign in to post a new location</small></em>
-  {{/if}}
+  <em><small>
+      {{#if currentUser}}
+      Ctrl click the map to post a new place
+      {{else}}
+      Sign in to post a new place
+      {{/if}}
+  </small></em>
 </div>
 {{#constant}}
 <div id="leaflet-map" class="leflet-map" style="margin-bottom: 20px"></div>
@@ -65,8 +67,8 @@
 
 <template name="details">
   <div class="details">
-    {{#if party}}
-      {{#with party}}
+    {{#if place}}
+      {{#with place}}
         <h2>{{title}}</h2>
 
         <div class="description">{{description}}</div>
@@ -82,27 +84,26 @@
             <input type="button" value="No"
                    class="btn btn-small rsvp_no {{maybeChosen "no"}}">
           {{else}}
-            <i>Sign in to RSVP for this party.</i>
+            <i>Sign in to RSVP for this place.</i>
           {{/if}}
           <p><small>Posted by {{creatorName}}</small></p>
         </div>
 
         {{#if canRemove}}
           <div class="alert alert-info"><small>
-              You posted this party and nobody is signed up to go, so if
-              you like, you could
+              You posted this place, you could
               <b><a href="#" class="remove">delete this listing</a></b>.
           </small></div>
         {{/if}}
       {{/with}}
     {{else}}
-      <h1 class="muted pagination-centered">
-        {{#if anyParties}}
+      <h3 class="muted pagination-centered">
+        {{#if anyPlaces}}
           Click a place to select it
         {{else}}
-          Ctrl click the map to post a new location
+         Ctrl click the map to post a new place
         {{/if}}
-      </h1>
+      </h3>
     {{/if}}
   </div>
 </template>
@@ -158,7 +159,7 @@
   <div class="modal">
     <div class="modal-header">
       <button type="button" class="close cancel">&times;</button>
-      <h3>Add party</h3>
+      <h3>Add Place</h3>
     </div>
 
     <div class="modal-body">
