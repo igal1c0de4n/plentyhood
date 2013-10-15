@@ -173,65 +173,37 @@ Template.leafletMap.rendered = function() {
 
   // closure vars
   var circles = [];
-  var locGroup = L.layerGroup(circles).addTo(llmap);
+
+  // control all markers via a single layer
+  var markerLayer = L.layerGroup().addTo(llmap);
 
   function drawLocations() {
-    var selected = Session.get('selected');
-    //     before redawing circles, delete the current ones
-    //  TBD: just update the circles which change
-      _.each(circles, function (c) {
-        locGroup.removeLayer(c);
-      });
-    //      locGroup.clearLayers();
+
+    // before redawing circles, delete the current ones
+    // TBD optimization: update only the markers which change
+    _.each(circles, function (c) {
+      markerLayer.removeLayer(c);
+    });
     var parties = Parties.find().fetch();
-    console.log("parties.length=" + parties.length);
     circles = [];
+    var selected = Session.get('selected');
+    var markerUnselectedStyle = {riseOnHover: true, opacity: 0.5};
+    var markerSelectedStyle = {riseOnHover: true};
+
     _.each(parties, function (party) {
-      var circle = L.circleMarker([party.lat, party.lng], 
-                         party._id === selected ? 
-                           selectedCircleStyle : circleStyle);
+      var latlng = [party.lat, party.lng];
+
+      style = selected == party._id ? 
+        markerSelectedStyle : markerUnselectedStyle;
+
+      var circle = L.marker(latlng, style).addTo(markerLayer);
       circle.partyId = party._id;
-      //      console.log(circle);
       circle.on('click', function(e) {
         Session.set("selected", this.partyId);
-        self.newlyClickedCircle = this;
       });
       circles.push(circle);
-      locGroup.addLayer(circle);
     });
   }
-
-  /*
-  function replaceCircle(c, isSelected) {
-      if (!c) {
-        return;
-      }
-      console.log("replacing circle " + c.partyId + " " +
-                  (isSelected ? "(selected)" : "(unselected)"));
-
-      locGroup.removeLayer(c);
-      if (found_cir) {
-        console.log("ok - found c in getLayers! at index " + found_idx);
-        locGroup.removeLayer(c); // not working ! WTFF????????
-      }
-      else {
-        console.log("did not find c in getLayers!");
-      }
-      circles.splice(circles.indexOf(c), 1);
-      var circle = L.circleMarker(c.getLatLng(), isSelected ? 
-                                  selectedCircleStyle : circleStyle);
-      circle.partyId = c.partyId;
-      if (!isSelected) {
-        circle.on('click', function(e) {
-          Session.set("selected", this.partyId);
-          self.newlyClickedCircle = this;
-        });
-      }
-      circles.push(circle);
-      locGroup.addLayer(circle);
-      //       circle.addTo(locGroup);
-  }
- */
 
   this.handle = Deps.autorun(function () {
     var parties = Parties.find().fetch();
@@ -246,32 +218,7 @@ Template.leafletMap.rendered = function() {
       console.log("llmh: skipping update." + statStr);
       return;
     }
-    //    ugly workaround 
-    drawLocations(); return;
-
-    /*
-    if (!self.drawDone) {
-      drawLocations();
-      self.drawDone = true;
-    }
-
-    if (last.selectedCircle) {
-      // convert last selected to to unselected style
-      replaceCircle(last.selectedCircle, false);
-    } else if (selected) {
-      console.log("first time selection");
-      self.newlyClickedCircle = 
-        _.find(circles, function (c) { return c.partyId == selected; }); 
-    }
-    last.selected = selected;
-
-    if (self.newlyClickedCircle) {
-      // render new circle
-      replaceCircle(self.newlyClickedCircle, true);
-      last.selectedCircle = self.newlyClickedCircle;
-    }
-   */
-
+    drawLocations();
   });
 };
 
