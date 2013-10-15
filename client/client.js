@@ -176,6 +176,22 @@ Template.leafletMap.rendered = function() {
 
   // control all markers via a single layer
   var markerLayer = L.layerGroup().addTo(llmap);
+  var staticRoot = "https://s3.amazonaws.com/plentyhood/"
+  var leafletStaticFolder = staticRoot + "leaflet/images/";
+  var markerIcon = L.icon({
+    iconUrl: leafletStaticFolder + "marker-icon.png",
+    shadowUrl: leafletStaticFolder + "marker-shadow.png",
+  });
+
+  var markerUnselectedStyle = {
+    icon: markerIcon,
+    riseOnHover: true, 
+    opacity: 0.5,
+  };
+  var markerSelectedStyle = {
+    icon: markerIcon,
+    riseOnHover: true,
+  };
 
   function drawLocations() {
 
@@ -187,13 +203,10 @@ Template.leafletMap.rendered = function() {
     var parties = Parties.find().fetch();
     circles = [];
     var selected = Session.get('selected');
-    var markerUnselectedStyle = {riseOnHover: true, opacity: 0.5};
-    var markerSelectedStyle = {riseOnHover: true};
-
     _.each(parties, function (party) {
       var latlng = [party.lat, party.lng];
 
-      style = selected == party._id ? 
+      var style = selected == party._id ? 
         markerSelectedStyle : markerUnselectedStyle;
 
       var circle = L.marker(latlng, style).addTo(markerLayer);
