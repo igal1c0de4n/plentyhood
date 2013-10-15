@@ -51,15 +51,16 @@
 </template>
 
 <template name="leafletMap">
-    {{#if currentUser}}
-    <div class="pagination-right" style="margin-right: 10px">
-      <em><small>Ctrl click the map to post a new location!</small></em>
-    </div>
-    {{/if}}
-    {{#constant}}
-    <div id="leaflet-map" class="leflet-map" 
-      style="margin-bottom: 20px"></div>
-    {{/constant}}
+<div class="pagination-right" style="margin-right: 10px">
+  {{#if currentUser}}
+  <em><small>Ctrl click the map to post a new location</small></em>
+  {{else}}
+  <em><small>Sign in to post a new location</small></em>
+  {{/if}}
+</div>
+{{#constant}}
+<div id="leaflet-map" class="leflet-map" style="margin-bottom: 20px"></div>
+{{/constant}}
 </template>
 
 <template name="details">
@@ -99,7 +100,7 @@
         {{#if anyParties}}
           Click a place to select it
         {{else}}
-          Sign in and Ctrl click the map to post a new location
+          Ctrl click the map to post a new location
         {{/if}}
       </h1>
     {{/if}}
