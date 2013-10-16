@@ -8,3 +8,5 @@ Meteor.publish("places", function () {
   return Places.find(
     {$or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
 });
+
+console.log("app env: " + JSON.stringify(process.env.NODE_ENV));

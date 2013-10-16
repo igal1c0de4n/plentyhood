@@ -40,6 +40,14 @@ attending = function (place) {
 };
 
 Meteor.methods({
+
+  getNodeEnv: function() {
+    // console.log(process.env);
+    if (Meteor.isServer) {
+      return JSON.stringify(process.env.NODE_ENV);
+    }
+  },
+
   // options should include: title, description, x, y, public
   createPlace: function (options) {
     options = options || {};

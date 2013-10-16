@@ -12,6 +12,9 @@ Meteor.startup(function () {
         Session.set("selected", place._id);
     }
   });
+  Meteor.call("getNodeEnv", function (error, result) {
+    console.log("app environment: " + result);
+  });
 });
 
 ///////////////////////////////////////////////////////////////////////////////
