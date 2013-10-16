@@ -5,15 +5,16 @@ Meteor.subscribe("places");
 
 // If no place selected, select one.
 Meteor.startup(function () {
+  Meteor.call("getNodeEnv", function (error, result) {
+    console.log("app environment: " + result);
+  });
+
   Deps.autorun(function () {
     if (! Session.get("selected")) {
       var place = Places.findOne();
       if (place)
         Session.set("selected", place._id);
     }
-  });
-  Meteor.call("getNodeEnv", function (error, result) {
-    console.log("app environment: " + result);
   });
 });
 
@@ -107,7 +108,7 @@ Template.attendance.canInvite = function () {
 
 Template.leafletMap.created = function() {
   var mapViewDefault = { 
-    center: [37.35024, -121.95751], 
+    latlng: [37.35024, -121.95751], 
     zoom: 13 
   }; // santa clara :) TBD: replace with auto-locate
 
@@ -128,11 +129,11 @@ Template.leafletMap.rendered = function() {
   }
   this.renderCount++;
   var view = Session.get('mapView');
-  console.log("view: center=" + view.center.toString() + ",zoom=" + view.zoom +")");
+  console.log("view: latlng=" + view.latlng.toString() + ",zoom=" + view.zoom +")");
   var llmap = L.map('leaflet-map', {maxZoom: 16, minZoom: 3, noWrap: true}).
-    setView(view.center, view.zoom).
-    locate({maximumAge : 1000 * 3600}).
-    whenReady(function () { console.log("llmap ready!")});
+    setView(view.latlng, view.zoom).
+    locate({maximumAge : 1000 * 60, setView: false}).
+    whenReady(function () { console.log("leaflet ready")});
 
   L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 18,
@@ -156,11 +157,12 @@ Template.leafletMap.rendered = function() {
 
   llmap.on('moveend', function(e) {
     var view = {};
-    view.center = llmap.getCenter();
-    console.log('moveend: center=' + view.center.toString());
+    view.zoom = llmap.getZoom();
+    view.latlng = llmap.getCenter();
+    console.log('moveend: latlng=' + view.latlng.toString());
     Session.set('mapView', view);
   });
-
+  
   llmap.on('click', function(e) {
     console.log('clicked at latlong: ' + e.latlng);
 
@@ -173,6 +175,18 @@ Template.leafletMap.rendered = function() {
       openCreateDialog(e.latlng.lat, e.latlng.lng);
     }
   });  
+
+  llmap.on('locationfound', function(e) {
+    var view = {};
+    view.latlng = e.latlng;
+    view.zoom = 15;
+    console.log('locationfound: latlng=' + view.latlng.toString());
+    Session.set('mapView', view);
+  });
+
+  llmap.on('locationerror', function(e) {
+    console.log('locationerror: ' + e.message + " " + e.code);
+  });
 
   // closure vars
   var circles = [];
@@ -226,15 +240,17 @@ Template.leafletMap.rendered = function() {
     var selected = Session.get('selected');
     var view = Session.get('mapView');
 
-    var statStr = " locations=" + places.length +
-                  " selected=" + selected;
-    console.log("llmh: " + statStr);
+    console.log("mapHandle: places=" + places.length +
+                  " selected=" + selected);
 
     if (places.length == 0 || selected == last.selected) {
-      console.log("llmh: skipping update." + statStr);
+      console.log("mapHandle: skipping update");
       return;
     }
+    if (!objectsEqual(last.view, view))
+      llmap.setView(view.latlng, view.zoom);
     drawLocations();
+    last.view = view;
   });
 };
 
@@ -320,3 +336,9 @@ Template.inviteDialog.uninvited = function () {
 Template.inviteDialog.displayName = function () {
   return displayName(this);
 };
+
+// generic helpers
+function objectsEqual(o1, o2) {
+  // note this only compare fields, not methods
+  return JSON.stringify(o1) == JSON.stringify(o2);
+}
