@@ -5,18 +5,9 @@ This web application is all about cooperation within the local community.
 It's about sharing resources such as tools, gardens, services etc. Craigslisting on a whole new level, this app knows your location and brings you results which are closer and thus more relevant to the user.
 
 
-Nearby Roadmap
-==============
-+ Use meteor as base
-+ Integrate leaflet open source map
-	- Support adding a place at specific address (via nominatim). 
-	Example here: http://derickrethans.nl/leaflet-and-nominatim.html
-
-- UI TBD
-	- add 'my' location circle
-	- auto-suggest current location as new place location
+Feature roadmap
+===============
 - Resources
-	- Add resources db
 	- Add admin page accessible via /admin
 	- Add dialog in admin page which creates resources
 
@@ -27,14 +18,17 @@ Nearby Roadmap
 	- Add 'categories' for resources: "home", "garden", "other"
 	- Add 'create category' 
 
-- Add services db
+- Services
 	- add dialog to add services
 
 - User features
 	- Add 'needs' field to 'user' (points to entries in both services and resources
 	- Add 'services' field to 'user'
-		- options: forpay, volunteer
-
+		- options: hire, volunteer
+- UI TBD
+	- auto-suggest current location as new place location
 - Mobile
-	- Touch & hold to add place, instead of ctrl+click
+	- Allow adding a new place somehow as ctrl+click is not an option
 
+- Support adding a place at specific address (via nominatim). 
+	Example here: http://derickrethans.nl/leaflet-and-nominatim.html
