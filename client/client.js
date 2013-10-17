@@ -5,6 +5,12 @@ Meteor.subscribe("places");
 Meteor.subscribe("resources");
 Meteor.subscribe("services");
 
+Meteor.Router.add({
+  '/admin': 'admin',
+  '/': 'main',
+  '*': '404'
+});
+
 // If no place selected, select one.
 Meteor.startup(function () {
   Meteor.call("getNodeEnv", function (error, result) {
