@@ -2,6 +2,8 @@
 
 Meteor.subscribe("directory");
 Meteor.subscribe("places");
+Meteor.subscribe("resources");
+Meteor.subscribe("services");
 
 // If no place selected, select one.
 Meteor.startup(function () {

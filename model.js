@@ -1,6 +1,9 @@
-// Places -- data model
 // Loaded on both the client and the server
 
+Resources = new Meteor.Collection("resources");
+Services = new Meteor.Collection("services");
+
+// Places -- data model
 /*
   Each place is represented by a document in the Places collection:
     owner: user id

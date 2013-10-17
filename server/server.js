@@ -9,4 +9,12 @@ Meteor.publish("places", function () {
     {$or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
 });
 
+Meteor.publish("resources", function () {
+  return Resources.find();
+});
+
+Meteor.publish("services", function () {
+  return Services.find();
+});
+
 console.log("app env: " + JSON.stringify(process.env.NODE_ENV));
