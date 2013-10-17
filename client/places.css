@@ -1,5 +1,5 @@
 #leaflet-map {
-    height:250px;
+    height: 250px;
 }
 
 .header {
@@ -58,6 +58,18 @@ input.chosen {
     text-anchor: middle;
     fill: white;
     font-weight: bold;
+}
+
+h1 {
+	font-size: 30px;
+}
+
+h2 {
+	font-size: 25px;
+}
+
+h1, h2, h3 {
+	color: #252;
 }
 
 .attribution {
