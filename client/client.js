@@ -121,6 +121,7 @@ Template.leafletMap.rendered = function() {
 
   var self = this;
   var last = {};
+  last.view = {};
 
   console.log("render iteration " + this.renderCount);
   if (this.renderCount > 0) {
@@ -139,21 +140,6 @@ Template.leafletMap.rendered = function() {
     maxZoom: 18,
     attribution : 'Tiles: &copy; Esri, National Geographic'
   }).addTo(llmap);
-
-  var selectedCircleStyle = {
-    stroke: true,
-    color: 'yellow',
-    opacity: 1,
-    radius: 15
-  };
-  var circleStyle = {
-    stroke: true,
-    color: 'green',
-    fillColor: 'green',
-    fillOpacity: 0.6,
-    opacity: 0.2,
-    radius: 10
-  };
 
   llmap.on('moveend', function(e) {
     var view = {};
@@ -176,10 +162,32 @@ Template.leafletMap.rendered = function() {
     }
   });  
 
+  var userLocationMarker;
+
   llmap.on('locationfound', function(e) {
     var view = {};
+    if (last.view.userLatlng != e.latlng) {
+      if (userLocationMarker) {
+        // remove previous user location circle
+        llmap.removeLayer(userLocationMarker);
+      }
+      // mark user on the map with circle
+      userLocationMarker = new L.CircleMarker(
+        e.latlng, { color: 'yellow' /* for blue: '#15f'*/, 
+          opacity: 0.9,
+          fillOpacity: 0.6,
+          radius: 10, 
+          stroke: true});
+      userLocationMarker.addTo(llmap);
+      console.log("updated current location marker to " + e.latlng);
+    }
+
+    view.userLatlng = e.latlng;
+
+    // pan the map to user location
     view.latlng = e.latlng;
     view.zoom = 15;
+
     console.log('locationfound: latlng=' + view.latlng.toString());
     Session.set('mapView', view);
   });
@@ -189,7 +197,7 @@ Template.leafletMap.rendered = function() {
   });
 
   // closure vars
-  var circles = [];
+  var markers = [];
 
   // control all markers via a single layer
   var markerLayer = L.layerGroup().addTo(llmap);
@@ -212,13 +220,13 @@ Template.leafletMap.rendered = function() {
 
   function drawLocations() {
 
-    // before redawing circles, delete the current ones
+    // before redawing markers, delete the current ones
     // TBD optimization: update only the markers which change
-    _.each(circles, function (c) {
+    _.each(markers, function (c) {
       markerLayer.removeLayer(c);
     });
     var places = Places.find().fetch();
-    circles = [];
+    markers = [];
     var selected = Session.get('selected');
     _.each(places, function (place) {
       var latlng = [place.lat, place.lng];
@@ -226,12 +234,12 @@ Template.leafletMap.rendered = function() {
       var style = selected == place._id ? 
         markerSelectedStyle : markerUnselectedStyle;
 
-      var circle = L.marker(latlng, style).addTo(markerLayer);
-      circle.placeId = place._id;
-      circle.on('click', function(e) {
+      var m = L.marker(latlng, style).addTo(markerLayer);
+      m.placeId = place._id;
+      m.on('click', function(e) {
         Session.set("selected", this.placeId);
       });
-      circles.push(circle);
+      markers.push(m);
     });
   }
 
