@@ -12,6 +12,10 @@ After that, well, the sky is the limit! =)
 Feature roadmap
 ---------------
 - Resources
+	- Implement 'categoryAdd'
+	- Implement 'categoryRemove'
+	- Implement 'resourceAdd'
+	- Implement 'resourceRemove'
 	- Add dialog in admin page which creates resources
 
 - Place features

@@ -1,7 +1,6 @@
-// Places -- client
-
 Meteor.subscribe("directory");
 Meteor.subscribe("places");
+Meteor.subscribe("categories");
 Meteor.subscribe("resources");
 Meteor.subscribe("services");
 
@@ -112,7 +111,8 @@ Template.attendance.canInvite = function () {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Map display
+// Map
+///////////////////////////////////////////////////////////////////////////////
 
 Template.leafletMap.created = function() {
   var mapViewDefault = { 
@@ -276,14 +276,14 @@ Template.leafletMap.rendered = function() {
 var openCreateDialog = function (lat, lng) {
   Session.set("createCoords", {lat: lat, lng: lng});
   Session.set("createError", null);
-  Session.set("showCreateDialog", true);
+  Session.set("showPlaceCreateDialog", true);
 };
 
-Template.pageHeader.showCreateDialog = function () {
-  return Session.get("showCreateDialog");
+Template.pageHeader.openPlaceCreateDialog = function () {
+  return Session.get("showPlaceCreateDialog");
 };
 
-Template.createDialog.events({
+Template.placeCreateDialog.events({
   'click .save': function (event, template) {
     var title = template.find(".title").value;
     var description = template.find(".description").value;
@@ -304,7 +304,7 @@ Template.createDialog.events({
             openInviteDialog();
         }
       });
-      Session.set("showCreateDialog", false);
+      Session.set("showPlaceCreateDialog", false);
     } else {
       Session.set("createError",
                   "It needs a title and a description, or why bother?");
@@ -312,11 +312,11 @@ Template.createDialog.events({
   },
 
   'click .cancel': function () {
-    Session.set("showCreateDialog", false);
+    Session.set("showPlaceCreateDialog", false);
   }
 });
 
-Template.createDialog.error = function () {
+Template.placeCreateDialog.error = function () {
   return Session.get("createError");
 };
 

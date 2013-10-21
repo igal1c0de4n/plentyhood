@@ -9,6 +9,10 @@ Meteor.publish("places", function () {
     {$or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
 });
 
+Meteor.publish("categories", function () {
+  return Categories.find();
+});
+
 Meteor.publish("resources", function () {
   return Resources.find();
 });

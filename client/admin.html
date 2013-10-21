@@ -1,0 +1,21 @@
+<template name="admin">
+  {{#if error}}
+    <div class="alert alert-error">{{error}}</div>
+  {{/if}}
+
+  <h2>Category</h2>
+  <form class="form-inline" role="form">
+      <input type="text" class="category span4" placeholder="category name">
+      <input type="button" class="btn btn-default categoryAdd" value="Add">
+  </form>
+  <form class="form-inline" role="form">
+    <select class="categoryList span4">
+      <option value="">Select category to remove</option>
+      {{#each allCategries}}
+        <option value="{{categoryName}}">{{categoryName}}</option>
+      {{/each}}
+    </select>
+    <input type="button" class="btn btn-default categoryRemove" value="Remove">
+  </form>
+  <h2>Resource</h2>
+</template>

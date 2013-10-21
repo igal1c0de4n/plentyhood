@@ -2,6 +2,19 @@
 
 Resources = new Meteor.Collection("resources");
 Services = new Meteor.Collection("services");
+Categories = new Meteor.Collection("categories");
+
+Categories.allow({
+  insert: function (userId) {
+    return false; 
+  },
+  update: function (userId) {
+    return false;
+  },
+  remove: function (userId) {
+    return false;
+  }
+});
 
 // Places -- data model
 /*
@@ -54,13 +67,13 @@ Meteor.methods({
   // options should include: title, description, x, y, public
   createPlace: function (options) {
     options = options || {};
-    // NH - validation breaks when trying to use lat lng
-    // if (! (typeof options.title === "string" && options.title.length &&
-    //        typeof options.description === "string" &&
-    //        options.description.length &&
-    //        typeof options.x === "number" && options.x >= 0 && options.x <= 1 &&
-    //        typeof options.y === "number" && options.y >= 0 && options.y <= 1 ))
-    //   throw new Meteor.Error(400, "Required parameter missing");
+    function isInRange(v, min, max) {
+      return v >= min && v <=max;
+    }
+    if (!isInRange(options.lat, -180, 180) ||
+       !isInRange(options.lng, -180, 180)) {
+      throw new Meteor.Error(413, "Bad lat/lng");
+    }
     if (options.title.length > 100)
       throw new Meteor.Error(413, "Title too long");
     if (options.description.length > 1000)
@@ -148,6 +161,38 @@ Meteor.methods({
       Places.update(placeId,
                      {$push: {rsvps: {user: this.userId, rsvp: rsvp}}});
     }
+  },
+
+  categoryAdd: function (options) {
+    console.log("categoryCreate");
+    var RESOURCE_CATEGORY_MAX = 64;
+
+    options = options || {};
+
+    if (options.name.length > RESOURCE_CATEGORY_MAX)
+      throw new Meteor.Error(413, "Category too long");
+    if (! this.userId)
+      throw new Meteor.Error(403, "You must be logged in");
+
+    // TBD: check for user == admin
+
+    return Categories.insert({
+      name: options.name,
+    });
+  },
+  categoryRemove: function (options) {
+    console.log("categoryRemove");
+
+    if (!options.name.length)
+      throw new Meteor.Error(413, "Empty category");
+    if (! this.userId)
+      throw new Meteor.Error(403, "You must be logged in");
+
+    // TBD: check for user == admin
+
+    return Categories.remove({
+      name: options.name,
+    });
   }
 });
 
