@@ -1,21 +1,64 @@
 <template name="admin">
-  {{#if error}}
-    <div class="alert alert-error">{{error}}</div>
+  {{#if errorExists}}
+    <div class="alert alert-error">{{getError}}</div>
+  {{/if}}
+  {{#if info}}
+    <div class="alert alert-info">{{info}}</div>
   {{/if}}
 
-  <h2>Category</h2>
+  <h2>Admin Menu</h2>
   <form class="form-inline" role="form">
-      <input type="text" class="category span4" placeholder="category name">
-      <input type="button" class="btn btn-default categoryAdd" value="Add">
+    <input type="text" class="category span4" 
+    placeholder="category name" id="eCategoryAddTf">
+      <input type="button" 
+      class="btn btn-default span4 categoryAdd" value="Add Category">
   </form>
   <form class="form-inline" role="form">
-    <select class="categoryList span4">
-      <option value="">Select category to remove</option>
-      {{#each allCategries}}
-        <option value="{{categoryName}}">{{categoryName}}</option>
-      {{/each}}
+    {{> categorySelect}}
+    <input type="button" 
+    class="btn btn-default span4 categoryRemove" value="Remove Category">
+  </form>
+
+  <form class="form-inline" role="form">
+    <input type="text" class="resourceAddTf span4" 
+    id="eCategoryAddTf" placeholder="resource name">
+    <input type="button" 
+    class="btn btn-default span4 resourceAdd" value="Add Resource">
+  </form>
+  <form class="form-inline" role="form">
+    {{> resourceSelect}}
+    <input type="button" 
+    class="btn btn-default span4 resourceRemove" 
+    value="Remove Resource" {{resourceRemoveButtonDisabled}}>
+  </form>
+</template>
+
+<template name="categorySelect">
+    <select class="categoryList span4" id="eCategorySelect">
+      {{#if categoriesExist}}
+        <option value="" disabled>select category</option>
+        {{#each allCategries}}
+        <option value="{{this._id}}" {{categoryOptionSelected}}>
+          {{this.name}}
+        </option>
+        {{/each}}
+      {{else}}
+        <option value="" disabled>no available categories</option>
+      {{/if}}
     </select>
-    <input type="button" class="btn btn-default categoryRemove" value="Remove">
-  </form>
-  <h2>Resource</h2>
+</template>
+
+<template name="resourceSelect">
+    <select class="resourceList span4" id="eResourceSelect">
+      {{#if resourcesExist}}
+        <option value="" disabled>select resource</option>
+        {{#each resourcesUnderCategory}}
+        <option value="{{this._id}}" {{resourceOptionSelected}}>
+          {{this.name}}
+        </option>
+        {{/each}}
+      {{else}}
+        <option value="" disabled>no available resources</option>
+      {{/if}}
+    </select>
 </template>

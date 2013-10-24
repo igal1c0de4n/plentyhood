@@ -11,20 +11,9 @@ After that, well, the sky is the limit! =)
 
 Feature roadmap
 ---------------
-- Resources
-	- Implement 'categoryAdd'
-	- Implement 'categoryRemove'
-	- Implement 'resourceAdd'
-	- Implement 'resourceRemove'
-	- Add dialog in admin page which creates resources
-
-- Place features
-	- Add 'resources' field to 'place'
-		- options: sell, rent, donation
+- Add features to 'place':
 	- Add UI for adding resorce to place
-	- Add 'categories' for resources: "home", "garden", "other"
-	- Add 'create category' 
-
+		- options: sell, rent, donation
 - Services
 	- add dialog to add services
 
@@ -33,7 +22,7 @@ Feature roadmap
 	- Add 'services' field to 'user'
 		- options: hire, volunteer
 - UI TBD
-	- auto-suggest current location as new place location
+	- auto-suggest current location as 'place location'
 	- click on place centers map on it, high zoom
 	- decrease space between map and header
 - Mobile
@@ -42,6 +31,6 @@ Feature roadmap
 - Support adding a place at specific address (via nominatim). 
 	Example here: http://derickrethans.nl/leaflet-and-nominatim.html
 
-IDE todo
---------
-- Integrate https://github.com/juvenn/mustache.vim
+- Refactor
+	- Create globals files
+	- rename files (README -> README.md, places.html -> app.html, + more)

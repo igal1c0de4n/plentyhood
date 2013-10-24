@@ -16,6 +16,18 @@ Categories.allow({
   }
 });
 
+Resources.allow({
+  insert: function (userId) {
+    return false; 
+  },
+  update: function (userId) {
+    return false;
+  },
+  remove: function (userId) {
+    return false;
+  }
+});
+
 // Places -- data model
 /*
   Each place is represented by a document in the Places collection:
@@ -164,39 +176,74 @@ Meteor.methods({
   },
 
   categoryAdd: function (options) {
-    console.log("categoryCreate");
-    var RESOURCE_CATEGORY_MAX = 64;
+    var CATEGORY_NAME_MAX_LEN = 64;
 
     options = options || {};
 
-    if (options.name.length > RESOURCE_CATEGORY_MAX)
-      throw new Meteor.Error(413, "Category too long");
+    var n = _(options.name).capitalize();
+    if (n.length > CATEGORY_NAME_MAX_LEN)
+      throw new Meteor.Error(413, "Name too long");
+    if (! this.userId)
+      throw new Meteor.Error(403, "You must be logged in");
+
+    if (categoryExist(n)) {
+      throw new Meteor.Error(403, "Already exists");
+    }
+    // TBD: check for user == admin
+
+    return Categories.insert({ name: n});
+  },
+
+  categoryRemove: function (options) {
+    if (!options.id)
+      throw new Meteor.Error(403, "Empty id");
+
+    if (!this.userId)
+      throw new Meteor.Error(403, "You must be logged in");
+
+    // TBD: check for user == admin
+
+    return Categories.remove({ _id: options.id});
+  },
+
+  resourceAdd: function (options) {
+    var RESOURCE_NAME_MAX_LEN = 64;
+
+    options = options || {};
+
+    if (options.name.length > RESOURCE_NAME_MAX_LEN)
+      throw new Meteor.Error(413, "name too long");
     if (! this.userId)
       throw new Meteor.Error(403, "You must be logged in");
 
     // TBD: check for user == admin
 
-    return Categories.insert({
-      name: options.name,
+    return Resources.insert({
+      name: _(options.name).capitalize(),
+      categoryId: options.categoryId,
     });
   },
-  categoryRemove: function (options) {
-    console.log("categoryRemove");
 
-    if (!options.name.length)
-      throw new Meteor.Error(413, "Empty category");
+  resourceRemove: function (options) {
+    if (!options.id)
+      throw new Meteor.Error(413, "Empty name");
     if (! this.userId)
       throw new Meteor.Error(403, "You must be logged in");
 
     // TBD: check for user == admin
 
-    return Categories.remove({
-      name: options.name,
+    return Resources.remove({
+      _id: options.id,
     });
-  }
+  },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+
+categoryExist = function (n) {
+  return Categories.find({name: n}).count() != 0;
+}
+
 // Users
 
 displayName = function (user) {
@@ -212,3 +259,16 @@ var contactEmail = function (user) {
     return user.services.facebook.email;
   return null;
 };
+
+// extend underscore
+_.mixin({
+  capitalize: function(string) {
+    return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
+  }
+});
+
+getFromSelectionById = function (selection, id) {
+  return selection.findOne({_id: id});
+}
+
+ENTER_KEY = 13;
