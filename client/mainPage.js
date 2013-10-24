@@ -6,7 +6,7 @@ Meteor.subscribe("services");
 
 Meteor.Router.add({
   '/admin': 'admin',
-  '/': 'main',
+  '/': 'mainPage',
   '*': '404'
 });
 
