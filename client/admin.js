@@ -86,7 +86,6 @@ Template.admin.events({
       }
       else {
         Session.set("adminInfo", "resource" + resourceName + "removed");
-//         template.find(".resourceList").value = "";
         Session.set("selectedResourceId", null);
       }
     });
