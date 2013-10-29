@@ -17,10 +17,10 @@ Meteor.startup(function () {
   });
 
   Deps.autorun(function () {
-    if (! Session.get("selected")) {
+    if (! Session.get("selectedPlace")) {
       var place = Places.findOne();
       if (place)
-        Session.set("selected", place._id);
+        Session.set("selectedPlace", place._id);
     }
   });
 });
@@ -29,7 +29,7 @@ Meteor.startup(function () {
 // Place details sidebar
 
 Template.details.place = function () {
-  return Places.findOne(Session.get("selected"));
+  return Places.findOne(Session.get("selectedPlace"));
 };
 
 Template.details.anyPlaces = function () {
@@ -57,15 +57,15 @@ Template.details.maybeChosen = function (what) {
 
 Template.details.events({
   'click .rsvp_yes': function () {
-    Meteor.call("rsvp", Session.get("selected"), "yes");
+    Meteor.call("rsvp", Session.get("selectedPlace"), "yes");
     return false;
   },
   'click .rsvp_maybe': function () {
-    Meteor.call("rsvp", Session.get("selected"), "maybe");
+    Meteor.call("rsvp", Session.get("selectedPlace"), "maybe");
     return false;
   },
   'click .rsvp_no': function () {
-    Meteor.call("rsvp", Session.get("selected"), "no");
+    Meteor.call("rsvp", Session.get("selectedPlace"), "no");
     return false;
   },
   'click .invite': function () {
@@ -166,7 +166,7 @@ Template.leafletMap.rendered = function() {
         console.log("must be logged in to create events");
         return;
       }
-      openCreateDialog(e.latlng.lat, e.latlng.lng);
+      schedCreateDialog(e.latlng.lat, e.latlng.lng);
     }
   });  
 
@@ -235,7 +235,8 @@ Template.leafletMap.rendered = function() {
     });
     var places = Places.find().fetch();
     markers = [];
-    var selected = Session.get('selected');
+    var selected = Session.get('selectedPlace');
+    last.selectedPlace = selected;
     _.each(places, function (place) {
       var latlng = [place.lat, place.lng];
 
@@ -245,7 +246,7 @@ Template.leafletMap.rendered = function() {
       var m = L.marker(latlng, style).addTo(markerLayer);
       m.placeId = place._id;
       m.on('click', function(e) {
-        Session.set("selected", this.placeId);
+        Session.set("selectedPlace", this.placeId);
       });
       markers.push(m);
     });
@@ -253,13 +254,13 @@ Template.leafletMap.rendered = function() {
 
   this.handle = Deps.autorun(function () {
     var places = Places.find().fetch();
-    var selected = Session.get('selected');
+    var selected = Session.get('selectedPlace');
     var view = Session.get('mapView');
 
     console.log("mapHandle: places=" + places.length +
                   " selected=" + selected);
 
-    if (places.length == 0 || selected == last.selected) {
+    if (places.length == 0 || selected == last.selectedPlace) {
       console.log("mapHandle: skipping update");
       return;
     }
@@ -273,7 +274,7 @@ Template.leafletMap.rendered = function() {
 ///////////////////////////////////////////////////////////////////////////////
 // Create Place dialog
 
-var openCreateDialog = function (lat, lng) {
+var schedCreateDialog = function (lat, lng) {
   Session.set("createCoords", {lat: lat, lng: lng});
   Session.set("createError", null);
   Session.set("showPlaceCreateDialog", true);
@@ -299,7 +300,7 @@ Template.placeCreateDialog.events({
         public: public
       }, function (error, place) {
         if (! error) {
-          Session.set("selected", place);
+          Session.set("selectedPlace", place);
           if (! public && Meteor.users.find().count() > 1)
             openInviteDialog();
         }
@@ -333,7 +334,7 @@ Template.pageHeader.showInviteDialog = function () {
 
 Template.inviteDialog.events({
   'click .invite': function (event, template) {
-    Meteor.call('invite', Session.get("selected"), this._id);
+    Meteor.call('invite', Session.get("selectedPlace"), this._id);
   },
   'click .done': function (event, template) {
     Session.set("showInviteDialog", false);
@@ -342,7 +343,7 @@ Template.inviteDialog.events({
 });
 
 Template.inviteDialog.uninvited = function () {
-  var place = Places.findOne(Session.get("selected"));
+  var place = Places.findOne(Session.get("selectedPlace"));
   if (! place)
     return []; // place hasn't loaded yet
   return Meteor.users.find({$nor: [{_id: {$in: place.invited}},
@@ -353,8 +354,133 @@ Template.inviteDialog.displayName = function () {
   return displayName(this);
 };
 
-// generic helpers
+///////////////////////////////////////////////////////////////////////////////
+// Add resource dialog
+
+Template.placeResourceAddDialog.saveDisabled = function () {
+  return Session.get("selectedResourceId") ? null : "disabled";
+}
+
+var schedResourceAddDialog = function () {
+  Session.set("placeResourceAddError", null);
+  Session.set("showResourceAddDialog", true);
+  Session.set("selectedResourceId", null);
+  Session.set("selectedCategoryId", null);
+};
+
+Template.pageHeader.openPlaceResourceAddDialog = function () {
+  return Session.get("showResourceAddDialog");
+};
+
+Template.placeResourceAddDialog.events({
+  'click .save': function (event, template) {
+    if (!_.isUndefined(event.target.attributes.disabled)) {
+      return;
+    }
+    var category = template.find(".categoryList").value;
+    var resource = template.find(".resourceList").value;
+    var description = template.find(".description").value;
+    var public = ! template.find(".private").checked;
+
+    if (category && resource) {
+      Meteor.call("placeResourceAdd", { 
+        id: Session.get("selectedPlace"),
+        resource: resource,
+        category: category,
+        description: description,
+        public: public,
+      }, function (error) {
+        if (error) {
+          console.log("error: " + error);
+          Session.set("placeResourceAddError", error.toString());
+        }
+        else {
+          console.log("resource added");
+          Session.set("showResourceAddDialog", false);
+        }
+      });
+    } else {
+      Session.set("placeResourceAddError",
+                  "missing category and/or resource");
+    }
+  },
+
+  'click .cancel': function () {
+    Session.set("showResourceAddDialog", false);
+  }
+});
+
+Template.placeResourceAddDialog.error = function () {
+  return Session.get("placeResourceAddError");
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+// PlaceInfo
+
+Template.placeInfo.events({
+  'click .addResource': function () {
+    console.log('adding resource');
+    schedResourceAddDialog();
+  },
+});
+
+Template.categorySelect.allCategries = function () {
+  return Categories.find({}, {sort: {name: 1}});
+};
+
+Template.categorySelect.events({
+  'change .categoryList' : function(event, template) {
+    Session.set("selectedCategoryId", template.find(".categoryList").value);
+    Session.set("selectedResourceId", null);
+  },
+});
+
+Template.categorySelect.categoriesExist = function () {
+  return Categories.find().count() > 0;
+};
+
+Template.categorySelect.categoryOptionSelected = function () {
+  return Session.get("selectedCategoryId") == this._id ? "selected" : undefined;
+};
+
+Template.resourceSelect.needDisable = function () {
+  return Session.get("selectedCategoryId") ? undefined : "disabled";
+};
+
+Template.resourceSelect.resourceOptionSelected = function () {
+  return Session.get("selectedResourceId") == this._id ? "selected" : null;
+};
+
+Template.resourceSelect.events({
+  'change .resourceList' : function(event, template) {
+    Session.set("selectedResourceId", template.find(".resourceList").value);
+    template.find(".resourceList").autofocus = true;
+  },
+});
+
+Template.resourceSelect.resourcesUnderCategory = function () {
+    return Resources.find(
+      {categoryId: Session.get("selectedCategoryId")}, 
+      {sort: {name: 1}});
+};
+
+Template.resourceSelect.resourcesExist = function () {
+  return Template.resourceSelect.resourcesUnderCategory().count() > 0;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// generic global helpers
+
 function objectsEqual(o1, o2) {
   // note this only compare fields, not methods
   return JSON.stringify(o1) == JSON.stringify(o2);
-}
+};
+
+function placeGetSelected() {
+  return Places.findOne(Session.get("selectedPlace"));
+};
+
+easyQuote = function (s) {
+  return " '" + s + "' ";
+};

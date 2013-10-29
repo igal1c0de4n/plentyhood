@@ -19,9 +19,66 @@ Template.admin.rerenderd = function () {
   clearNotifications();
 };
 
-Template.admin.resourceRemoveButtonDisabled = function () {
+Template.admin.disableResourceRemove = function () {
   return Session.get("selectedResourceId") ? null : "disabled";
 }
+
+Template.admin.disableCategoryRemove = function () {
+  return Session.get("selectedCategoryId") ? null : "disabled";
+}
+
+var clientCategoryAdd = function(template) {
+  var n = _(template.find(".category").value).capitalize();
+
+  if (!n.length) {
+    Session.set("adminError", "empty category");
+    return;
+  }
+  if (categoryExist(n)) {
+    Session.set("adminError", "category" +
+                easyQuote(n) + "already exists");
+    return;
+  }
+
+  Meteor.call('categoryAdd', {
+    name: n,
+  }, function (error, place) {
+    if (error) {
+      Session.set("adminError", error.toString());
+    }
+    else {
+      Session.set("adminInfo", "category" + easyQuote(n) + "created");
+      template.find(".category").value = "";
+    }
+  });
+};
+
+var clientResourceAdd = function (template) {
+  var cid = template.find(".categoryList").value;
+  if (!cid) {
+    Session.set("adminError", "category not selected");
+    return;
+  }
+  var resourceName = template.find(".resourceAddTf").value;
+  if (!resourceName) {
+    Session.set("adminError", "empty resource name");
+    return;
+  }
+  Meteor.call('resourceAdd', {
+    name: resourceName,
+    categoryId: cid,
+  }, function (error, place) {
+    if (error) {
+      Session.set("adminError", error.toString());
+    }
+    else {
+      var categoryName = getFromSelectionById(Categories, cid).name;
+      Session.set("adminInfo", "resource" + easyQuote(resourceName) +
+                  "created under category" + easyQuote(categoryName));
+      template.find(".resourceAddTf").value = "";
+    }
+  });
+};
 
 Template.admin.events({
   'keypress .category' : function(event, template) {
@@ -91,102 +148,3 @@ Template.admin.events({
     });
   },
 });
-
-Template.categorySelect.allCategries = function () {
-  return Categories.find({}, {sort: {name: 1}});
-};
-
-Template.categorySelect.events({
-  'change .categoryList' : function(event, template) {
-    Session.set("selectedCategoryId", template.find(".categoryList").value);
-    Session.set("selectedResourceId", null);
-  },
-});
-
-Template.categorySelect.categoriesExist = function () {
-  return Categories.find().count() > 0;
-};
-
-Template.categorySelect.categoryOptionSelected = function () {
-  return Session.get("selectedCategoryId") == this._id ? "selected" : null;
-};
-
-var easyQuote = function (s) {
-  return " '" + s + "' ";
-};
-
-var clientCategoryAdd = function(template) {
-  clearNotifications();
-  var n = _(template.find(".category").value).capitalize();
-
-  if (!n.length) {
-    Session.set("adminError", "empty category");
-    return;
-  }
-  if (categoryExist(n)) {
-    Session.set("adminError", "category" +
-                easyQuote(n) + "already exists");
-    return;
-  }
-
-  Meteor.call('categoryAdd', {
-    name: n,
-  }, function (error, place) {
-    if (error) {
-      Session.set("adminError", error.toString());
-    }
-    else {
-      Session.set("adminInfo", "category" + easyQuote(n) + "created");
-      template.find(".category").value = "";
-    }
-  });
-};
-
-var clientResourceAdd = function (template) {
-  clearNotifications();
-  var cid = template.find(".categoryList").value;
-  if (!cid) {
-    Session.set("adminError", "category not selected");
-    return;
-  }
-  var resourceName = template.find(".resourceAddTf").value;
-  if (!resourceName) {
-    Session.set("adminError", "empty resource name");
-    return;
-  }
-  Meteor.call('resourceAdd', {
-    name: resourceName,
-    categoryId: cid,
-  }, function (error, place) {
-    if (error) {
-      Session.set("adminError", error.toString());
-    }
-    else {
-      var categoryName = getFromSelectionById(Categories, cid).name;
-      Session.set("adminInfo", "resource" + easyQuote(resourceName) +
-                  "created under category" + easyQuote(categoryName));
-    }
-  });
-};
-
-Template.resourceSelect.resourceOptionSelected = function () {
-  return Session.get("selectedResourceId") == this._id ? "selected" : null;
-};
-
-Template.resourceSelect.events({
-  'change .resourceList' : function(event, template) {
-    Session.set("selectedResourceId", template.find(".resourceList").value);
-    template.find(".resourceList").autofocus = true;
-  },
-});
-
-resourcesUnderCategory = function () {
-  return Resources.find(
-    {categoryId: Session.get("selectedCategoryId")}, 
-    {sort: {name: 1}});
-};
-
-Template.resourceSelect.resourcesExist = function () {
-  return resourcesUnderCategory().count() > 0;
-};
-

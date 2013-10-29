@@ -16,12 +16,13 @@
   <form class="form-inline" role="form">
     {{> categorySelect}}
     <input type="button" 
-    class="btn btn-default span4 categoryRemove" value="Remove Category">
+    class="btn btn-default span4 categoryRemove"
+    value="Remove Category" {{disableCategoryRemove}}>
   </form>
 
   <form class="form-inline" role="form">
     <input type="text" class="resourceAddTf span4" 
-    id="eCategoryAddTf" placeholder="resource name">
+    id="eResourceAddTf" placeholder="resource name">
     <input type="button" 
     class="btn btn-default span4 resourceAdd" value="Add Resource">
   </form>
@@ -29,36 +30,6 @@
     {{> resourceSelect}}
     <input type="button" 
     class="btn btn-default span4 resourceRemove" 
-    value="Remove Resource" {{resourceRemoveButtonDisabled}}>
+    value="Remove Resource" {{disableResourceRemove}}>
   </form>
-</template>
-
-<template name="categorySelect">
-    <select class="categoryList span4" id="eCategorySelect">
-      {{#if categoriesExist}}
-        <option value="" disabled>select category</option>
-        {{#each allCategries}}
-        <option value="{{this._id}}" {{categoryOptionSelected}}>
-          {{this.name}}
-        </option>
-        {{/each}}
-      {{else}}
-        <option value="" disabled>no available categories</option>
-      {{/if}}
-    </select>
-</template>
-
-<template name="resourceSelect">
-    <select class="resourceList span4" id="eResourceSelect">
-      {{#if resourcesExist}}
-        <option value="" disabled>select resource</option>
-        {{#each resourcesUnderCategory}}
-        <option value="{{this._id}}" {{resourceOptionSelected}}>
-          {{this.name}}
-        </option>
-        {{/each}}
-      {{else}}
-        <option value="" disabled>no available resources</option>
-      {{/if}}
-    </select>
 </template>

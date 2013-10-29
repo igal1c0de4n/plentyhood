@@ -13,6 +13,10 @@
     {{> inviteDialog}}
   {{/if}}
 
+  {{#if openPlaceResourceAddDialog}}
+    {{> placeResourceAddDialog}}
+  {{/if}}
+
   <div class="header row">
     <div class="span6">
       <h1 style="margin: 0px">Plentyhood</h1>
@@ -25,6 +29,38 @@
   </div>
 </template>
 
+<template name="placeResourceAddDialog">
+  <div class="mask"> </div>
+  <div class="modal">
+    <div class="modal-header">
+      <button type="button" class="close cancel">&times;</button>
+      <h3>Add Resource</h3>
+    </div>
+
+    <div class="modal-body">
+      {{#if error}}
+        <div class="alert alert-error">{{error}}</div>
+      {{/if}}
+
+      {{> categorySelect}}
+      {{> resourceSelect}}
+
+      <label>Description</label>
+      <textarea class="description span5"></textarea>
+
+      <label class="checkbox">
+        <input type="checkbox" class="private">
+        Private &mdash; friends only
+      </label>
+    </div>
+
+    <div class="modal-footer">
+      <a href="#" class="btn cancel">Cancel</a>
+      <a href="#" class="btn btn-primary save" {{saveDisabled}}>Save</a>
+    </div>
+  </div>
+</template>
+
 <template name="placeInfo">
 <div class="row">
   <div class="span4">
@@ -33,8 +69,11 @@
     {{/if}}
   </div>
   <div class="span6">
-    <h2>Shared Items</h2>
-    <div class="description">Content placeholder</div>
+  <form class="form-horizonal" role="form">
+    <input type="button" 
+    class="btn btn-default span4 addResource" 
+    value="Add Resource">
+  </form>
   </div>
 </div>
 </template>
@@ -200,3 +239,32 @@
   </div>
 </template>
 
+<template name="categorySelect">
+  <select class="categoryList span4" id="eCategorySelect">
+    {{#if categoriesExist}}
+      <option value="" disabled>select category</option>
+      {{#each allCategries}}
+      <option value="{{this._id}}" {{categoryOptionSelected}}>
+        {{this.name}}
+      </option>
+      {{/each}}
+    {{else}}
+      <option value="" disabled>no available categories</option>
+    {{/if}}
+  </select>
+</template>
+
+<template name="resourceSelect">
+  <select class="resourceList span4" id="eResourceSelect" {{needDisable}}>
+    {{#if resourcesExist}}
+      <option value="" disabled>select resource</option>
+      {{#each resourcesUnderCategory}}
+        <option value="{{this._id}}" {{resourceOptionSelected}}>
+        {{this.name}}
+        </option>
+      {{/each}}
+    {{else}}
+      <option value="" disabled>no resources yet</option>
+    {{/if}}
+  </select>
+</template>

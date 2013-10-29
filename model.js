@@ -236,6 +236,9 @@ Meteor.methods({
       _id: options.id,
     });
   },
+
+  placeResourceAdd: function (options) {
+  },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
