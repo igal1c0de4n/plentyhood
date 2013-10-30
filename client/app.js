@@ -6,7 +6,7 @@ Meteor.subscribe("services");
 
 Meteor.Router.add({
   '/admin': 'admin',
-  '/': 'mainPage',
+  '/': 'application',
   '*': '404'
 });
 
@@ -28,7 +28,7 @@ Meteor.startup(function () {
 ///////////////////////////////////////////////////////////////////////////////
 // Place details sidebar
 
-Template.details.place = function () {
+Template.infoPanel.selectedPlace = function () {
   return Places.findOne(Session.get("selectedPlace"));
 };
 
@@ -280,10 +280,6 @@ var schedCreateDialog = function (lat, lng) {
   Session.set("showPlaceCreateDialog", true);
 };
 
-Template.pageHeader.openPlaceCreateDialog = function () {
-  return Session.get("showPlaceCreateDialog");
-};
-
 Template.placeCreateDialog.events({
   'click .save': function (event, template) {
     var title = template.find(".title").value;
@@ -328,10 +324,6 @@ var openInviteDialog = function () {
   Session.set("showInviteDialog", true);
 };
 
-Template.pageHeader.showInviteDialog = function () {
-  return Session.get("showInviteDialog");
-};
-
 Template.inviteDialog.events({
   'click .invite': function (event, template) {
     Meteor.call('invite', Session.get("selectedPlace"), this._id);
@@ -355,6 +347,21 @@ Template.inviteDialog.displayName = function () {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// dialogs
+
+Template.dialogs.openPlaceResourceAddDialog = function () {
+  return Session.get("showResourceAddDialog");
+};
+
+Template.dialogs.openPlaceCreateDialog = function () {
+  return Session.get("showPlaceCreateDialog");
+};
+
+Template.dialogs.showInviteDialog = function () {
+  return Session.get("showInviteDialog");
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // Add resource dialog
 
 Template.placeResourceAddDialog.saveDisabled = function () {
@@ -363,13 +370,9 @@ Template.placeResourceAddDialog.saveDisabled = function () {
 
 var schedResourceAddDialog = function () {
   Session.set("placeResourceAddError", null);
-  Session.set("showResourceAddDialog", true);
   Session.set("selectedResourceId", null);
   Session.set("selectedCategoryId", null);
-};
-
-Template.pageHeader.openPlaceResourceAddDialog = function () {
-  return Session.get("showResourceAddDialog");
+  Session.set("showResourceAddDialog", true);
 };
 
 Template.placeResourceAddDialog.events({
@@ -413,14 +416,27 @@ Template.placeResourceAddDialog.error = function () {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// PlaceInfo
+// placeInfo
 
-Template.placeInfo.events({
+Template.placeResourcesPanel.events({
   'click .addResource': function () {
     console.log('adding resource');
     schedResourceAddDialog();
   },
 });
+
+Template.placeResourcesPanel.resourceName = function () {
+  return Resources.findOne(this.id).name;
+};
+
+Template.placeResourcesPanel.placeResources = function () {
+  var place = Places.findOne(Session.get("selectedPlace"));
+  console.log("place: ", place, " resources: ", place.resources);
+  return place.resources;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// categorySelect
 
 Template.categorySelect.allCategries = function () {
   return Categories.find({}, {sort: {name: 1}});

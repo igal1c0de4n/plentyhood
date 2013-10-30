@@ -1,10 +1,9 @@
-<template name="mainPage">
+<template name="application">
   {{> leafletMap}}
-  {{> placeInfo}}
+  {{> infoPanel}}
 </template>
 
-<template name="pageHeader">
-
+<template name="dialogs">
   {{#if openPlaceCreateDialog}}
     {{> placeCreateDialog}}
   {{/if}}
@@ -16,7 +15,11 @@
   {{#if openPlaceResourceAddDialog}}
     {{> placeResourceAddDialog}}
   {{/if}}
+</template>
 
+<template name="pageHeader">
+
+  {{> dialogs}}
   <div class="header row">
     <div class="span6">
       <h1 style="margin: 0px">Plentyhood</h1>
@@ -61,21 +64,16 @@
   </div>
 </template>
 
-<template name="placeInfo">
-<div class="row">
-  <div class="span4">
-    {{#if currentUser}}
-    {{> details}}
-    {{/if}}
-  </div>
-  <div class="span6">
+<template name="placeResourcesPanel">
   <form class="form-horizonal" role="form">
+    <h3>Resources</h3>
+    {{#each placeResources}}
+      <label>{{resourceName}}</label>
+    {{/each}}
     <input type="button" 
     class="btn btn-default span4 addResource" 
     value="Add Resource">
   </form>
-  </div>
-</div>
 </template>
 
 <template name="leafletMap">
@@ -93,36 +91,11 @@
 {{/constant}}
 </template>
 
-<template name="details">
+<template name="infoPanel">
   <div class="details">
-    {{#if place}}
-      {{#with place}}
-        <h2>{{title}}</h2>
-
-        <div class="description">{{description}}</div>
-
-        {{> attendance}}
-
-        <div class="rsvp-buttons">
-          {{#if currentUser}}
-            <input type="button" value="I'm going!"
-                   class="btn btn-small rsvp_yes {{maybeChosen "yes"}}">
-            <input type="button" value="Maybe"
-                   class="btn btn-small rsvp_maybe {{maybeChosen "maybe"}}">
-            <input type="button" value="No"
-                   class="btn btn-small rsvp_no {{maybeChosen "no"}}">
-          {{else}}
-            <i>Sign in to RSVP for this place.</i>
-          {{/if}}
-          <p><small>Posted by {{creatorName}}</small></p>
-        </div>
-
-        {{#if canRemove}}
-          <div class="alert alert-info"><small>
-              You posted this place, you could
-              <b><a href="#" class="remove">delete this listing</a></b>.
-          </small></div>
-        {{/if}}
+    {{#if selectedPlace}}
+      {{#with selectedPlace}}
+        {{> placeContainer}}
       {{/with}}
     {{else}}
       <h3 class="muted pagination-centered">
@@ -134,6 +107,45 @@
       </h3>
     {{/if}}
   </div>
+</template>
+
+<template name="placeContainer">
+  <div class="row">
+    <div class="span4">
+      {{#if currentUser}}
+        {{> details}}
+      {{/if}}
+    </div>
+    <div class="span6">
+        {{> placeResourcesPanel}}
+    </div>
+  </div>
+</template>
+
+<template name="details">
+  <h2>{{title}}</h2>
+  <div class="description">{{description}}</div>
+  {{> attendance}}
+  <div class="rsvp-buttons">
+    {{#if currentUser}}
+      <input type="button" value="Join"
+             class="btn btn-small rsvp_yes {{maybeChosen "yes"}}">
+      <input type="button" value="Maybe"
+             class="btn btn-small rsvp_maybe {{maybeChosen "maybe"}}">
+      <input type="button" value="No"
+             class="btn btn-small rsvp_no {{maybeChosen "no"}}">
+    {{else}}
+      <i>Sign in to RSVP for this place.</i>
+    {{/if}}
+    <p><small>Posted by {{creatorName}}</small></p>
+  </div>
+
+  {{#if canRemove}}
+    <div class="alert alert-info"><small>
+        You posted this place, you could
+        <b><a href="#" class="remove">delete this listing</a></b>.
+    </small></div>
+  {{/if}}
 </template>
 
 <template name="attendance">
