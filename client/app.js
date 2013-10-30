@@ -377,16 +377,14 @@ Template.placeResourceAddDialog.events({
     if (!_.isUndefined(event.target.attributes.disabled)) {
       return;
     }
-    var category = template.find(".categoryList").value;
     var resource = template.find(".resourceList").value;
     var description = template.find(".description").value;
     var public = ! template.find(".private").checked;
 
-    if (category && resource) {
+    if (resource) {
       Meteor.call("placeResourceAdd", { 
-        id: Session.get("selectedPlace"),
-        resource: resource,
-        category: category,
+        placeId: Session.get("selectedPlace"),
+        resourceId: resource,
         description: description,
         public: public,
       }, function (error) {
@@ -400,8 +398,7 @@ Template.placeResourceAddDialog.events({
         }
       });
     } else {
-      Session.set("placeResourceAddError",
-                  "missing category and/or resource");
+      Session.set("placeResourceAddError", "missing resource");
     }
   },
 

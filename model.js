@@ -13,7 +13,7 @@ Categories.allow({
   },
   remove: function (userId) {
     return false;
-  }
+  },
 });
 
 Resources.allow({
@@ -25,7 +25,7 @@ Resources.allow({
   },
   remove: function (userId) {
     return false;
-  }
+  },
 });
 
 // Places -- data model
@@ -90,8 +90,7 @@ Meteor.methods({
       throw new Meteor.Error(413, "Title too long");
     if (options.description.length > 1000)
       throw new Meteor.Error(413, "Description too long");
-    if (! this.userId)
-      throw new Meteor.Error(403, "You must be logged in");
+    verifyLoggedIn.call(this);
 
     return Places.insert({
       owner: this.userId,
@@ -136,8 +135,7 @@ Meteor.methods({
   },
 
   rsvp: function (placeId, rsvp) {
-    if (! this.userId)
-      throw new Meteor.Error(403, "You must be logged in to RSVP");
+    verifyLoggedIn.call(this);
     if (! _.contains(['yes', 'no', 'maybe'], rsvp))
       throw new Meteor.Error(400, "Invalid RSVP");
     var place = Places.findOne(placeId);
@@ -183,8 +181,7 @@ Meteor.methods({
     var n = _(options.name).capitalize();
     if (n.length > CATEGORY_NAME_MAX_LEN)
       throw new Meteor.Error(413, "Name too long");
-    if (! this.userId)
-      throw new Meteor.Error(403, "You must be logged in");
+    verifyLoggedIn.call(this);
 
     if (categoryExist(n)) {
       throw new Meteor.Error(403, "Already exists");
@@ -198,8 +195,7 @@ Meteor.methods({
     if (!options.id)
       throw new Meteor.Error(403, "Empty id");
 
-    if (!this.userId)
-      throw new Meteor.Error(403, "You must be logged in");
+    verifyLoggedIn.call(this);
 
     // TBD: check for user == admin
 
@@ -213,8 +209,7 @@ Meteor.methods({
 
     if (options.name.length > RESOURCE_NAME_MAX_LEN)
       throw new Meteor.Error(413, "name too long");
-    if (! this.userId)
-      throw new Meteor.Error(403, "You must be logged in");
+    verifyLoggedIn.call(this);
 
     // TBD: check for user == admin
 
@@ -227,8 +222,7 @@ Meteor.methods({
   resourceRemove: function (options) {
     if (!options.id)
       throw new Meteor.Error(413, "Empty name");
-    if (! this.userId)
-      throw new Meteor.Error(403, "You must be logged in");
+    verifyLoggedIn.call(this);
 
     // TBD: check for user == admin
 
@@ -238,10 +232,43 @@ Meteor.methods({
   },
 
   placeResourceAdd: function (options) {
+    options = options || {};
+
+    verifyLoggedIn.call(this);
+
+    if (!options.placeId) {
+      throw new Meteor.Error(403, "missing place id");
+    }
+    var place = Places.findOne(options.placeId);
+
+    if (!place || place.owner !== this.userId) {
+      throw new Meteor.Error(404, "No such place");
+    }
+
+    if (_.contains(place.resources, options.resourceId)) {
+      throw new Meteor.Error(404, "resource already exists in place");
+    }
+    else {
+      Places.update(options.placeId, { 
+        $addToSet: { 
+          resources: { 
+            id: options.resourceId, 
+            description: options.description,
+            public: options.public,  
+          }
+        }
+      });
+    }
   },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+
+var verifyLoggedIn = function () {
+  if (! this.userId) {
+    throw new Meteor.Error(403, "You must be logged in");
+  }
+}
 
 categoryExist = function (n) {
   return Categories.find({name: n}).count() != 0;
