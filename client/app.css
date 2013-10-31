@@ -3,11 +3,12 @@
 }
 
 .header {
-    padding: 20px 0;
+    padding: 10px 0;
+    padding-bottom: 0px;
 }
 
 .details {
-    margin-top: -18px;
+    margin-top: -30px;
 }
 
 .mask {
@@ -34,7 +35,7 @@
     margin: 20px 0 20px 0;
 }
 
-.attendance .who {
+.attendance .usersList {
     margin-bottom: 5px;
 }
 
@@ -52,6 +53,10 @@ h1 {
 
 h2 {
 	font-size: 25px;
+}
+
+h3 {
+	font-size: 20px;
 }
 
 h1, h2, h3 {

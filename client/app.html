@@ -70,9 +70,11 @@
     {{#each placeResources}}
       <label>{{resourceName}}</label>
     {{/each}}
-    <input type="button" 
-    class="btn btn-default span4 addResource" 
-    value="Add Resource">
+    {{#if isPlaceOwner}}
+      <input type="button" 
+      class="btn btn-default span4 addResource" 
+      value="Add Resource">
+    {{/if}}
   </form>
 </template>
 
@@ -123,72 +125,52 @@
 </template>
 
 <template name="details">
-  <h2>{{title}}</h2>
-  <div class="description">{{description}}</div>
-  {{> attendance}}
-  <div class="rsvp-buttons">
-    {{#if currentUser}}
-      <input type="button" value="Join"
-             class="btn btn-small rsvp_yes {{maybeChosen "yes"}}">
-      <input type="button" value="Maybe"
-             class="btn btn-small rsvp_maybe {{maybeChosen "maybe"}}">
-      <input type="button" value="No"
-             class="btn btn-small rsvp_no {{maybeChosen "no"}}">
+  <h3>{{title}}</h3>
+  <div>
+    <b>
+    {{#if public}}
+      Public
     {{else}}
-      <i>Sign in to RSVP for this place.</i>
+      Private
     {{/if}}
-    <p><small>Posted by {{creatorName}}</small></p>
+    </b>
   </div>
-
-  {{#if canRemove}}
-    <div class="alert alert-info"><small>
-        You posted this place, you could
-        <b><a href="#" class="remove">delete this listing</a></b>.
-    </small></div>
+  Location: xxxxxx
+    {{#if isOwner}}
+      <input type="button" 
+      class="btn btn-default span2 movePlaceOnMap" 
+      value="Move">
+    {{/if}}
+  <p>
+    <small>Owner is {{creatorName}}</small>
+  </p>
+  <div class="description">{{description}}</div>
+  {{#unless public}}
+    {{> attendance}}
+  {{/unless}}
+  {{#if isOwner}}
+    <div class="alert alert-info">
+      <small>
+        Need to <a href="#" class="remove">delete this place</a>?
+      </small>
+    </div>
   {{/if}}
 </template>
 
 <template name="attendance">
   <div class="attendance well well-small">
-    <div class="muted who"><b>Who</b></div>
-    {{#if public}}
+    <div class="muted usersList"><b>Private, but visible to:</b></div>
+    {{#each outstandingInvitations}}
       <div>
-        <b>Everyone</b>
-        <span class="label label-inverse pull-right">Invited</span>
-      </div>
-    {{/if}}
-
-    {{#each rsvps}}
-      <div>
-        {{rsvpName}}
-        {{#if rsvpIs "yes"}}
-          <span class="label label-success pull-right">Going</span>
-        {{/if}}
-        {{#if rsvpIs "maybe"}}
-          <span class="label label-info pull-right">Maybe</span>
-        {{/if}}
-        {{#if rsvpIs "no"}}
-          <span class="label label pull-right">No</span>
-        {{/if}}
+        {{invitationName}}
       </div>
     {{/each}}
-
-    {{#unless public}}
-      {{#each outstandingInvitations}}
-        <div>
-          {{invitationName}}
-          <span class="label label-inverse pull-right">Invited</span>
-        </div>
-      {{/each}}
-    {{/unless}}
-
     {{#if nobody}}
       <div>Nobody.</div>
     {{/if}}
-
     {{#if canInvite}}
       <div class="invite">
-        <a href="#" class="btn btn-mini invite">Invite people</a>
+        <a href="#" class="btn btn-mini invite">Invite More</a>
       </div>
     {{/if}}
   </div>

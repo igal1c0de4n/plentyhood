@@ -43,8 +43,8 @@ Template.details.creatorName = function () {
   return displayName(owner);
 };
 
-Template.details.canRemove = function () {
-  return this.owner === Meteor.userId() && attending(this) === 0;
+Template.details.isOwner = function () {
+  return this.owner === Meteor.userId();
 };
 
 Template.details.maybeChosen = function (what) {
@@ -133,7 +133,7 @@ Template.leafletMap.rendered = function() {
 
   console.log("render iteration " + this.renderCount);
   if (this.renderCount > 0) {
-    console.log("workaround for leaflet rerender call #" + this.renderCount);
+//     console.log("workaround for leaflet rerender call #" + this.renderCount);
     return;
   }
   this.renderCount++;
@@ -153,12 +153,12 @@ Template.leafletMap.rendered = function() {
     var view = {};
     view.zoom = llmap.getZoom();
     view.latlng = llmap.getCenter();
-    console.log('moveend: latlng=' + view.latlng.toString());
+//     console.log('moveend: latlng=' + view.latlng.toString());
     Session.set('mapView', view);
   });
   
   llmap.on('click', function(e) {
-    console.log('clicked at latlong: ' + e.latlng);
+    //     console.log('clicked at latlong: ' + e.latlng);
 
     // ctrl is meta key to add a new place
     if (e.originalEvent.ctrlKey === true) {
@@ -176,7 +176,7 @@ Template.leafletMap.rendered = function() {
     var view = {};
     if (last.view.userLatlng != e.latlng) {
       if (userLocationMarker) {
-        // remove previous user location circle
+        // remove previous user location
         llmap.removeLayer(userLocationMarker);
       }
       // mark user on the map with circle
@@ -255,18 +255,17 @@ Template.leafletMap.rendered = function() {
   this.handle = Deps.autorun(function () {
     var places = Places.find().fetch();
     var selected = Session.get('selectedPlace');
-    var view = Session.get('mapView');
 
-    console.log("mapHandle: places=" + places.length +
-                  " selected=" + selected);
-
-    if (places.length == 0 || selected == last.selectedPlace) {
-      console.log("mapHandle: skipping update");
-      return;
-    }
-    if (!objectsEqual(last.view, view))
-      llmap.setView(view.latlng, view.zoom);
+//     console.log("mapHandle: places=" + places.length +
+//                   " selected=" + selected);
     drawLocations();
+  });
+
+  this.handleMapChange = Deps.autorun(function () {
+    var view = Session.get('mapView');
+    if (!objectsEqual(last.view, view)) {
+      llmap.setView(view.latlng, view.zoom);
+    }
     last.view = view;
   });
 };
@@ -431,8 +430,12 @@ Template.placeResourcesPanel.resourceName = function () {
 
 Template.placeResourcesPanel.placeResources = function () {
   var place = Places.findOne(Session.get("selectedPlace"));
-  console.log("place: ", place, " resources: ", place.resources);
+//   console.log("place: ", place, " resources: ", place.resources);
   return place.resources;
+};
+
+Template.placeResourcesPanel.isPlaceOwner = function () {
+  return this.owner === Meteor.userId();
 };
 
 ///////////////////////////////////////////////////////////////////////////////

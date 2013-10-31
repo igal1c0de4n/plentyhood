@@ -221,7 +221,7 @@ Meteor.methods({
 
   resourceRemove: function (options) {
     if (!options.id)
-      throw new Meteor.Error(413, "Empty name");
+      throw new Meteor.Error(413, "Empty id");
     verifyLoggedIn.call(this);
 
     // TBD: check for user == admin
