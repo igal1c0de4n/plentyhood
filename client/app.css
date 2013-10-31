@@ -26,20 +26,15 @@
     margin: 10px 10px 10px 0;
 }
 
-.rsvp-buttons {
-    text-align: center;
-    margin: 40px 0 40px 0;
-}
-
 .description {
     margin: 20px 0 20px 0;
 }
 
-.attendance .usersList {
+.sharedPanel .usersList {
     margin-bottom: 5px;
 }
 
-.attendance .invite {
+.sharedPanel .invite {
     text-align: center;
 }
 

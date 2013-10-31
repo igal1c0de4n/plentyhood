@@ -146,19 +146,19 @@
   </p>
   <div class="description">{{description}}</div>
   {{#unless public}}
-    {{> attendance}}
+    {{> sharedPanel}}
   {{/unless}}
   {{#if isOwner}}
     <div class="alert alert-info">
       <small>
-        Need to <a href="#" class="remove">delete this place</a>?
+        Need to <a href="#" class="removePlace">delete this place</a>?
       </small>
     </div>
   {{/if}}
 </template>
 
-<template name="attendance">
-  <div class="attendance well well-small">
+<template name="sharedPanel">
+  <div class="sharedPanel well well-small">
     <div class="muted usersList"><b>Private, but visible to:</b></div>
     {{#each outstandingInvitations}}
       <div>

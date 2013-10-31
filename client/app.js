@@ -47,66 +47,34 @@ Template.details.isOwner = function () {
   return this.owner === Meteor.userId();
 };
 
-Template.details.maybeChosen = function (what) {
-  var myRsvp = _.find(this.rsvps, function (r) {
-    return r.user === Meteor.userId();
-  }) || {};
-
-  return what == myRsvp.rsvp ? "chosen btn-inverse" : "";
-};
-
 Template.details.events({
-  'click .rsvp_yes': function () {
-    Meteor.call("rsvp", Session.get("selectedPlace"), "yes");
-    return false;
-  },
-  'click .rsvp_maybe': function () {
-    Meteor.call("rsvp", Session.get("selectedPlace"), "maybe");
-    return false;
-  },
-  'click .rsvp_no': function () {
-    Meteor.call("rsvp", Session.get("selectedPlace"), "no");
-    return false;
-  },
   'click .invite': function () {
     openInviteDialog();
     return false;
   },
-  'click .remove': function () {
+  'click .removePlace': function () {
     Places.remove(this._id);
     return false;
   }
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// Place attendance widget
+// Place sharedPanel widget
 
-Template.attendance.rsvpName = function () {
-  var user = Meteor.users.findOne(this.user);
-  return displayName(user);
-};
-
-Template.attendance.outstandingInvitations = function () {
+Template.sharedPanel.outstandingInvitations = function () {
   var place = Places.findOne(this._id);
-  return Meteor.users.find({$and: [
-    {_id: {$in: place.invited}}, // they're invited
-    {_id: {$nin: _.pluck(place.rsvps, 'user')}} // but haven't RSVP'd
-  ]});
+  return Meteor.users.find({_id: {$in: place.invited}});
 };
 
-Template.attendance.invitationName = function () {
+Template.sharedPanel.invitationName = function () {
   return displayName(this);
 };
 
-Template.attendance.rsvpIs = function (what) {
-  return this.rsvp === what;
+Template.sharedPanel.nobody = function () {
+  return ! this.public && this.invited.length === 0;
 };
 
-Template.attendance.nobody = function () {
-  return ! this.public && (this.rsvps.length + this.invited.length === 0);
-};
-
-Template.attendance.canInvite = function () {
+Template.sharedPanel.canInvite = function () {
   return ! this.public && this.owner === Meteor.userId();
 };
 

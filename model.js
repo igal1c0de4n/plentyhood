@@ -36,7 +36,6 @@ Resources.allow({
     title, description: String
     public: Boolean
     invited: Array of user id's that are invited (only if !public)
-    rsvps: Array of objects like {user: userId, rsvp: "yes"} (or "no"/"maybe")
 */
 Places = new Meteor.Collection("places");
 
@@ -58,14 +57,10 @@ Places.allow({
     return true;
   },
   remove: function (userId, place) {
-    // You can only remove places that you created and nobody is going to.
-    return place.owner === userId && attending(place) === 0;
+    // You can only remove places that you created
+    return place.owner === userId;
   }
 });
-
-attending = function (place) {
-  return (_.groupBy(place.rsvps, 'rsvp').yes || []).length;
-};
 
 Meteor.methods({
 
@@ -102,7 +97,6 @@ Meteor.methods({
       description: options.description,
       public: !! options.public,
       invited: [],
-      rsvps: []
     });
   },
 
@@ -131,45 +125,6 @@ Meteor.methods({
 "\n\nCome check it out: " + Meteor.absoluteUrl() + "\n"
         });
       }
-    }
-  },
-
-  rsvp: function (placeId, rsvp) {
-    verifyLoggedIn.call(this);
-    if (! _.contains(['yes', 'no', 'maybe'], rsvp))
-      throw new Meteor.Error(400, "Invalid RSVP");
-    var place = Places.findOne(placeId);
-    if (! place)
-      throw new Meteor.Error(404, "No such place");
-    if (! place.public && place.owner !== this.userId &&
-        !_.contains(place.invited, this.userId))
-      // private, but let's not tell this to the user
-      throw new Meteor.Error(403, "No such place");
-
-    var rsvpIndex = _.indexOf(_.pluck(place.rsvps, 'user'), this.userId);
-    if (rsvpIndex !== -1) {
-      // update existing rsvp entry
-
-      if (Meteor.isServer) {
-        // update the appropriate rsvp entry with $
-        Places.update(
-          {_id: placeId, "rsvps.user": this.userId},
-          {$set: {"rsvps.$.rsvp": rsvp}});
-      } else {
-        // minimongo doesn't yet support $ in modifier. as a temporary
-        // workaround, make a modifier that uses an index. this is
-        // safe on the client since there's only one thread.
-        var modifier = {$set: {}};
-        modifier.$set["rsvps." + rsvpIndex + ".rsvp"] = rsvp;
-        Places.update(placeId, modifier);
-      }
-
-      // Possible improvement: send email to the other people that are
-      // coming to the place.
-    } else {
-      // add new rsvp entry
-      Places.update(placeId,
-                     {$push: {rsvps: {user: this.userId, rsvp: rsvp}}});
     }
   },
 
