@@ -4,11 +4,18 @@
 </head>
 
 <body>
-<div class="container">
   {{> pageHeader}}
-  {{renderPage}}
-</div>
+  {{> leafletMap}}
+  <div class="container">
+    {{renderPage}}
+  </div>
 </body>
+
+<template name="leafletMap">
+  {{#constant}}
+    <div id="leaflet-map" class="leflet-map"></div>
+  {{/constant}}
+</template>
 
 <template name="404">
   <h2>Oops, page not found</h2>

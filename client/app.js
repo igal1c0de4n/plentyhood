@@ -6,7 +6,7 @@ Meteor.subscribe("services");
 
 Meteor.Router.add({
   '/admin': 'admin',
-  '/': 'application',
+  '/': 'mainPanel',
   '*': '404'
 });
 
@@ -26,11 +26,14 @@ Meteor.startup(function () {
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// Place details sidebar
+// main panel
 
-Template.infoPanel.selectedPlace = function () {
+Template.mainPanel.selectedPlace = function () {
   return Places.findOne(Session.get("selectedPlace"));
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// Place details 
 
 Template.details.anyPlaces = function () {
   return Places.find().count() > 0;

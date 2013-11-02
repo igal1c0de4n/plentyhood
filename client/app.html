@@ -1,8 +1,3 @@
-<template name="application">
-  {{> leafletMap}}
-  {{> infoPanel}}
-</template>
-
 <template name="dialogs">
   {{#if openPlaceCreateDialog}}
     {{> placeCreateDialog}}
@@ -78,22 +73,7 @@
   </form>
 </template>
 
-<template name="leafletMap">
-<div class="pagination-right" style="margin-right: 10px">
-  <em><small>
-      {{#if currentUser}}
-      Ctrl click the map to post a new place
-      {{else}}
-      Sign in to post a new place
-      {{/if}}
-  </small></em>
-</div>
-{{#constant}}
-<div id="leaflet-map" class="leflet-map" style="margin-bottom: 20px"></div>
-{{/constant}}
-</template>
-
-<template name="infoPanel">
+<template name="mainPanel">
   <div class="details">
     {{#if selectedPlace}}
       {{#with selectedPlace}}
@@ -103,11 +83,18 @@
       <h3 class="muted pagination-centered">
         {{#if anyPlaces}}
           Click a place to select it
-        {{else}}
-         Ctrl click the map to post a new place
         {{/if}}
       </h3>
     {{/if}}
+  </div>
+  <div class="pagination-right" style="margin-right: 10px">
+    <em><small>
+      {{#if currentUser}}
+      Ctrl click the map to post a new place
+      {{else}}
+      Sign in to post a new place
+      {{/if}}
+    </small></em>
   </div>
 </template>
 
