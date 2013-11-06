@@ -1,3 +1,6 @@
+;(function () {
+  "use strict";
+
 Meteor.subscribe("directory");
 Meteor.subscribe("places");
 Meteor.subscribe("categories");
@@ -254,7 +257,7 @@ Template.placeCreateDialog.events({
   'click .save': function (event, template) {
     var title = template.find(".title").value;
     var description = template.find(".description").value;
-    var public = ! template.find(".private").checked;
+    var pub = ! template.find(".private").checked;
     var coords = Session.get("createCoords");
 
     if (title.length && description.length) {
@@ -263,11 +266,11 @@ Template.placeCreateDialog.events({
         description: description,
         lat: coords.lat,
         lng: coords.lng,
-        public: public
+        public: pub
       }, function (error, place) {
         if (! error) {
           Session.set("selectedPlace", place);
-          if (! public && Meteor.users.find().count() > 1)
+          if (! pub && Meteor.users.find().count() > 1)
             openInviteDialog();
         }
       });
@@ -352,14 +355,14 @@ Template.placeResourceAddDialog.events({
     }
     var resource = template.find(".resourceList").value;
     var description = template.find(".description").value;
-    var public = ! template.find(".private").checked;
+    var pub = ! template.find(".private").checked;
 
     if (resource) {
       Meteor.call("placeResourceAdd", { 
         placeId: Session.get("selectedPlace"),
         resourceId: resource,
         description: description,
-        public: public,
+        public: pub
       }, function (error) {
         if (error) {
           console.log("error: " + error);
@@ -473,7 +476,6 @@ Template.resourceSelect.resourcesExist = function () {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// generic global helpers
 
 function objectsEqual(o1, o2) {
   // note this only compare fields, not methods
@@ -484,6 +486,10 @@ function placeGetSelected() {
   return Places.findOne(Session.get("selectedPlace"));
 };
 
-easyQuote = function (s) {
-  return " '" + s + "' ";
+function displayName(user) {
+  if (user.profile && user.profile.name)
+    return user.profile.name;
+  return user.emails[0].address;
 };
+
+}());

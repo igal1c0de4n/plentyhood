@@ -1,3 +1,6 @@
+;(function () {
+  "use strict";
+
 Template.admin.errorExists = function () {
   return Session.get("adminError");
 };
@@ -148,3 +151,12 @@ Template.admin.events({
     });
   },
 });
+
+var getFromSelectionById = function (selection, id) {
+  return selection.findOne({_id: id});
+}
+
+var easyQuote = function (s) {
+  return " '" + s + "' ";
+};
+}());

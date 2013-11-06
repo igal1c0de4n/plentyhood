@@ -1,8 +1,7 @@
-// Loaded on both the client and the server
+;(function () {
+  "use strict";
 
-Resources = new Meteor.Collection("resources");
-Services = new Meteor.Collection("services");
-Categories = new Meteor.Collection("categories");
+// Loaded on both the client and the server
 
 Categories.allow({
   insert: function (userId) {
@@ -37,8 +36,6 @@ Resources.allow({
     public: Boolean
     invited: Array of user id's that are invited (only if !public)
 */
-Places = new Meteor.Collection("places");
-
 Places.allow({
   insert: function (userId, place) {
     return false; // no cowboy inserts -- use createPlace method
@@ -267,17 +264,7 @@ var verifyLoggedIn = function () {
   }
 }
 
-categoryExist = function (n) {
-  return Categories.find({name: n}).count() != 0;
-}
-
 // Users
-
-displayName = function (user) {
-  if (user.profile && user.profile.name)
-    return user.profile.name;
-  return user.emails[0].address;
-};
 
 var contactEmail = function (user) {
   if (user.emails && user.emails.length)
@@ -294,8 +281,4 @@ _.mixin({
   }
 });
 
-getFromSelectionById = function (selection, id) {
-  return selection.findOne({_id: id});
-}
-
-ENTER_KEY = 13;
+}());
