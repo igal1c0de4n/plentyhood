@@ -389,9 +389,25 @@ Template.placeResourceAddDialog.error = function () {
 // placeInfo
 
 Template.placeResourcesPanel.events({
-  'click .addResource': function () {
+  'click .placeResourceAdd': function (event, template) {
     console.log('adding resource');
     schedResourceAddDialog();
+  },
+
+  'click .placeResourceRemove': function (event, template) {
+    var rid = this.id;
+    console.log('removing resource', rid);
+    Meteor.call("placeResourceRemove", { 
+      placeId: Session.get("selectedPlace"),
+      resourceId: rid,
+    }, function (error) {
+      if (error) {
+        console.log("error: " + error);
+      }
+      else {
+        console.log("resource", rid, "removed");
+      }
+    });
   },
 });
 

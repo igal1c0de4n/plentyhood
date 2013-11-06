@@ -190,18 +190,11 @@ Meteor.methods({
     options = options || {};
 
     verifyLoggedIn.call(this);
+    var p = placeGet(options.placeId);
+    placeOwnerConfirm.call(this, p);
 
-    if (!options.placeId) {
-      throw new Meteor.Error(403, "missing place id");
-    }
-    var place = Places.findOne(options.placeId);
-
-    if (!place || place.owner !== this.userId) {
-      throw new Meteor.Error(404, "No such place");
-    }
-
-    if (_.contains(place.resources, options.resourceId)) {
-      throw new Meteor.Error(404, "resource already exists in place");
+    if (placeHasResource(p, options.resourceId)) {
+      throw new Meteor.Error(403, "resource already exists in place");
     }
     else {
       Places.update(options.placeId, { 
@@ -215,9 +208,58 @@ Meteor.methods({
       });
     }
   },
+
+  placeResourceRemove: function (options) {
+    options = options || {};
+
+    verifyLoggedIn.call(this);
+
+    var p = placeGet(options.placeId);
+
+    placeOwnerConfirm.call(this, p);
+
+    if (!placeHasResource(p, options.resourceId)) {
+      throw new Meteor.Error(403, "resource " + 
+                             options.resourceId + " is not in place "
+                            + options.placeId);
+    }
+    else {
+      Places.update(options.placeId, { 
+        $pull: { 
+          resources: { 
+            id: options.resourceId, 
+          }
+        }
+      });
+    }
+  }
+
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+
+var placeGet = function (placeId) {
+  if (!placeId) {
+    throw new Meteor.Error(403, "null place id");
+  }
+  var p = Places.findOne(placeId);
+
+  if (!p) {
+    throw new Meteor.Error(403, "place not found");
+  }
+  return p;
+}
+
+var placeOwnerConfirm = function (p) {
+  if (p.owner !== this.userId) {
+    throw new Meteor.Error(403, "unauthorized user");
+  }
+}
+
+var placeHasResource = function (place, rid) {
+    var ridList = _.pluck(place.resources, 'id');
+    return _.contains(ridList, rid);
+}
 
 var verifyLoggedIn = function () {
   if (! this.userId) {

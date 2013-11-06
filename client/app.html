@@ -63,11 +63,15 @@
   <form class="form-horizonal" role="form">
     <h3>Resources</h3>
     {{#each placeResources}}
-      <label>{{resourceName}}</label>
+      <label class="span3">
+        {{resourceName}}
+        <button type="button" aria-hidden="true" class="close placeResourceRemove">
+          &times;</button>
+      </label>
     {{/each}}
     {{#if isPlaceOwner}}
       <input type="button" 
-      class="btn btn-default span4 addResource" 
+      class="btn btn-default span4 placeResourceAdd" 
       value="Add Resource">
     {{/if}}
   </form>
