@@ -12,9 +12,9 @@ body {
 
 .container {
 	position: absolute;
-	top: 90px;
-	left: 50px;
-	width: 700px;
+	top: 70px;
+	left: 20px;
+	width: 400px;
 	padding: 20px;
 	background-color: white;
 	opacity: 0.9;
