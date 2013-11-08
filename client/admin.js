@@ -85,7 +85,7 @@ var clientResourceAdd = function (template) {
 
 Template.admin.events({
   'keypress .category' : function(event, template) {
-    if (event.which == ENTER_KEY) {
+    if (event.which == keyCode.ENTER) {
       clientCategoryAdd(template);
       return false;
     }
@@ -120,7 +120,7 @@ Template.admin.events({
   },
 
   'keypress .resourceAddTf' : function(event, template) {
-    if (event.which == ENTER_KEY) {
+    if (event.which == keyCode.ENTER) {
       clientResourceAdd(template);
       return false;
     }

@@ -5,8 +5,8 @@ Categories = new Meteor.Collection("categories");
 Resources = new Meteor.Collection("resources");
 Services = new Meteor.Collection("services");
 
-var categoryExist = function (n) {
+categoryExist = function (n) {
   return Categories.find({name: n}).count() != 0;
 }
 
-ENTER_KEY = 13;
+keyCode = { ENTER: 13, ESCAPE: 27};
