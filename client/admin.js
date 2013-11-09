@@ -37,7 +37,7 @@ var clientCategoryAdd = function(template) {
     Session.set("adminError", "empty category");
     return;
   }
-  if (categoryExist(n)) {
+  if (App.categoryExist(n)) {
     Session.set("adminError", "category" +
                 easyQuote(n) + "already exists");
     return;
@@ -75,7 +75,8 @@ var clientResourceAdd = function (template) {
       Session.set("adminError", error.toString());
     }
     else {
-      var categoryName = getFromSelectionById(Categories, cid).name;
+      var categoryName = 
+        getFromSelectionById(App.collections.Categories, cid).name;
       Session.set("adminInfo", "resource" + easyQuote(resourceName) +
                   "created under category" + easyQuote(categoryName));
       template.find(".resourceAddTf").value = "";
@@ -85,7 +86,7 @@ var clientResourceAdd = function (template) {
 
 Template.admin.events({
   'keypress .category' : function(event, template) {
-    if (event.which == keyCode.ENTER) {
+    if (event.which == App.keyCode.ENTER) {
       clientCategoryAdd(template);
       return false;
     }
@@ -103,7 +104,8 @@ Template.admin.events({
         Session.set("adminError", "category not selected");
         return;
     }
-    var categoryName = getFromSelectionById(Categories, cid).name;
+    var categoryName = 
+      getFromSelectionById(App.collections.Categories, cid).name;
 
     Meteor.call('categoryRemove', {
       id: cid,
@@ -120,7 +122,7 @@ Template.admin.events({
   },
 
   'keypress .resourceAddTf' : function(event, template) {
-    if (event.which == keyCode.ENTER) {
+    if (event.which == App.keyCode.ENTER) {
       clientResourceAdd(template);
       return false;
     }

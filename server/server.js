@@ -1,4 +1,4 @@
-// Places -- server
+// server
 
 ;(function () {
   "use strict";
@@ -8,20 +8,20 @@ Meteor.publish("directory", function () {
 });
 
 Meteor.publish("places", function () {
-  return Places.find(
+  return App.collections.Places.find(
     {$or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
 });
 
 Meteor.publish("categories", function () {
-  return Categories.find();
+  return App.collections.Categories.find();
 });
 
 Meteor.publish("resources", function () {
-  return Resources.find();
+  return App.collections.Resources.find();
 });
 
 Meteor.publish("services", function () {
-  return Services.find();
+  return App.collections.Services.find();
 });
 
 console.log("app env: " + JSON.stringify(process.env.NODE_ENV));

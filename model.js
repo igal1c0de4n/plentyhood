@@ -3,7 +3,7 @@
 
 // Loaded on both the client and the server
 
-Categories.allow({
+App.collections.Categories.allow({
   insert: function (userId) {
     return false; 
   },
@@ -15,7 +15,7 @@ Categories.allow({
   },
 });
 
-Resources.allow({
+App.collections.Resources.allow({
   insert: function (userId) {
     return false; 
   },
@@ -36,7 +36,7 @@ Resources.allow({
     public: Boolean
     invited: Array of user id's that are invited (only if !public)
 */
-Places.allow({
+App.collections.Places.allow({
   insert: function (userId, place) {
     return false; // no cowboy inserts -- use createPlace method
   },
@@ -84,7 +84,7 @@ Meteor.methods({
       throw new Meteor.Error(413, "Description too long");
     verifyLoggedIn.call(this);
 
-    return Places.insert({
+    return App.collections.Places.insert({
       owner: this.userId,
       x: options.x,
       y: options.y,
@@ -98,14 +98,14 @@ Meteor.methods({
   },
 
   invite: function (placeId, userId) {
-    var place = Places.findOne(placeId);
+    var place = App.collections.Places.findOne(placeId);
     if (! place || place.owner !== this.userId)
       throw new Meteor.Error(404, "No such place");
     if (place.public)
       throw new Meteor.Error(400,
                              "That place is public. No need to invite people.");
     if (userId !== place.owner && ! _.contains(place.invited, userId)) {
-      Places.update(placeId, { $addToSet: { invited: userId } });
+      App.collections.Places.update(placeId, { $addToSet: { invited: userId } });
 
       var from = contactEmail(Meteor.users.findOne(this.userId));
       var to = contactEmail(Meteor.users.findOne(userId));
@@ -135,12 +135,12 @@ Meteor.methods({
       throw new Meteor.Error(413, "Name too long");
     verifyLoggedIn.call(this);
 
-    if (categoryExist(n)) {
+    if (App.categoryExist(n)) {
       throw new Meteor.Error(403, "Already exists");
     }
     // TBD: check for user == admin
 
-    return Categories.insert({ name: n});
+    return App.collections.Categories.insert({ name: n});
   },
 
   categoryRemove: function (options) {
@@ -151,7 +151,7 @@ Meteor.methods({
 
     // TBD: check for user == admin
 
-    return Categories.remove({ _id: options.id});
+    return App.collections.Categories.remove({ _id: options.id});
   },
 
   resourceAdd: function (options) {
@@ -165,7 +165,7 @@ Meteor.methods({
 
     // TBD: check for user == admin
 
-    return Resources.insert({
+    return App.collections.Resources.insert({
       name: _(options.name).capitalize(),
       categoryId: options.categoryId,
     });
@@ -178,7 +178,7 @@ Meteor.methods({
 
     // TBD: check for user == admin
 
-    return Resources.remove({
+    return App.collections.Resources.remove({
       _id: options.id,
     });
   },
@@ -194,7 +194,7 @@ Meteor.methods({
       throw new Meteor.Error(403, "resource already exists in place");
     }
     else {
-      Places.update(options.placeId, { 
+      App.collections.Places.update(options.placeId, { 
         $addToSet: { 
           resources: { 
             id: options.resourceId, 
@@ -221,7 +221,7 @@ Meteor.methods({
                             + options.placeId);
     }
     else {
-      Places.update(options.placeId, { 
+      App.collections.Places.update(options.placeId, { 
         $pull: { 
           resources: { 
             id: options.resourceId, 
@@ -239,7 +239,7 @@ var placeGet = function (placeId) {
   if (!placeId) {
     throw new Meteor.Error(403, "null place id");
   }
-  var p = Places.findOne(placeId);
+  var p = App.collections.Places.findOne(placeId);
 
   if (!p) {
     throw new Meteor.Error(403, "place not found");

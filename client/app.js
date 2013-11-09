@@ -21,7 +21,7 @@ Meteor.startup(function () {
 
   Deps.autorun(function () {
     if (! Session.get("selectedPlace")) {
-      var place = Places.findOne();
+      var place = App.collections.Places.findOne();
       if (place)
         Session.set("selectedPlace", place._id);
     }
@@ -32,14 +32,14 @@ Meteor.startup(function () {
 // main panel
 
 Template.mainPanel.selectedPlace = function () {
-  return Places.findOne(Session.get("selectedPlace"));
+  return App.collections.Places.findOne(Session.get("selectedPlace"));
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // Place details 
 
 Template.details.anyPlaces = function () {
-  return Places.find().count() > 0;
+  return App.collections.Places.find().count() > 0;
 };
 
 Template.details.creatorName = function () {
@@ -59,7 +59,7 @@ Template.details.events({
     return false;
   },
   'click .removePlace': function () {
-    Places.remove(this._id);
+    App.collections.Places.remove(this._id);
     return false;
   }
 });
@@ -68,7 +68,7 @@ Template.details.events({
 // Place sharedPanel widget
 
 Template.sharedPanel.outstandingInvitations = function () {
-  var place = Places.findOne(this._id);
+  var place = App.collections.Places.findOne(this._id);
   return Meteor.users.find({_id: {$in: place.invited}});
 };
 
@@ -207,7 +207,7 @@ Template.leafletMap.rendered = function() {
     _.each(markers, function (c) {
       markerLayer.removeLayer(c);
     });
-    var places = Places.find().fetch();
+    var places = App.collections.Places.find().fetch();
     markers = [];
     var selected = Session.get('selectedPlace');
     last.selectedPlace = selected;
@@ -227,7 +227,7 @@ Template.leafletMap.rendered = function() {
   }
 
   this.handle = Deps.autorun(function () {
-    var places = Places.find().fetch();
+    var places = App.collections.Places.find().fetch();
     var selected = Session.get('selectedPlace');
 
 //     console.log("mapHandle: places=" + places.length +
@@ -308,7 +308,7 @@ Template.inviteDialog.events({
 });
 
 Template.inviteDialog.uninvited = function () {
-  var place = Places.findOne(Session.get("selectedPlace"));
+  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
   if (! place)
     return []; // place hasn't loaded yet
   return Meteor.users.find({$nor: [{_id: {$in: place.invited}},
@@ -415,11 +415,11 @@ Template.placeResourcesPanel.events({
 });
 
 Template.placeResourcesPanel.resourceName = function () {
-  return Resources.findOne(this.id).name;
+  return App.collections.Resources.findOne(this.id).name;
 };
 
 Template.placeResourcesPanel.placeResources = function () {
-  var place = Places.findOne(Session.get("selectedPlace"));
+  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
 //   console.log("place: ", place, " resources: ", place.resources);
   return place.resources;
 };
@@ -432,7 +432,7 @@ Template.placeResourcesPanel.isPlaceOwner = function () {
 // categorySelect
 
 Template.categorySelect.allCategries = function () {
-  return Categories.find({}, {sort: {name: 1}});
+  return App.collections.Categories.find({}, {sort: {name: 1}});
 };
 
 Template.categorySelect.events({
@@ -443,7 +443,7 @@ Template.categorySelect.events({
 });
 
 Template.categorySelect.categoriesExist = function () {
-  return Categories.find().count() > 0;
+  return App.collections.Categories.find().count() > 0;
 };
 
 Template.categorySelect.categoryOptionSelected = function () {
@@ -466,7 +466,7 @@ Template.resourceSelect.events({
 });
 
 Template.resourceSelect.resourcesUnderCategory = function () {
-    return Resources.find(
+    return App.collections.Resources.find(
       {categoryId: Session.get("selectedCategoryId")}, 
       {sort: {name: 1}});
 };
@@ -483,7 +483,7 @@ function objectsEqual(o1, o2) {
 };
 
 function placeGetSelected() {
-  return Places.findOne(Session.get("selectedPlace"));
+  return App.collections.Places.findOne(Session.get("selectedPlace"));
 };
 
 function displayName(user) {
