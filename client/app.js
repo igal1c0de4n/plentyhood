@@ -250,7 +250,30 @@ Template.leafletMap.rendered = function() {
 var schedCreateDialog = function (lat, lng) {
   Session.set("createCoords", {lat: lat, lng: lng});
   Session.set("createError", null);
-  Session.set("showPlaceCreateDialog", true);
+  Session.set("activeDialog", "placeCreate");
+};
+
+var unsetActiveDialog = function (name) {
+  var currActiveDialog = Session.get("activeDialog");
+  if (currActiveDialog && (currActiveDialog == name || !name)) {
+    console.log("resetting active dialog from", currActiveDialog);
+    Session.set("activeDialog", undefined);
+  }
+};
+
+var bsModalOnShow = function (name) {
+  $('#eModalDialog').modal();
+  $('#eModalDialog').on('hide.bs.modal', function () {
+    unsetActiveDialog(name);
+  })
+}
+
+var bsModalOnHide = function (name) {
+  $('#eModalDialog').modal('hide');
+}
+
+Template.placeCreateDialog.rendered = function () {
+  bsModalOnShow("placeCreate");
 };
 
 Template.placeCreateDialog.events({
@@ -274,7 +297,7 @@ Template.placeCreateDialog.events({
             openInviteDialog();
         }
       });
-      Session.set("showPlaceCreateDialog", false);
+      bsModalOnHide("placeCreate");
     } else {
       Session.set("createError",
                   "It needs a title and a description, or why bother?");
@@ -282,7 +305,7 @@ Template.placeCreateDialog.events({
   },
 
   'click .cancel': function () {
-    Session.set("showPlaceCreateDialog", false);
+    bsModalOnHide();
   }
 });
 
@@ -294,7 +317,7 @@ Template.placeCreateDialog.error = function () {
 // Invite dialog
 
 var openInviteDialog = function () {
-  Session.set("showInviteDialog", true);
+  Session.set("activeDialog", "invite");
 };
 
 Template.inviteDialog.events({
@@ -302,10 +325,14 @@ Template.inviteDialog.events({
     Meteor.call('invite', Session.get("selectedPlace"), this._id);
   },
   'click .done': function (event, template) {
-    Session.set("showInviteDialog", false);
+    bsModalOnHide();
     return false;
   }
 });
+
+Template.inviteDialog.rendered = function () {
+  bsModalOnShow("invite");
+};
 
 Template.inviteDialog.uninvited = function () {
   var place = App.collections.Places.findOne(Session.get("selectedPlace"));
@@ -322,16 +349,20 @@ Template.inviteDialog.displayName = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // dialogs
 
-Template.dialogs.openPlaceResourceAddDialog = function () {
-  return Session.get("showResourceAddDialog");
+Template.dialogs.isDialogActive = function () {
+  return !!Session.get("activeDialog");
 };
 
-Template.dialogs.openPlaceCreateDialog = function () {
-  return Session.get("showPlaceCreateDialog");
+Template.dialogs.isPlaceResourceAddActive = function () {
+  return Session.get("activeDialog") == "placeResourceAdd";
 };
 
-Template.dialogs.showInviteDialog = function () {
-  return Session.get("showInviteDialog");
+Template.dialogs.isPlaceCreateActive = function () {
+  return Session.get("activeDialog") == "placeCreate";
+};
+
+Template.dialogs.isInviteActive = function () {
+  return Session.get("activeDialog") == "invite";
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -345,7 +376,11 @@ var schedResourceAddDialog = function () {
   Session.set("placeResourceAddError", null);
   Session.set("selectedResourceId", null);
   Session.set("selectedCategoryId", null);
-  Session.set("showResourceAddDialog", true);
+  Session.set("activeDialog","placeResourceAdd");
+};
+
+Template.placeResourceAddDialog.rendered = function () {
+  bsModalOnShow("placeResourceAdd");
 };
 
 Template.placeResourceAddDialog.events({
@@ -370,7 +405,7 @@ Template.placeResourceAddDialog.events({
         }
         else {
           console.log("resource added");
-          Session.set("showResourceAddDialog", false);
+          bsModalOnHide();
         }
       });
     } else {
@@ -379,7 +414,7 @@ Template.placeResourceAddDialog.events({
   },
 
   'click .cancel': function () {
-    Session.set("showResourceAddDialog", false);
+    bsModalOnHide();
   }
 });
 

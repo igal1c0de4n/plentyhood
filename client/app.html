@@ -1,14 +1,22 @@
 <template name="dialogs">
-  {{#if openPlaceCreateDialog}}
-    {{> placeCreateDialog}}
-  {{/if}}
+  {{#if isDialogActive}}
+    <div class="modal fade" id="eModalDialog" tabindex='-1'>
+      <div class="modal-dialog">
+        <div class="modal-content">
+          {{#if isPlaceCreateActive}}
+            {{> placeCreateDialog}}
+          {{/if}}
 
-  {{#if showInviteDialog}}
-    {{> inviteDialog}}
-  {{/if}}
+          {{#if isInviteActive}}
+            {{> inviteDialog}}
+          {{/if}}
 
-  {{#if openPlaceResourceAddDialog}}
-    {{> placeResourceAddDialog}}
+          {{#if isPlaceResourceAddActive}}
+            {{> placeResourceAddDialog}}
+          {{/if}}
+        </div>
+      </div>
+    </div>
   {{/if}}
 </template>
 
@@ -27,34 +35,31 @@
 </template>
 
 <template name="placeResourceAddDialog">
-  <div class="mask"> </div>
-  <div class="modal">
-    <div class="modal-header">
-      <button type="button" class="close cancel">&times;</button>
-      <h3>Add Resource</h3>
-    </div>
+  <div class="modal-header">
+    <button type="button" class="close cancel">&times;</button>
+    <h3>Add Resource</h3>
+  </div>
 
-    <div class="modal-body">
-      {{#if error}}
-        <div class="alert alert-error">{{error}}</div>
-      {{/if}}
+  <div class="modal-body">
+    {{#if error}}
+      <div class="alert alert-error">{{error}}</div>
+    {{/if}}
 
-      {{> categorySelect}}
-      {{> resourceSelect}}
+    {{> categorySelect}}
+    {{> resourceSelect}}
 
-      <label>Description</label>
-      <textarea class="description span5"></textarea>
+    <label>Description</label>
+    <textarea class="description span5"></textarea>
 
-      <label class="checkbox">
-        <input type="checkbox" class="private">
-        Private &mdash; friends only
-      </label>
-    </div>
+    <label class="checkbox">
+      <input type="checkbox" class="private">
+      Private &mdash; friends only
+    </label>
+  </div>
 
-    <div class="modal-footer">
-      <a href="#" class="btn cancel">Cancel</a>
-      <a href="#" class="btn btn-primary save" {{saveDisabled}}>Save</a>
-    </div>
+  <div class="modal-footer">
+    <a href="#" class="btn cancel">Cancel</a>
+    <a href="#" class="btn btn-primary save" {{saveDisabled}}>Save</a>
   </div>
 </template>
 
@@ -167,59 +172,53 @@
 </template>
 
 <template name="placeCreateDialog">
-  <div class="mask"> </div>
-  <div class="modal">
-    <div class="modal-header">
-      <button type="button" class="close cancel">&times;</button>
-      <h3>Add Place</h3>
-    </div>
+  <div class="modal-header">
+    <button type="button" class="close cancel">&times;</button>
+    <h3>Add Place</h3>
+  </div>
 
-    <div class="modal-body">
-      {{#if error}}
-        <div class="alert alert-error">{{error}}</div>
-      {{/if}}
+  <div class="modal-body">
+    {{#if error}}
+    <div class="alert alert-error">{{error}}</div>
+    {{/if}}
 
-      <label>Title</label>
-      <input type="text" class="title span5">
+    <label>Title</label>
+    <input type="text" class="title span5">
 
-      <label>Description</label>
-      <textarea class="description span5"></textarea>
+    <label>Description</label>
+    <textarea class="description span5"></textarea>
 
-      <label class="checkbox">
-        <input type="checkbox" class="private">
-        Private place &mdash; friends only
-      </label>
-    </div>
+    <label class="checkbox">
+      <input type="checkbox" class="private">
+      Private place &mdash; friends only
+    </label>
+  </div>
 
-    <div class="modal-footer">
-      <a href="#" class="btn cancel">Cancel</a>
-      <a href="#" class="btn btn-primary save">Add place</a>
-    </div>
+  <div class="modal-footer">
+    <a href="#" class="btn cancel">Cancel</a>
+    <a href="#" class="btn btn-primary save">Add place</a>
   </div>
 </template>
 
 <template name="inviteDialog">
-  <div class="mask"> </div>
-  <div class="modal">
-    <div class="modal-header">
-      <button type="button" class="close done">&times;</button>
-      <h3>Invite people</h3>
-    </div>
+  <div class="modal-header">
+    <button type="button" class="close done">&times;</button>
+    <h3>Invite people</h3>
+  </div>
 
-    <div class="modal-body">
-      {{#each uninvited}}
-        <div class="invite-row">
-          <a href="#" class="btn invite">Invite</a>
-          {{displayName}}
-        </div>
-      {{else}}
-        Everyone on the site has already been invited.
-      {{/each}}
-    </div>
+  <div class="modal-body">
+    {{#each uninvited}}
+      <div class="invite-row">
+        <a href="#" class="btn invite">Invite</a>
+        {{displayName}}
+      </div>
+    {{else}}
+      Everyone on the site has already been invited.
+    {{/each}}
+  </div>
 
-    <div class="modal-footer">
-      <a href="#" class="btn btn-primary done">Done</a>
-    </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary done">Done</a>
   </div>
 </template>
 
