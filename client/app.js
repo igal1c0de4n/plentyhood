@@ -35,18 +35,36 @@ Template.mainPanel.selectedPlace = function () {
   return App.collections.Places.findOne(Session.get("selectedPlace"));
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// Place details 
-
-Template.details.anyPlaces = function () {
+Template.mainPanel.anyPlaces = function () {
   return App.collections.Places.find().count() > 0;
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// Place Container
+
+Template.placeContainer.isOwner = function () {
+  return this.owner === Meteor.userId();
+};
+
+Template.placeContainer.events({
+  'click .removePlace': function () {
+    App.collections.Places.remove(this._id);
+    return false;
+  },
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// Place details 
 
 Template.details.creatorName = function () {
   var owner = Meteor.users.findOne(this.owner);
   if (owner._id === Meteor.userId())
-    return "me";
-  return displayName(owner);
+    return "my place";
+  return "Owner: " + displayName(owner);
+};
+
+Template.details.placeLocationGet = function () {
+  return "(" + this.lat + "," + this.lng + ")";
 };
 
 Template.details.isOwner = function () {
@@ -58,10 +76,6 @@ Template.details.events({
     openInviteDialog();
     return false;
   },
-  'click .removePlace': function () {
-    App.collections.Places.remove(this._id);
-    return false;
-  }
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -450,7 +464,14 @@ Template.placeResourcesPanel.events({
 });
 
 Template.placeResourcesPanel.resourceName = function () {
-  return App.collections.Resources.findOne(this.id).name;
+  var r = App.collections.Resources.findOne(this.id);
+  return r ? r.name : "loading...";
+};
+
+Template.placeResourcesPanel.placeHasResources = function () {
+  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
+//   console.log("place: ", place, " resources: ", place.resources);
+  return !place.resources || place.resources.length === 0 ? false : true;
 };
 
 Template.placeResourcesPanel.placeResources = function () {

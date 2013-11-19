@@ -7,15 +7,12 @@ body {
     margin: 0;
 }
 
-#leaflet-map {
-}
-
 .container {
 	position: absolute;
-	top: 70px;
-	left: 20px;
-	width: 450px;
-	padding: 20px;
+	top: 60px;
+	left: 45px;
+	width: 310px;
+	padding: 10px;
 	background-color: white;
 	opacity: 0.9;
 
@@ -29,9 +26,6 @@ body {
 .header {
     padding: 10px 0;
     padding-bottom: 0px;
-}
-
-.details {
 }
 
 .mask {
@@ -50,7 +44,7 @@ body {
 }
 
 .description {
-    margin: 20px 0 20px 0;
+    margin: 10px 0 10px 0;
 }
 
 .sharedPanel .usersList {
@@ -74,7 +68,9 @@ h2 {
 }
 
 h3 {
+  margin: 0;
 	font-size: 20px;
+  line-height: 30px;
 }
 
 h1, h2, h3 {
@@ -87,4 +83,12 @@ h1, h2, h3 {
     background-color: white;
     padding: 3px;
     padding-bottom: 0;
+}
+
+.movePlaceOnMap {
+    margin: 0;
+}
+
+pull-right {
+  margin-right: 20px;
 }

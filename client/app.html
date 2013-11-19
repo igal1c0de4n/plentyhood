@@ -65,7 +65,8 @@
 
 <template name="placeResourcesPanel">
   <form class="form-horizonal" role="form">
-    <h3>Resources</h3>
+    {{#if placeHasResources}}
+    <h4>Resources</h4>
     {{#each placeResources}}
       <label class="span3">
         {{resourceName}}
@@ -73,6 +74,9 @@
           &times;</button>
       </label>
     {{/each}}
+    {{else}}
+    <p>No resources yet</p>
+    {{/if}}
     {{#if isPlaceOwner}}
       <input type="button" 
       class="btn btn-default span4 placeResourceAdd" 
@@ -82,79 +86,80 @@
 </template>
 
 <template name="mainPanel">
-  <div class="details">
-    {{#if selectedPlace}}
-      {{#with selectedPlace}}
-        {{> placeContainer}}
-      {{/with}}
-    {{else}}
-      <h3 class="muted pagination-centered">
-        {{#if anyPlaces}}
-          Click a place to select it
-        {{/if}}
-      </h3>
-    {{/if}}
-  </div>
-  <div class="pagination-right" style="margin-right: 10px">
-    <em><small>
-      {{#if currentUser}}
-      Ctrl click the map to post a new place
+<div>
+  {{#if selectedPlace}}
+  {{#with selectedPlace}}
+  {{> placeContainer}}
+  {{/with}}
+  {{else}}
+  <em><small>
+      {{#if anyPlaces}}
+      Select a place to see details
       {{else}}
-      Sign in to post a new place
+      How wierd - No places yet!
       {{/if}}
-    </small></em>
-  </div>
+  </small></em>
+  {{/if}}
+</div>
+<div class="pagination-right" style="margin-right: 10px">
+  <em>
+    <small>
+      {{#if currentUser}}
+      Ctrl + click the map to post a new place
+      {{else}}
+      Sign in to post your place
+      {{/if}}
+    </small>
+  </em>
+</div>
 </template>
 
 <template name="placeContainer">
-  <div class="row">
-    <div class="span4">
-      {{#if currentUser}}
-        {{> details}}
-      {{/if}}
-    </div>
-    <div class="span6">
-        {{> placeResourcesPanel}}
-    </div>
+<div>
+  {{> details}}
+  {{> placeResourcesPanel}}
+</div>
+{{#if isOwner}}
+<div class="row">
+  <div class="alert alert-info span3">
+    <small>
+      Need to <a href="#" class="removePlace">delete this place</a>?
+    </small>
   </div>
+</div>
+{{/if}}
 </template>
 
 <template name="details">
-  <h3>{{title}}</h3>
-  <div>
-    <b>
-    {{#if public}}
-      Public
-    {{else}}
-      Private
-    {{/if}}
-    </b>
-  </div>
-  Location: xxxxxx
-    {{#if isOwner}}
-      <input type="button" 
-      class="btn btn-default span2 movePlaceOnMap" 
-      value="Move">
-    {{/if}}
-  <p>
-    <small>Owner is {{creatorName}}</small>
-  </p>
-  <div class="description">{{description}}</div>
-  {{#unless public}}
-    {{> sharedPanel}}
-  {{/unless}}
+<h3>
+  {{title}}
   {{#if isOwner}}
-    <div class="alert alert-info">
-      <small>
-        Need to <a href="#" class="removePlace">delete this place</a>?
-      </small>
-    </div>
+  <div class="row pull-right">
+    <input type="button" 
+    class="btn btn-success movePlaceOnMap"
+    value="Move">
+  </div>
   {{/if}}
+</h3>
+<small style="margin-left=20px">
+  <b>{{#if public}} Public{{else}} Private{{/if}},</b>
+</small>
+<small>{{creatorName}}</small>
+<div>
+  <small> GPS {{placeLocationGet}} </small>
+</div>
+
+<div class="description">
+  About: {{description}}
+</div>
+{{#unless public}}
+{{> sharedPanel}}
+{{/unless}}
 </template>
 
 <template name="sharedPanel">
   <div class="sharedPanel well well-small">
-    <div class="muted usersList"><b>Private, but visible to:</b></div>
+    <div class="muted usersList"><b>Friends:</b></div>
     {{#each outstandingInvitations}}
       <div>
         {{invitationName}}
