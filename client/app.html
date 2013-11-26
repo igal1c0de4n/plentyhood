@@ -20,20 +20,6 @@
   {{/if}}
 </template>
 
-<template name="pageHeader">
-
-  <div class="header row">
-    <div class="span6">
-      <h1 style="margin: 0px">Plentyhood</h1>
-    </div>
-    <div class="span6">
-      <div style="float: right">
-        {{loginButtons align="right"}}
-      </div>
-    </div>
-  </div>
-</template>
-
 <template name="placeResourceAddDialog">
   <div class="modal-header">
     <button type="button" class="close cancel">&times;</button>
@@ -85,32 +71,42 @@
   </form>
 </template>
 
-<template name="mainPanel">
-<div>
-  {{#if selectedPlace}}
-  {{#with selectedPlace}}
-  {{> placeContainer}}
-  {{/with}}
-  {{else}}
-  <em><small>
-      {{#if anyPlaces}}
-      Select a place to see details
-      {{else}}
-      How wierd - No places yet!
-      {{/if}}
-  </small></em>
-  {{/if}}
-</div>
-<div class="pagination-right" style="margin-right: 10px">
-  <em>
-    <small>
-      {{#if currentUser}}
-      Ctrl + click the map to post a new place
-      {{else}}
-      Sign in to post your place
-      {{/if}}
-    </small>
-  </em>
+<template name="leafletMap">
+  {{#constant}}
+    <div id="leaflet-map" class="leflet-map"></div>
+  {{/constant}}
+</template>
+
+<template name="places">
+{{> header}}
+{{> leafletMap}}
+<div class="placeContainer">
+  <div>
+    {{#if selectedPlace}}
+    {{#with selectedPlace}}
+    {{> placeContainer}}
+    {{/with}}
+    {{else}}
+    <em><small>
+        {{#if anyPlaces}}
+        Select a place to see details
+        {{else}}
+        How wierd - No places yet!
+        {{/if}}
+    </small></em>
+    {{/if}}
+  </div>
+  <div class="pagination-right" style="margin-right: 10px">
+    <em>
+      <small>
+        {{#if currentUser}}
+        Ctrl + click the map to post a new place
+        {{else}}
+        Sign in to post your place
+        {{/if}}
+      </small>
+    </em>
+  </div>
 </div>
 </template>
 

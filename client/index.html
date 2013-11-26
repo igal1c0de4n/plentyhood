@@ -5,21 +5,157 @@
 </head>
 
 <body>
-  {{> pageHeader}}
   {{> dialogs}}
-  {{> leafletMap}}
-  <div class="container">
-    {{renderPage}}
-  </div>
+  {{renderPage}}
+  <div id="log"></div>
 </body>
 
-<template name="leafletMap">
-  {{#constant}}
-    <div id="leaflet-map" class="leflet-map"></div>
-  {{/constant}}
+<template name="notfound">
+{{> header}}
+<h2>Oops, page not found</h2>
+<p>The page you were looking for has gone missing!</p>
 </template>
 
-<template name="404">
-  <h2>Oops, page not found</h2>
-  <p>The page you were looking for has gone missing!</p>
+<template name="signin">
+{{> header}}
+<div class="signin">
+  <div class="login-form">
+    <h1>Sign In</h1>
+    {{loginButtons}}
+  </div>
+  <div class="example-users">
+    <p>Normal User: normal@example.com | apple1</p>
+    <p>View Secrets: view@example.com | apple1</p>
+    <p>Manage Users: manage@example.com | apple1</p>
+    <p>Admin User: admin@example.com | apple1</p>
+  </div>
+</div>
+</template>
+
+<template name="loading">
+<h1>Loading...</h1>
+</template>
+
+<template name="awaiting-verification">
+{{> header}}
+<h1>Awaiting email verification...</h1>
+</template>
+
+<template name="invalid-access">
+{{> header}}
+<h3>403 Forbidden - Invalid Access</h3>
+</template>
+
+<template name="header">
+<div class="navbar navbar-inverse navbar-navbar-fixed-top">
+  <div class="navbar-inner">
+    <a class="brand" href="/">Plentyhood</a>
+    <ul class="nav">
+      <li class="active"><a href="/places">Places</a></li>
+      {{#if isInRole 'admin,view-secrets'}}
+      <li><a href="/secrets">Secrets</a></li>
+      {{/if}}
+      {{#if isInRole 'admin'}}
+      <li><a href="/admin">Admin</a></li>
+      {{/if}}
+      {{#if isInRole 'admin,manage-users'}}
+      <li><a href="/manage">Users</a></li>
+      {{/if}}
+    </ul>
+    <ul class="nav pull-right">
+      {{#if userSignedIn}}
+      <li class="dropdown pull-right">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        {{displayName}}<b class="caret"></b>
+      </a>
+      <ul class="dropdown-menu">
+        <li><a class="signout" href="/signout">Sign out</a></li>
+      </ul>
+      </li>
+      {{else}}
+      <li>{{loginButtons align="right"}}</li>
+      {{/if}}
+    </ul>
+    <form class="navbar-search pull-right">
+      <input type="text" class="search-query" placeholder="Search">
+    </form>
+  </div>
+</div>
+</template>
+
+<template name="noteOfTheDay">
+<p>Note of the day: {{note}}</p>
+</template>
+
+<template name="start">
+{{> header}}
+<h3>TBD: carousle slideshow explaining app, </h3>
+<div><p>why it's awesome, allow joining or signing in</p></div>
+</template>
+
+<template name="noname1">
+{{> header}}
+<div class="page row">
+  <div class="offset4 span8">
+    <p class="note">
+    All logged-in users will see this page in their header nav.
+    </p>
+    <h2>Start Page</h2>
+
+    {{> noteOfTheDay}}
+
+    <div>
+      <p>
+      This application is an example app for the
+      <a href="https://github.com/alanning/meteor-roles">
+        <em>meteor-roles</em>
+      </a> 
+      smart package.
+      </p>
+    </div>
+  </div>
+</div>
+</template>
+
+<template name="secrets">
+{{> header}}
+<div class="secrets row">
+  <div class="offset4 span8">
+
+    <p class="note">
+    Only Admins and those with the 'view-secrets' role
+    will see this page in their header nav.</p>
+
+    <h2>Secrets!</h2>
+    <ul>
+      {{#each secrets}}
+      <li><p>{{secret}}</p></li>
+      {{/each}}
+    </ul>
+  </div>
+</div>
+</template>
+
+<template name="displayUsers">
+<h3>Current Users</h3>
+<ul>
+  {{#each users}}
+  <li>{{email}} - Roles: {{roles}}</li>
+  {{/each}}
+</ul>
+</template>
+
+<template name="manage">
+{{> header}}
+<div class="manage-users row">
+  <div class="offset4 span8">
+    <p class="note">
+    Only Admins and those with the 'manage-users' role 
+    will see this page in their nav menu.
+    </p>
+    <h2>Manage Users</h2>
+    <br />
+    {{> displayUsers}}
+  </div>
+</div>
 </template>

@@ -7,10 +7,10 @@ body {
     margin: 0;
 }
 
-.container {
+.placeContainer {
 	position: absolute;
-	top: 60px;
-	left: 45px;
+	top: 70px;
+	left: 20px;
 	width: 310px;
 	padding: 10px;
 	background-color: white;

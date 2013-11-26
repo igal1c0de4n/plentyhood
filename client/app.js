@@ -7,12 +7,6 @@ Meteor.subscribe("categories");
 Meteor.subscribe("resources");
 Meteor.subscribe("services");
 
-Meteor.Router.add({
-  '/admin': 'admin',
-  '/': 'mainPanel',
-  '*': '404'
-});
-
 // If no place selected, select one.
 Meteor.startup(function () {
   Meteor.call("getNodeEnv", function (error, result) {
@@ -31,11 +25,18 @@ Meteor.startup(function () {
 ///////////////////////////////////////////////////////////////////////////////
 // main panel
 
-Template.mainPanel.selectedPlace = function () {
+Template.header.userSignedIn = function () {
+  return Meteor.userId() ? true : false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// main panel
+
+Template.places.selectedPlace = function () {
   return App.collections.Places.findOne(Session.get("selectedPlace"));
 };
 
-Template.mainPanel.anyPlaces = function () {
+Template.places.anyPlaces = function () {
   return App.collections.Places.find().count() > 0;
 };
 
@@ -102,15 +103,23 @@ Template.sharedPanel.canInvite = function () {
 // Map
 ///////////////////////////////////////////////////////////////////////////////
 
-Template.leafletMap.created = function() {
-  var mapViewDefault = { 
-    latlng: [37.35024, -121.95751], 
-    zoom: 13 
-  }; // santa clara :) TBD: replace with auto-locate
+var leafletMapCreated = false;
 
-  console.log("template leafletMap created");
-  Session.set('mapView', mapViewDefault);
-  this.renderCount = 0;
+Template.leafletMap.created = function() {
+  if (leafletMapCreated) {
+    console.log("warning: template created more than once!");
+  }
+  else {
+    leafletMapCreated = true;
+    var mapViewDefault = { 
+      latlng: [37.35024, -121.95751], 
+      zoom: 13 
+    }; // santa clara :) TBD: replace with auto-locate
+
+    console.log("template leafletMap created");
+    Session.set('mapView', mapViewDefault);
+    this.renderCount = 0;
+  }
 };
 
 Template.leafletMap.rendered = function() {
@@ -127,15 +136,21 @@ Template.leafletMap.rendered = function() {
   this.renderCount++;
   var view = Session.get('mapView');
   console.log("view: latlng=" + view.latlng.toString() + ",zoom=" + view.zoom +")");
-  var llmap = L.map('leaflet-map', {maxZoom: 16, minZoom: 3, noWrap: true}).
+  var llmapOptions = {
+    maxZoom: 16,
+    minZoom: 3,
+    noWrap: true,
+    zoomControl: false,
+  };
+  var llmap = L.map('leaflet-map', llmapOptions).
     setView(view.latlng, view.zoom).
     locate({maximumAge : 1000 * 60, setView: false}).
     whenReady(function () { console.log("leaflet ready")});
-
   L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 18,
     attribution : 'Tiles: &copy; Esri, National Geographic'
   }).addTo(llmap);
+  llmap.addControl(L.control.zoom({position: 'topright'}));
 
   llmap.on('moveend', function(e) {
     var view = {};
