@@ -51,15 +51,16 @@
   <div class="navbar-inner">
     <a class="brand" href="/">Plentyhood</a>
     <ul class="nav">
-      <li class="active"><a href="/places">Places</a></li>
+      <li  class="{{isActive "start"}}"><a href="/start">Home</a></li>
+      <li  class="{{isActive "places"}}"><a href="/places">Places</a></li>
       {{#if isInRole 'admin,view-secrets'}}
-      <li><a href="/secrets">Secrets</a></li>
+      <li class="{{isActive "secrets"}}"><a href="/secrets">Secrets</a></li>
       {{/if}}
       {{#if isInRole 'admin'}}
-      <li><a href="/admin">Admin</a></li>
+      <li class="{{isActive "admin"}}"><a href="/admin">Admin</a></li>
       {{/if}}
       {{#if isInRole 'admin,manage-users'}}
-      <li><a href="/manage">Users</a></li>
+      <li class="{{isActive "manage"}}"><a href="/manage">Users</a></li>
       {{/if}}
     </ul>
     <ul class="nav pull-right">
@@ -90,9 +91,27 @@
 <template name="start">
 {{> header}}
 <div class="container">
-  <h3>TBD: carousle slideshow explaining app, </h3>
-  <div><p>why it's awesome, allow joining or signing in</p></div>
-  {{> displayUsers}}
+  <h3>Plentyhood?</h3>
+  <p>
+  This web application builds on the recent sharing revolution to facilitate
+  cooperation within a local community. It's about sharing nearby resources such as tools, produce, gardens, services and more.
+  </p>
+  <p>
+  The app wroks with the user's location to enable access to resources which are 
+  closer and thus more relevant. 
+
+  At first, we will be focusing on gardening: facilitating growing of produce: local, organic fruits and vegetables. If that works, hopefully everything else!
+  </p>
+  <p>TBD carousle slideshow</p>
+  <h3>How can I use this site?</h3>
+  <p> This is a mockup version. As such, security is deliberately not enforced. Create your own account or login with any of these users: </p>
+  <ul>
+    <li>normal@example.com</li>
+    <li>view@example.com</li>
+    <li>manage@example.com</li>
+    <li>admin@example.com</li>
+  </ul>
+  <p>The generic password is: apple1</p>
 </div>
 </template>
 

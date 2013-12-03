@@ -22,3 +22,11 @@ Template.header.events({
     }
   },
 });
+
+Template.header.isActive = function (page) {
+  if (Meteor.Router.page() == page) {
+    console.log("active page", page);
+    return "active";
+  }
+  return "";
+}
