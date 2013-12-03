@@ -1,13 +1,8 @@
 Plentyhood
 ==========
+This web application builds on the recent sharing revolution to facilitate cooperation within a local community. It's about sharing resources such as tools, produce, gardens, services and more.
 
-This web application is about cooperation within the local community.
-It's about sharing resources such as tools, gardens, services etc. 
-Creating the next-gen 'Craigslist', on a whole new level, the app wroks with 
-the user's location and provides results which are closer and thus more relevant.
-At first, the app focuses on gardening: helping people growing food, not lawns.
-After that, well, the sky is the limit! =)
-
+The app wroks with the user's location to enable access to resources which are closer and thus more relevant. At first, we will be focusing on gardening: facilitating growing of produce: local, organic fruits and vegetables. After that, hopefully everything else!
 
 Feature roadmap
 ---------------
