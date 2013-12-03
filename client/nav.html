@@ -89,31 +89,10 @@
 
 <template name="start">
 {{> header}}
-<h3>TBD: carousle slideshow explaining app, </h3>
-<div><p>why it's awesome, allow joining or signing in</p></div>
-</template>
-
-<template name="noname1">
-{{> header}}
-<div class="page row">
-  <div class="offset4 span8">
-    <p class="note">
-    All logged-in users will see this page in their header nav.
-    </p>
-    <h2>Start Page</h2>
-
-    {{> noteOfTheDay}}
-
-    <div>
-      <p>
-      This application is an example app for the
-      <a href="https://github.com/alanning/meteor-roles">
-        <em>meteor-roles</em>
-      </a> 
-      smart package.
-      </p>
-    </div>
-  </div>
+<div class="container">
+  <h3>TBD: carousle slideshow explaining app, </h3>
+  <div><p>why it's awesome, allow joining or signing in</p></div>
+  {{> displayUsers}}
 </div>
 </template>
 
