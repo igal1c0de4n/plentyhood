@@ -1,19 +1,20 @@
 <template name="admin">
-  {{> header}}
+{{> header}}
 
-  {{#if errorExists}}
-    <div class="alert alert-error">{{getError}}</div>
-  {{/if}}
-  {{#if info}}
-    <div class="alert alert-info">{{info}}</div>
-  {{/if}}
+{{#if errorExists}}
+<div class="alert alert-error">{{getError}}</div>
+{{/if}}
+{{#if info}}
+<div class="alert alert-info">{{info}}</div>
+{{/if}}
 
-  <h2>Admin Menu</h2>
+<div class="container">
+  <h2>Edit Categories and Resources</h2>
   <form class="form-inline" role="form">
     <input type="text" class="category span4" 
     placeholder="category name" id="eCategoryAddTf">
-      <input type="button" 
-      class="btn btn-default span4 categoryAdd" value="Add Category">
+    <input type="button" 
+    class="btn btn-default span4 categoryAdd" value="Add Category">
   </form>
   <form class="form-inline" role="form">
     {{> categorySelect}}
@@ -34,4 +35,5 @@
     class="btn btn-default span4 resourceRemove" 
     value="Remove Resource" {{disableResourceRemove}}>
   </form>
+</div>
 </template>

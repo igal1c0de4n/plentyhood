@@ -39,7 +39,7 @@ var clientCategoryAdd = function(template) {
   }
   if (App.categoryExist(n)) {
     Session.set("adminError", "category" +
-                easyQuote(n) + "already exists");
+                strQuoteAdd(n) + "already exists");
     return;
   }
 
@@ -50,7 +50,7 @@ var clientCategoryAdd = function(template) {
       Session.set("adminError", error.toString());
     }
     else {
-      Session.set("adminInfo", "category" + easyQuote(n) + "created");
+      Session.set("adminInfo", "category" + strQuoteAdd(n) + "created");
       template.find(".category").value = "";
     }
   });
@@ -77,8 +77,8 @@ var clientResourceAdd = function (template) {
     else {
       var categoryName = 
         getFromSelectionById(App.collections.Categories, cid).name;
-      Session.set("adminInfo", "resource" + easyQuote(resourceName) +
-                  "created under category" + easyQuote(categoryName));
+      Session.set("adminInfo", "resource" + strQuoteAdd(resourceName) +
+                  "created under category" + strQuoteAdd(categoryName));
       template.find(".resourceAddTf").value = "";
     }
   });
@@ -115,7 +115,7 @@ Template.admin.events({
       }
       else {
         Session.set("adminInfo", 
-                    "category" + easyQuote(categoryName) + "removed");
+                    "category" + strQuoteAdd(categoryName) + "removed");
         Session.set("selectedCategoryId", null);
       }
     });
@@ -139,7 +139,8 @@ Template.admin.events({
       Session.set("adminError", "resource not selected");
       return;
     }
-    var resourceName = easyQuote(getFromSelectionById(Resources, rid).name);
+    var resourceName = strQuoteAdd(
+      getFromSelectionById(App.collections.Resources, rid).name);
     Meteor.call('resourceRemove', {
       id: rid,
     }, function (error, place) {
@@ -158,7 +159,7 @@ var getFromSelectionById = function (selection, id) {
   return selection.findOne({_id: id});
 }
 
-var easyQuote = function (s) {
+var strQuoteAdd = function (s) {
   return " '" + s + "' ";
 };
 }());
