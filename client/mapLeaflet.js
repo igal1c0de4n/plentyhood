@@ -177,3 +177,9 @@ function objectsEqual(o1, o2) {
   // note this only compare fields, not methods
   return JSON.stringify(o1) == JSON.stringify(o2);
 };
+
+var schedCreateDialog = function (lat, lng) {
+  Session.set("createCoords", {lat: lat, lng: lng});
+  Session.set("createError", null);
+  Session.set("activeDialog", "placeCreate");
+};

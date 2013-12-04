@@ -95,12 +95,6 @@ Template.sharedPanel.canInvite = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // Create Place dialog
 
-var schedCreateDialog = function (lat, lng) {
-  Session.set("createCoords", {lat: lat, lng: lng});
-  Session.set("createError", null);
-  Session.set("activeDialog", "placeCreate");
-};
-
 var unsetActiveDialog = function (name) {
   var currActiveDialog = Session.get("activeDialog");
   if (currActiveDialog && (currActiveDialog == name || !name)) {
