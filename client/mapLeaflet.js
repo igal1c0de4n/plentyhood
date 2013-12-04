@@ -117,6 +117,7 @@ Template.leafletMap.rendered = function() {
   var markerIcon = L.icon({
     iconUrl: leafletStaticFolder + "marker-icon.png",
     shadowUrl: leafletStaticFolder + "marker-shadow.png",
+    iconAnchor: [12, 41], // half width, full length of marker-icon.png
   });
 
   var markerUnselectedStyle = {
