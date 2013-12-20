@@ -2,10 +2,8 @@
 
   "use strict";
 
-
 ////////////////////////////////////////////////////////////////////
 // Routing
-//
 
 // override with meteor-router navigate method
 Meteor.navigateTo = function (path) {
@@ -21,28 +19,25 @@ function emailVerified (user) {
 Meteor.Router.add({
   '/': function () {
     var user;
-
-    console.log('router root');
+//     console.log('router root');
     if (Meteor.loggingIn()) {
-      console.log('home: loading');
+//       console.log('home: loading');
       return 'loading';
     }
     user = Meteor.user();
     if (user) {
-      console.log('home: user found');
-      console.log(user.roles);
+//       console.log('home: user found');
+//       console.log(user.roles);
        if (!emailVerified(user)) {
          console.log('home: awaiting-verification');
          return 'awaiting-verification';
        }
     }
-    console.log('home: start');
     return 'start';
   },
+
   '/start': 'start',
   '/places': 'places',
-  '/secrets': 'secrets',
-
   '/admin': function () {
     if (Roles.userIsInRole(Meteor.user(), 'admin')) {
       return 'admin';
@@ -82,7 +77,7 @@ Meteor.Router.filters({
         return 'awaiting-verification';
 
       } 
-      console.log('filter: done');
+//       console.log('filter: done');
       return page;
     }
   }

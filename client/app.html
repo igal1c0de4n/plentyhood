@@ -1,254 +1,153 @@
-<template name="dialogs">
-  {{#if isDialogActive}}
-    <div class="modal fade" id="eModalDialog" tabindex='-1'>
-      <div class="modal-dialog">
-        <div class="modal-content">
-          {{#if isPlaceCreateActive}}
-            {{> placeCreateDialog}}
-          {{/if}}
-
-          {{#if isInviteActive}}
-            {{> inviteDialog}}
-          {{/if}}
-
-          {{#if isPlaceResourceAddActive}}
-            {{> placeResourceAddDialog}}
-          {{/if}}
-        </div>
-      </div>
-    </div>
-  {{/if}}
-</template>
-
-<template name="placeResourceAddDialog">
-  <div class="modal-header">
-    <button type="button" class="close cancel">&times;</button>
-    <h3>Add Resource</h3>
-  </div>
-
-  <div class="modal-body">
-    {{#if error}}
-      <div class="alert alert-error">{{error}}</div>
-    {{/if}}
-
-    {{> categorySelect}}
-    {{> resourceSelect}}
-
-    <label>Description</label>
-    <textarea class="description span5"></textarea>
-
-    <label class="checkbox">
-      <input type="checkbox" class="private">
-      Private &mdash; friends only
-    </label>
-  </div>
-
-  <div class="modal-footer">
-    <a href="#" class="btn cancel">Cancel</a>
-    <a href="#" class="btn btn-primary save" {{saveDisabled}}>Save</a>
-  </div>
-</template>
-
-<template name="placeResourcesPanel">
-  <form class="form-horizonal" role="form">
-    {{#if placeHasResources}}
-    <h4>Resources</h4>
-    {{#each placeResources}}
-      <label class="span3">
-        {{resourceName}}
-        <button type="button" aria-hidden="true" class="close placeResourceRemove">
-          &times;</button>
-      </label>
-    {{/each}}
-    {{else}}
-    <p>No resources yet</p>
-    {{/if}}
-    {{#if isPlaceOwner}}
-      <input type="button" 
-      class="btn btn-default span4 placeResourceAdd" 
-      value="Add Resource">
-    {{/if}}
-  </form>
-</template>
-
-<template name="leafletMap">
-  {{#constant}}
-    <div id="leaflet-map" class="leflet-map"></div>
-  {{/constant}}
-</template>
-
 <template name="places">
 {{> header}}
 {{> leafletMap}}
-<div class="placeContainer">
-  <div>
-    {{#if selectedPlace}}
-    {{#with selectedPlace}}
-    {{> placeContainer}}
-    {{/with}}
-    {{else}}
-    <em><small>
-        {{#if anyPlaces}}
-        Select a place to see details
-        {{else}}
-        How wierd - No places yet!
-        {{/if}}
-    </small></em>
-    {{/if}}
-  </div>
-  <div class="pagination-right" style="margin-right: 10px">
-    <em>
-      <small>
-        {{#if currentUser}}
-        Ctrl + click the map to post a new place
-        {{else}}
-        Sign in to post your place
-        {{/if}}
-      </small>
-    </em>
-  </div>
-</div>
-</template>
-
-<template name="placeContainer">
-<div>
-  {{> details}}
-  {{> placeResourcesPanel}}
-</div>
-{{#if isOwner}}
-<div class="row">
-  <div class="alert alert-info span3">
-    <small>
-      Need to <a href="#" class="removePlace">delete this place</a>?
-    </small>
-  </div>
-</div>
+{{> searchPanel}}
+{{#if isPanelActive "help"}}
+{{> panelHelp}}
+{{/if}}
+{{#if isPanelActive "place"}}
+{{> panelPlace}}
+{{/if}}
+{{#if isPanelActive "edit"}}
+{{> placeEditPanel}}
 {{/if}}
 </template>
 
-<template name="details">
-<h3>
-  {{title}}
+<template name="searchPanel">
+<div class="searchPanel">
+  <form class="navbar-search pull-right">
+    <input type="text" class="search-query" placeholder="Search">
+  </form>
+</div>
+</template>
+
+<template name="leafletMap">
+{{#constant}}
+<div id="leaflet-map" class="leflet-map"></div>
+{{/constant}}
+</template>
+
+<template name="panelPlaceEdit">
+<div class="panelPlaceEdit floatingPanel">
+  abcd
+</div>
+</template>
+
+<template name="panelHelp">
+<div class="panelHelp floatingPanel">
+  <label>
+    <em>
+      {{#if anyPlaces}}
+      <i class="icon-th-list"></i> Select a place to see details
+      {{else}}
+      <i class="icon-minus-sign"></i> No places yet, but stay tuned!
+      {{/if}}
+    </em>
+  </label>
+  <label>
+    <em>
+      {{#if currentUser}}
+      <i class="icon-home"></i> Ctrl + click the map to post a new place
+      {{else}}
+      <i class="icon-user"></i>
+      Sign in to post a new place
+      {{/if}}
+    </em>
+  </label>
+</div>
+</template>
+
+<template name="panelPlace">
+<div class="panelPlace floatingPanel">
+  {{#with selectedPlace}}
+  {{> details}}
+  {{> placeResourcesPanel}}
+  {{#unless public}}
+  {{> sharedPanel}}
+  {{/unless}}
   {{#if isOwner}}
-  <div class="row pull-right">
-    <input type="button" 
-    class="btn btn-success movePlaceOnMap"
-    value="Move">
+  <div class="row">
+    <div class="alert alert-info span2">
+      <small>
+        Need to <a href="#" class="removePlace">delete this place</a>?
+      </small>
+    </div>
   </div>
   {{/if}}
-</h3>
-<small style="margin-left=20px">
-  <b>{{#if public}} Public{{else}} Private{{/if}},</b>
-</small>
-<small>{{creatorName}}</small>
-<div>
-  <small> GPS {{placeLocationGet}} </small>
+  {{/with}}
 </div>
+</template>
 
-<div class="description">
-  About: {{description}}
+<template name="details">
+<label>
+  <i class="icon-bookmark"></i>
+  <b>{{title}}</b>
+  <em>- {{#if public}}Public{{else}}Private{{/if}}</em>
+  {{#if isOwner}}
+  <input type="button" class="btn btn-mini editPlace" value="Edit">
+  {{/if}}
+  <button type="button" aria-hidden="true" class="close">&times;</button>
+</label>
+<div class="indent">
+  <small>{{creatorName}}</small> 
 </div>
-{{#unless public}}
-{{> sharedPanel}}
-{{/unless}}
+<div>
+  <i class="icon-comment"></i>
+  <em><b>About</b></em></div>
+</div>
+<div class="indent">{{description}}</div>
+<div>
+  <i class="icon-map-marker"></i>
+  <em><b>Location</b></em>
+  {{#if isOwner}}
+  <input type="button" class="btn btn-mini editLocation" value="Edit">
+  {{/if}}
+</div>
+<div class="indent">{{placeLocationGet}}</div>
+</template>
+
+<template name="placeResourcesPanel">
+<label>
+  {{#if placeHasResources}}
+  <i class="icon-th-list"></i>
+  {{else}}
+  <i class="icon-minus-sign"></i>
+  {{/if}}
+  <em><b>Resources</b></em>
+  {{#if isOwner}}
+  <input type="button" class="btn btn-mini placeResourceAdd" value="Add">
+  {{/if}}
+</label>
+{{#if placeHasResources}}
+{{#each placeResources}}
+<label for="" class="indent">
+  {{#if isOwner}}
+  <button type="button" aria-hidden="true" 
+    class="close placeResourceRemove pull-left">
+    &times;
+  </button>
+  {{else}}
+  <i class="icon-ok"></i>
+  {{/if}}
+  {{this.title}}
+</label>
+{{/each}}
+{{/if}}
 </template>
 
 <template name="sharedPanel">
-  <div class="sharedPanel well well-small">
-    <div class="muted usersList"><b>Friends:</b></div>
-    {{#each outstandingInvitations}}
-      <div>
-        {{invitationName}}
-      </div>
-    {{/each}}
-    {{#if nobody}}
-      <div>Nobody.</div>
-    {{/if}}
-    {{#if canInvite}}
-      <div class="invite">
-        <a href="#" class="btn btn-mini invite">Invite More</a>
-      </div>
-    {{/if}}
-  </div>
-</template>
-
-<template name="placeCreateDialog">
-  <div class="modal-header">
-    <button type="button" class="close cancel">&times;</button>
-    <h3>Add Place</h3>
-  </div>
-
-  <div class="modal-body">
-    {{#if error}}
-    <div class="alert alert-error">{{error}}</div>
-    {{/if}}
-
-    <label>Title</label>
-    <input type="text" class="title span5">
-
-    <label>Description</label>
-    <textarea class="description span5"></textarea>
-
-    <label class="checkbox">
-      <input type="checkbox" class="private">
-      Private place &mdash; friends only
-    </label>
-  </div>
-
-  <div class="modal-footer">
-    <a href="#" class="btn cancel">Cancel</a>
-    <a href="#" class="btn btn-primary save">Add place</a>
-  </div>
-</template>
-
-<template name="inviteDialog">
-  <div class="modal-header">
-    <button type="button" class="close done">&times;</button>
-    <h3>Invite people</h3>
-  </div>
-
-  <div class="modal-body">
-    {{#each uninvited}}
-      <div class="invite-row">
-        <a href="#" class="btn invite">Invite</a>
-        {{displayName}}
-      </div>
-    {{else}}
-      Everyone on the site has already been invited.
-    {{/each}}
-  </div>
-
-  <div class="modal-footer">
-    <a href="#" class="btn btn-primary done">Done</a>
-  </div>
-</template>
-
-<template name="categorySelect">
-  <select class="categoryList span4" id="eCategorySelect">
-    {{#if categoriesExist}}
-      <option value="" disabled>select category</option>
-      {{#each allCategries}}
-      <option value="{{this._id}}" {{categoryOptionSelected}}>
-        {{this.name}}
-      </option>
-      {{/each}}
-    {{else}}
-      <option value="" disabled>no available categories</option>
-    {{/if}}
-  </select>
-</template>
-
-<template name="resourceSelect">
-  <select class="resourceList span4" id="eResourceSelect" {{needDisable}}>
-    {{#if resourcesExist}}
-      <option value="" disabled>select resource</option>
-      {{#each resourcesUnderCategory}}
-        <option value="{{this._id}}" {{resourceOptionSelected}}>
-        {{this.name}}
-        </option>
-      {{/each}}
-    {{else}}
-      <option value="" disabled>no resources yet</option>
-    {{/if}}
-  </select>
+<div class="sharedPanel well well-small">
+<div class="muted usersList"><b>Friends:</b></div>
+{{#each outstandingInvitations}}
+<div>{{invitationName}}</div>
+{{/each}}
+{{#if nobody}}
+<div>Nobody.</div>
+{{/if}}
+{{#if canInvite}}
+<div class="invite">
+  <a href="#" class="btn btn-mini invite">Invite More</a>
+</div>
+{{/if}}
+</div>
 </template>

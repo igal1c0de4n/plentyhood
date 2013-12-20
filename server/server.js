@@ -12,18 +12,17 @@ Meteor.publish("places", function () {
     {$or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
 });
 
-Meteor.publish("categories", function () {
-  return App.collections.Categories.find();
-});
-
-Meteor.publish("resources", function () {
-  return App.collections.Resources.find();
-});
-
-Meteor.publish("services", function () {
-  return App.collections.Services.find();
+Meteor.publish("tags", function () {
+  return App.collections.Tags.find();
 });
 
 console.log("app env: " + JSON.stringify(process.env.NODE_ENV));
+
+var fixDB = function() {
+  _.each(App.collections.Tags.find().fetch(), function (r) {
+    console.log("resource", r);
+    App.collections.Tags.update(r._id, {name: r.name.toLowerCase()});
+  });
+};
 
 }());

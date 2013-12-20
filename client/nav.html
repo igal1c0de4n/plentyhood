@@ -25,7 +25,6 @@
   </div>
   <div class="example-users">
     <p>Normal User: normal@example.com | apple1</p>
-    <p>View Secrets: view@example.com | apple1</p>
     <p>Manage Users: manage@example.com | apple1</p>
     <p>Admin User: admin@example.com | apple1</p>
   </div>
@@ -47,27 +46,25 @@
 </template>
 
 <template name="header">
-<div class="navbar navbar-inverse navbar-navbar-fixed-top">
-  <div class="navbar-inner">
+<div class="navbar navbar-inverse navbar-navbar-fixed-top 
+  {{page2class "places" "navbar-w-map"}}">
+  <div class="navbar-inner {{page2class "places" "navbar-inner-w-map"}}">
     <a class="brand" href="/">Plentyhood</a>
     <ul class="nav">
-      <li  class="{{isActive "start"}}"><a href="/start">Home</a></li>
-      <li  class="{{isActive "places"}}"><a href="/places">Places</a></li>
-      {{#if isInRole 'admin,view-secrets'}}
-      <li class="{{isActive "secrets"}}"><a href="/secrets">Secrets</a></li>
-      {{/if}}
+      <li  class="{{page2class "start" "active"}}"><a href="/start">Home</a></li>
+      <li  class="{{page2class "places" "active"}}"><a href="/places">Places</a></li>
       {{#if isInRole 'admin'}}
-      <li class="{{isActive "admin"}}"><a href="/admin">Admin</a></li>
+      <li class="{{page2class "admin" "active"}}"><a href="/admin">Admin</a></li>
       {{/if}}
       {{#if isInRole 'admin,manage-users'}}
-      <li class="{{isActive "manage"}}"><a href="/manage">Users</a></li>
+      <li class="{{page2class "manage" "active"}}"><a href="/manage">Users</a></li>
       {{/if}}
     </ul>
     <ul class="nav pull-right">
       {{#if userSignedIn}}
       <li class="dropdown pull-right">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        {{displayName}}<b class="caret"></b>
+        {{rolesDispName}}<b class="caret"></b>
       </a>
       <ul class="dropdown-menu">
         <li><a class="signout" href="/signout">Sign out</a></li>
@@ -77,9 +74,6 @@
       <li>{{loginButtons align="right"}}</li>
       {{/if}}
     </ul>
-    <form class="navbar-search pull-right">
-      <input type="text" class="search-query" placeholder="Search">
-    </form>
   </div>
 </div>
 </template>
@@ -92,45 +86,26 @@
 {{> header}}
 <div class="container">
   <h3>Plentyhood?</h3>
-  <p>
-  This web application builds on the recent sharing revolution to facilitate
-  cooperation within a local community. It's about sharing nearby resources such as tools, produce, gardens, services and more.
+  <p> Plentiful neighborHood. 
+  It's about easily sharing nearby resources: 
+  tools, produce, gardens, services and more. 
   </p>
   <p>
-  The app wroks with the user's location to enable access to resources which are 
-  closer and thus more relevant. 
-
-  At first, we will be focusing on gardening: facilitating growing of produce: local, organic fruits and vegetables. If that works, hopefully everything else!
+  The app facilitates cooperation within a local community using the user's location 
+  to enable access to resources which are closer and relevant. 
+  The system is tag-based. Just create your place, add resources and tag those!
   </p>
-  <p>TBD carousle slideshow</p>
   <h3>How can I use this site?</h3>
-  <p> This is a mockup version. As such, security is deliberately not enforced. Create your own account or login with any of these users: </p>
+  <p>Create an account or login with any of these users: </p>
   <ul>
     <li>normal@example.com</li>
     <li>view@example.com</li>
     <li>manage@example.com</li>
     <li>admin@example.com</li>
   </ul>
-  <p>The generic password is: apple1</p>
-</div>
-</template>
-
-<template name="secrets">
-{{> header}}
-<div class="secrets row">
-  <div class="offset4 span8">
-
-    <p class="note">
-    Only Admins and those with the 'view-secrets' role
-    will see this page in their header nav.</p>
-
-    <h2>Secrets!</h2>
-    <ul>
-      {{#each secrets}}
-      <li><p>{{secret}}</p></li>
-      {{/each}}
-    </ul>
-  </div>
+  <p>The generic password is: <em>apple1</em></p>
+  <p><small>Current vertion is pre-alpha. Security is not strictly enforced. 
+    Expect bugs abd missing features!</small></p>
 </div>
 </template>
 

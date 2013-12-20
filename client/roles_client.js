@@ -38,9 +38,6 @@ Deps.autorun(function () {
   // will update once user has logged in
   var user = Meteor.user();
 
-  // secrets
-  Meteor.subscribe('secrets');
-
   // users, for manage-users page
   Meteor.subscribe('users');
 });
@@ -59,20 +56,14 @@ Template.header.events({
 });
 
 Template.header.helpers({
-  displayName: function () {
-    return displayName();
-  }
-});
-
-Template.secrets.helpers({
-  secrets: function () {
-    return App.collections.Secrets.find();
+  rolesDispName: function () {
+    return rolesDispName();
   }
 });
 
 Template.noteOfTheDay.helpers({
   note: function () {
-    return "Greetings " + displayName() + "!";
+    return "Greetings " + rolesDispName() + "!";
   }
 });
 
@@ -95,7 +86,7 @@ Template.displayUsers.helpers({
 ////////////////////////////////////////////////////////////////////
 // Misc helper functions
 
-function displayName (user) {
+function rolesDispName (user) {
   var name;
 
   if (!user) {

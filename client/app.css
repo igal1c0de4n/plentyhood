@@ -1,94 +1,139 @@
-html, body, #leaflet-map {
-    height: 98%;
+html, body, .fill {
+  height: 100%;
+  width: 100%;
+}
+
+.searchPanel {
+  position: fixed;
+  top: 50px;
+  right: 10px;
+  z-index: 1;
+}
+
+.floatingPanel {
+  position: fixed;
+  top: 64px;
+  left: 20px;
+  padding: 10px;
+  background-color: white;
+  opacity: 0.9;
+  /* TBD: add css transitions 
+   * It only work if the element future size is known in advance, not in auto
+   * (there's a workaround)
+   */
+  /* 	transition:width 2s, height 2s, background-color 2s, transform 2s; */
+}
+
+.panelHelp {
+  width: 270px;
+}
+
+.panelPlace {
+  width: 350px;
+}
+
+#leaflet-map {
+  height: 100%;
 }
 
 body {
-    padding: 0;
-    margin: 0;
+  padding: 0;
+  margin: 0;
+  /* tbd: set map.height to (window.height - navbar.height)
+  meanwhile, workaround which hides the bottom part of the map 
+  and the leaflet(c) part
+   */
+  /*    overflow: hidden; */
 }
 
-.placeContainer {
-	position: absolute;
-	top: 70px;
-	left: 20px;
-	width: 310px;
-	padding: 10px;
-	background-color: white;
-	opacity: 0.9;
-
-/* TBD: add css transitions 
- * It only work if the element future size is known in advance, not in auto
- * (there's a workaround)
- */
-// 	transition:width 2s, height 2s, background-color 2s, transform 2s;
+.indent {
+  margin-left: 10px;
 }
 
 .header {
-    padding: 10px 0;
-    padding-bottom: 0px;
+  padding: 10px 0;
+  padding-bottom: 0px;
 }
 
 .mask {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0px;
-    left: 0px;
-    background-color: #000000;
-    opacity: .4;
-    z-index: 1;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  background-color: #000000;
+  opacity: .4;
+  z-index: 1;
 }
 
 .invite-row .invite {
-    margin: 10px 10px 10px 0;
-}
-
-.description {
-    margin: 10px 0 10px 0;
+  margin: 10px 10px 10px 0;
 }
 
 .sharedPanel .usersList {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .sharedPanel .invite {
-    text-align: center;
+  text-align: center;
 }
 
 input.chosen {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 h1 {
-	font-size: 30px;
+  font-size: 30px;
 }
 
 h2 {
-	font-size: 25px;
+  font-size: 25px;
 }
 
 h3 {
   margin: 0;
-	font-size: 20px;
+  font-size: 20px;
   line-height: 30px;
 }
 
 h1, h2, h3 {
-	color: #252;
+  color: #252;
 }
 
 .attribution {
-    position: absolute;
-    bottom: 0;
-    background-color: white;
-    padding: 3px;
-    padding-bottom: 0;
+  position: absolute;
+  bottom: 0;
+  background-color: white;
+  padding: 3px;
+  padding-bottom: 0;
 }
 
 .movePlaceOnMap {
-    margin: 0;
+  margin: 0;
 }
 
 pull-right {
   margin-right: 20px;
+}
+
+.verticalMargin {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.tagsLabel {
+  padding-right: 5px;
+}
+
+.bootstrap-tagsinput {
+  margin-bottom: 0;
+  width: 95%;
+}
+
+.fullWidth {
+  width: 95%;
+}
+
+.placeResourceRemove {
+  margin-right: 5px;
 }

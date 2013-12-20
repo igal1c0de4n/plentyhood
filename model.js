@@ -3,30 +3,6 @@
 
 // Loaded on both the client and the server
 
-App.collections.Categories.allow({
-  insert: function (userId) {
-    return false; 
-  },
-  update: function (userId) {
-    return false;
-  },
-  remove: function (userId) {
-    return false;
-  },
-});
-
-App.collections.Resources.allow({
-  insert: function (userId) {
-    return false; 
-  },
-  update: function (userId) {
-    return false;
-  },
-  remove: function (userId) {
-    return false;
-  },
-});
-
 // Places -- data model
 /*
   Each place is represented by a document in the Places collection:
@@ -38,7 +14,7 @@ App.collections.Resources.allow({
 */
 App.collections.Places.allow({
   insert: function (userId, place) {
-    return false; // no cowboy inserts -- use createPlace method
+    return false; // no cowboy inserts -- use mtcPlaceCreate method
   },
   update: function (userId, place, fields, modifier) {
     if (userId !== place.owner)
@@ -61,7 +37,7 @@ App.collections.Places.allow({
 
 Meteor.methods({
 
-  getNodeEnv: function() {
+  mtcNodeEnvGet: function() {
     // console.log(process.env);
     if (Meteor.isServer) {
       return JSON.stringify(process.env.NODE_ENV);
@@ -69,7 +45,7 @@ Meteor.methods({
   },
 
   // options should include: title, description, x, y, public
-  createPlace: function (options) {
+  mtcPlaceCreate: function (options) {
     options = options || {};
     function isInRange(v, min, max) {
       return v >= min && v <=max;
@@ -97,7 +73,7 @@ Meteor.methods({
     });
   },
 
-  invite: function (placeId, userId) {
+  mtcInvite: function (placeId, userId) {
     var place = App.collections.Places.findOne(placeId);
     if (! place || place.owner !== this.userId)
       throw new Meteor.Error(404, "No such place");
@@ -125,88 +101,47 @@ Meteor.methods({
     }
   },
 
-  categoryAdd: function (options) {
-    var CATEGORY_NAME_MAX_LEN = 64;
-
-    options = options || {};
-
-    var n = _(options.name).capitalize();
-    if (n.length > CATEGORY_NAME_MAX_LEN)
-      throw new Meteor.Error(413, "Name too long");
-    verifyLoggedIn.call(this);
-
-    if (App.categoryExist(n)) {
-      throw new Meteor.Error(403, "Already exists");
-    }
-    // TBD: check for user == admin
-
-    return App.collections.Categories.insert({ name: n});
-  },
-
-  categoryRemove: function (options) {
-    if (!options.id)
-      throw new Meteor.Error(403, "Empty id");
-
-    verifyLoggedIn.call(this);
-
-    // TBD: check for user == admin
-
-    return App.collections.Categories.remove({ _id: options.id});
-  },
-
-  resourceAdd: function (options) {
-    var RESOURCE_NAME_MAX_LEN = 64;
-
-    options = options || {};
-
-    if (options.name.length > RESOURCE_NAME_MAX_LEN)
-      throw new Meteor.Error(413, "name too long");
-    verifyLoggedIn.call(this);
-
-    // TBD: check for user == admin
-
-    return App.collections.Resources.insert({
-      name: _(options.name).capitalize(),
-      categoryId: options.categoryId,
-    });
-  },
-
-  resourceRemove: function (options) {
-    if (!options.id)
-      throw new Meteor.Error(413, "Empty id");
-    verifyLoggedIn.call(this);
-
-    // TBD: check for user == admin
-
-    return App.collections.Resources.remove({
-      _id: options.id,
-    });
-  },
-
-  placeResourceAdd: function (options) {
+  mtcPlaceResourceAdd: function (options) {
     options = options || {};
 
     verifyLoggedIn.call(this);
     var p = placeGet(options.placeId);
     placeOwnerConfirm.call(this, p);
 
-    if (placeHasResource(p, options.resourceId)) {
-      throw new Meteor.Error(403, "resource already exists in place");
-    }
-    else {
+    var tagIdsList = _.map(options.tags, function (tagTitle) {
+      var t = App.collections.Tags.findOne({title: tagTitle});
+      if (t) {
+        t.popularity++;
+        console.log("tag:", tagTitle, "exists, popularity:", t.popularity);
+        App.collections.Tags.update(t._id, t);
+        return t._id;
+      }
+      // must be new tag
+      console.log("creating new tag:", tagTitle);
+      var newTagId = App.collections.Tags.insert(
+        {title: tagTitle.trim().toLowerCase(), popularity: 1});
+      return newTagId;
+    });
+
+    if (options.title && options.tags.length) {
       App.collections.Places.update(options.placeId, { 
         $addToSet: { 
           resources: { 
-            id: options.resourceId, 
+            _id: (new Meteor.Collection.ObjectID())._str, 
+            title: options.title, 
             description: options.description,
-            public: options.public,  
+            public: options.public,
+            tags: tagIdsList,
           }
         }
       });
     }
+    else {
+      throw new Meteor.Error(403, "missing options");
+    }
   },
 
-  placeResourceRemove: function (options) {
+  mtcPlaceResourceRemove: function (options) {
     options = options || {};
 
     verifyLoggedIn.call(this);
@@ -224,13 +159,12 @@ Meteor.methods({
       App.collections.Places.update(options.placeId, { 
         $pull: { 
           resources: { 
-            id: options.resourceId, 
+            _id: options.resourceId, 
           }
         }
       });
     }
   }
-
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -254,8 +188,13 @@ var placeOwnerConfirm = function (p) {
 }
 
 var placeHasResource = function (place, rid) {
-    var ridList = _.pluck(place.resources, 'id');
-    return _.contains(ridList, rid);
+    var ridList = _.find(place.resources, function (r) {
+      if (r._id == rid) {
+        console.log("place has resource", r._id, r.title);
+        return true; 
+      }
+    });
+    return !!ridList;
 }
 
 var verifyLoggedIn = function () {
@@ -273,12 +212,5 @@ var contactEmail = function (user) {
     return user.services.facebook.email;
   return null;
 };
-
-// extend underscore
-_.mixin({
-  capitalize: function(string) {
-    return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
-  }
-});
 
 }());

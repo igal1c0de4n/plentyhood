@@ -1,39 +1,31 @@
 <template name="admin">
 {{> header}}
-
 {{#if errorExists}}
 <div class="alert alert-error">{{getError}}</div>
 {{/if}}
 {{#if info}}
 <div class="alert alert-info">{{info}}</div>
 {{/if}}
-
 <div class="container">
-  <h2>Edit Categories and Resources</h2>
-  <form class="form-inline" role="form">
-    <input type="text" class="category span4" 
-    placeholder="category name" id="eCategoryAddTf">
-    <input type="button" 
-    class="btn btn-default span4 categoryAdd" value="Add Category">
-  </form>
-  <form class="form-inline" role="form">
-    {{> categorySelect}}
-    <input type="button" 
-    class="btn btn-default span4 categoryRemove"
-    value="Remove Category" {{disableCategoryRemove}}>
-  </form>
-
-  <form class="form-inline" role="form">
-    <input type="text" class="resourceAddTf span4" 
-    id="eResourceAddTf" placeholder="resource name">
-    <input type="button" 
-    class="btn btn-default span4 resourceAdd" value="Add Resource">
-  </form>
-  <form class="form-inline" role="form">
-    {{> resourceSelect}}
-    <input type="button" 
-    class="btn btn-default span4 resourceRemove" 
-    value="Remove Resource" {{disableResourceRemove}}>
-  </form>
+  <div class="row">
+  <h2>Tags</h2>
+  </div>
+  <div class="row">
+    <form class="navbar-search" role="form">
+      <input type="text" class="search-query" placeholder="Search tags">
+    </form>
+  </div>
+  <div class="row">
+    {{#if tagSelected}}
+    <hr/>
+    <form class="form-inline" role="form">
+      <label>Popularity</label>
+      <input type="text" class="popularity" placeholder={{tagPopularityGet}}>
+      <input type="button" 
+      class="btn btn-default span4 tagRemove"
+      value="Remove Tag">
+    </form>
+    {{/if}}
+  </div>
 </div>
 </template>

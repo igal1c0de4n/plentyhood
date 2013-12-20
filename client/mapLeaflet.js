@@ -2,15 +2,10 @@
 // Leaflet Map
 ///////////////////////////////////////////////////////////////////////////////
 
-var leafletMapCreated = false;
-var renderCount;
+var renderCount; // for troubleshooting extra renders
+var llmap;
 
 Template.leafletMap.created = function() {
-  if (leafletMapCreated) {
-    console.log("warning: template created more than once!");
-  }
-  else {
-    leafletMapCreated = true;
     var mapViewDefault = { 
       latlng: [37.35024, -121.95751], 
       zoom: 13 
@@ -19,7 +14,12 @@ Template.leafletMap.created = function() {
     console.log("template leafletMap created");
     Session.set('mapView', mapViewDefault);
     renderCount = 0;
-  }
+};
+
+Template.leafletMap.destroyed = function() {
+  console.log("leafletmap -> destroyed");
+  llmap.remove();
+  llmap = undefined;
 };
 
 Template.leafletMap.rendered = function() {
@@ -42,7 +42,7 @@ Template.leafletMap.rendered = function() {
     noWrap: true,
     zoomControl: false,
   };
-  var llmap = L.map('leaflet-map', llmapOptions).
+  llmap = L.map('leaflet-map', llmapOptions).
     setView(view.latlng, view.zoom).
     locate({maximumAge : 1000 * 60, setView: false}).
     whenReady(function () { console.log("leaflet ready")});
@@ -50,7 +50,7 @@ Template.leafletMap.rendered = function() {
     maxZoom: 18,
     attribution : 'Tiles: &copy; Esri, National Geographic'
   }).addTo(llmap);
-  llmap.addControl(L.control.zoom({position: 'topright'}));
+  llmap.addControl(L.control.zoom({position: 'bottomright'}));
 
   llmap.on('moveend', function(e) {
     var view = {};
@@ -137,6 +137,8 @@ Template.leafletMap.rendered = function() {
     _.each(markers, function (c) {
       markerLayer.removeLayer(c);
     });
+
+    // TBD: fetch only places in proximity to map center
     var places = App.collections.Places.find().fetch();
     markers = [];
     var selected = Session.get('selectedPlace');

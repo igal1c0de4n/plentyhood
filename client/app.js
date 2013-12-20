@@ -3,48 +3,64 @@
 
 Meteor.subscribe("directory");
 Meteor.subscribe("places");
-Meteor.subscribe("categories");
-Meteor.subscribe("resources");
-Meteor.subscribe("services");
+Meteor.subscribe("tags");
+Session.set("activePanel", "help");
 
 // If no place selected, select one.
 Meteor.startup(function () {
-  Meteor.call("getNodeEnv", function (error, result) {
+  Meteor.call("mtcNodeEnvGet", function (error, result) {
     console.log("app environment: " + result);
-  });
-
-  Deps.autorun(function () {
-    if (! Session.get("selectedPlace")) {
-      var place = App.collections.Places.findOne();
-      if (place)
-        Session.set("selectedPlace", place._id);
-    }
   });
 });
 
 ///////////////////////////////////////////////////////////////////////////////
 // main panel
 
-Template.places.selectedPlace = function () {
-  return App.collections.Places.findOne(Session.get("selectedPlace"));
+Template.places.isPanelActive = function (name) {
+  if (Session.get("disablePanel")) 
+    return false;
+
+  if (name == "place") {
+    return !!Session.get("selectedPlace") && !Session.get("editPlace");
+  }
+  if (name == "edit") {
+    return !!Session.get("editPlace");
+  }
+  if (name == "help") {
+    return !Session.get("selectedPlace") &&
+      Session.get("activePanel") == "help";
+  }
 };
 
-Template.places.anyPlaces = function () {
+///////////////////////////////////////////////////////////////////////////////
+// help panel
+
+Template.panelHelp.anyPlaces = function () {
   return App.collections.Places.find().count() > 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Place Container
+// place panel
 
-Template.placeContainer.isOwner = function () {
+Template.panelPlace.selectedPlace = function () {
+  return App.collections.Places.findOne(Session.get("selectedPlace"));
+};
+
+Template.panelPlace.isOwner = function () {
   return this.owner === Meteor.userId();
 };
 
-Template.placeContainer.events({
+Template.panelPlace.events({
   'click .removePlace': function () {
     App.collections.Places.remove(this._id);
+    Session.set("selectedPlace", undefined);
     return false;
   },
+  'click .movePlaceOnMap': function () {
+    console.log("implementation tbd");
+    return false;
+  },
+
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,11 +70,12 @@ Template.details.creatorName = function () {
   var owner = Meteor.users.findOne(this.owner);
   if (owner._id === Meteor.userId())
     return "my place";
-  return "Owner: " + displayName(owner);
+  return "User: " + client.displayName(owner);
 };
 
 Template.details.placeLocationGet = function () {
-  return "(" + this.lat + "," + this.lng + ")";
+//   return "(" + this.lat + "," + this.lng + ")";
+  return "(tbd, lookup from GPS)"
 };
 
 Template.details.isOwner = function () {
@@ -68,6 +85,10 @@ Template.details.isOwner = function () {
 Template.details.events({
   'click .invite': function () {
     openInviteDialog();
+    return false;
+  },
+  'click .close': function () {
+    Session.set("selectedPlace", undefined);
     return false;
   },
 });
@@ -81,7 +102,7 @@ Template.sharedPanel.outstandingInvitations = function () {
 };
 
 Template.sharedPanel.invitationName = function () {
-  return displayName(this);
+  return client.displayName(this);
 };
 
 Template.sharedPanel.nobody = function () {
@@ -93,191 +114,18 @@ Template.sharedPanel.canInvite = function () {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// Create Place dialog
-
-var unsetActiveDialog = function (name) {
-  var currActiveDialog = Session.get("activeDialog");
-  if (currActiveDialog && (currActiveDialog == name || !name)) {
-    console.log("resetting active dialog from", currActiveDialog);
-    Session.set("activeDialog", undefined);
-  }
-};
-
-var bsModalOnShow = function (name) {
-  $('#eModalDialog').modal();
-  $('#eModalDialog').on('hide.bs.modal', function () {
-    unsetActiveDialog(name);
-  })
-}
-
-var bsModalOnHide = function (name) {
-  $('#eModalDialog').modal('hide');
-}
-
-Template.placeCreateDialog.rendered = function () {
-  bsModalOnShow("placeCreate");
-};
-
-Template.placeCreateDialog.events({
-  'click .save': function (event, template) {
-    var title = template.find(".title").value;
-    var description = template.find(".description").value;
-    var pub = ! template.find(".private").checked;
-    var coords = Session.get("createCoords");
-
-    if (title.length && description.length) {
-      Meteor.call('createPlace', {
-        title: title,
-        description: description,
-        lat: coords.lat,
-        lng: coords.lng,
-        public: pub
-      }, function (error, place) {
-        if (! error) {
-          Session.set("selectedPlace", place);
-          if (! pub && Meteor.users.find().count() > 1)
-            openInviteDialog();
-        }
-      });
-      bsModalOnHide("placeCreate");
-    } else {
-      Session.set("createError",
-                  "It needs a title and a description, or why bother?");
-    }
-  },
-
-  'click .cancel': function () {
-    bsModalOnHide();
-  }
-});
-
-Template.placeCreateDialog.error = function () {
-  return Session.get("createError");
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// Invite dialog
-
-var openInviteDialog = function () {
-  Session.set("activeDialog", "invite");
-};
-
-Template.inviteDialog.events({
-  'click .invite': function (event, template) {
-    Meteor.call('invite', Session.get("selectedPlace"), this._id);
-  },
-  'click .done': function (event, template) {
-    bsModalOnHide();
-    return false;
-  }
-});
-
-Template.inviteDialog.rendered = function () {
-  bsModalOnShow("invite");
-};
-
-Template.inviteDialog.uninvited = function () {
-  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
-  if (! place)
-    return []; // place hasn't loaded yet
-  return Meteor.users.find({$nor: [{_id: {$in: place.invited}},
-                                   {_id: place.owner}]});
-};
-
-Template.inviteDialog.displayName = function () {
-  return displayName(this);
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// dialogs
-
-Template.dialogs.isDialogActive = function () {
-  return !!Session.get("activeDialog");
-};
-
-Template.dialogs.isPlaceResourceAddActive = function () {
-  return Session.get("activeDialog") == "placeResourceAdd";
-};
-
-Template.dialogs.isPlaceCreateActive = function () {
-  return Session.get("activeDialog") == "placeCreate";
-};
-
-Template.dialogs.isInviteActive = function () {
-  return Session.get("activeDialog") == "invite";
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// Add resource dialog
-
-Template.placeResourceAddDialog.saveDisabled = function () {
-  return Session.get("selectedResourceId") ? null : "disabled";
-}
-
-var schedResourceAddDialog = function () {
-  Session.set("placeResourceAddError", null);
-  Session.set("selectedResourceId", null);
-  Session.set("selectedCategoryId", null);
-  Session.set("activeDialog","placeResourceAdd");
-};
-
-Template.placeResourceAddDialog.rendered = function () {
-  bsModalOnShow("placeResourceAdd");
-};
-
-Template.placeResourceAddDialog.events({
-  'click .save': function (event, template) {
-    if (!_.isUndefined(event.target.attributes.disabled)) {
-      return;
-    }
-    var resource = template.find(".resourceList").value;
-    var description = template.find(".description").value;
-    var pub = ! template.find(".private").checked;
-
-    if (resource) {
-      Meteor.call("placeResourceAdd", { 
-        placeId: Session.get("selectedPlace"),
-        resourceId: resource,
-        description: description,
-        public: pub
-      }, function (error) {
-        if (error) {
-          console.log("error: " + error);
-          Session.set("placeResourceAddError", error.toString());
-        }
-        else {
-          console.log("resource added");
-          bsModalOnHide();
-        }
-      });
-    } else {
-      Session.set("placeResourceAddError", "missing resource");
-    }
-  },
-
-  'click .cancel': function () {
-    bsModalOnHide();
-  }
-});
-
-Template.placeResourceAddDialog.error = function () {
-  return Session.get("placeResourceAddError");
-};
-
-
-///////////////////////////////////////////////////////////////////////////////
-// placeInfo
+// place resource panel
 
 Template.placeResourcesPanel.events({
   'click .placeResourceAdd': function (event, template) {
     console.log('adding resource');
-    schedResourceAddDialog();
+    client.schedResourceAddDialog();
   },
 
   'click .placeResourceRemove': function (event, template) {
-    var rid = this.id;
+    var rid = this._id;
     console.log('removing resource', rid);
-    Meteor.call("placeResourceRemove", { 
+    Meteor.call("mtcPlaceResourceRemove", { 
       placeId: Session.get("selectedPlace"),
       resourceId: rid,
     }, function (error) {
@@ -291,11 +139,6 @@ Template.placeResourcesPanel.events({
   },
 });
 
-Template.placeResourcesPanel.resourceName = function () {
-  var r = App.collections.Resources.findOne(this.id);
-  return r ? r.name : "loading...";
-};
-
 Template.placeResourcesPanel.placeHasResources = function () {
   var place = App.collections.Places.findOne(Session.get("selectedPlace"));
 //   console.log("place: ", place, " resources: ", place.resources);
@@ -308,67 +151,42 @@ Template.placeResourcesPanel.placeResources = function () {
   return place.resources;
 };
 
-Template.placeResourcesPanel.isPlaceOwner = function () {
-  return this.owner === Meteor.userId();
+Template.placeResourcesPanel.isOwner = function () {
+  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
+  return place.owner === Meteor.userId();
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// categorySelect
+// search panel
 
-Template.categorySelect.allCategries = function () {
-  return App.collections.Categories.find({}, {sort: {name: 1}});
-};
-
-Template.categorySelect.events({
-  'change .categoryList' : function(event, template) {
-    Session.set("selectedCategoryId", template.find(".categoryList").value);
-    Session.set("selectedResourceId", null);
+Template.searchPanel.events({
+  'keypress .search-query' : function(event, template) {
+    var places = {};
+    if (event.which == App.keyCode.ENTER) {
+      if (event.target.value) {
+        var v = event.target.value.trim().toLowerCase();
+        console.log("searching for", v);
+        var tags = App.collections.Tags.find({title: v}).fetch();
+        if (tags) {
+          console.log("tags search result: ", tags);
+          _.each(tags, function (t) {
+            places[t] = App.collections.Places.find(
+              {'resources.tags' : {'$all': [t._id]}}).fetch()
+            console.log("tag", t._id, places[t]);
+          });
+        }
+        else {
+          console.log("no tags found");
+        }
+      }
+      else {
+        places = App.collections.Places.find({}).fetch();
+        console.log("search invoked w/o tags");
+      }
+      console.log("places search result:", places);
+      return false;
+    }
   },
 });
-
-Template.categorySelect.categoriesExist = function () {
-  return App.collections.Categories.find().count() > 0;
-};
-
-Template.categorySelect.categoryOptionSelected = function () {
-  return Session.get("selectedCategoryId") == this._id ? "selected" : undefined;
-};
-
-Template.resourceSelect.needDisable = function () {
-  return Session.get("selectedCategoryId") ? undefined : "disabled";
-};
-
-Template.resourceSelect.resourceOptionSelected = function () {
-  return Session.get("selectedResourceId") == this._id ? "selected" : null;
-};
-
-Template.resourceSelect.events({
-  'change .resourceList' : function(event, template) {
-    Session.set("selectedResourceId", template.find(".resourceList").value);
-    template.find(".resourceList").autofocus = true;
-  },
-});
-
-Template.resourceSelect.resourcesUnderCategory = function () {
-    return App.collections.Resources.find(
-      {categoryId: Session.get("selectedCategoryId")}, 
-      {sort: {name: 1}});
-};
-
-Template.resourceSelect.resourcesExist = function () {
-  return Template.resourceSelect.resourcesUnderCategory().count() > 0;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-
-function placeGetSelected() {
-  return App.collections.Places.findOne(Session.get("selectedPlace"));
-};
-
-function displayName(user) {
-  if (user.profile && user.profile.name)
-    return user.profile.name;
-  return user.emails[0].address;
-};
 
 }());
