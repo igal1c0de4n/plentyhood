@@ -3,6 +3,18 @@
 
 // Loaded on both the client and the server
 
+App.collections.Tags.allow({
+  insert: function (userId) {
+    return false; 
+  },
+  update: function (userId) {
+    return false;
+  },
+  remove: function (userId) {
+    return false;
+  },
+});
+
 // Places -- data model
 /*
   Each place is represented by a document in the Places collection:
