@@ -1,6 +1,7 @@
 <template name="places">
 {{> header}}
 {{> leafletMap}}
+{{#unless isDialogActive}}
 {{> searchPanel}}
 {{#if isPanelActive "help"}}
 {{> panelHelp}}
@@ -11,13 +12,13 @@
 {{#if isPanelActive "edit"}}
 {{> placeEditPanel}}
 {{/if}}
+{{/unless}}
 </template>
 
 <template name="searchPanel">
 <div class="searchPanel">
-  <form class="navbar-search pull-right">
-    <input type="text" class="search-query" placeholder="Search">
-  </form>
+  <input class="tagsSearchInputField" type="text" placeholder="Search">
+  <input type="button" class="btn btn-default goSearch" value="Go">
 </div>
 </template>
 

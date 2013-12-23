@@ -132,27 +132,7 @@ client.schedResourceAddDialog = function () {
 Template.placeResourceAddDialog.rendered = function () {
   bsModalOnShow("placeResourceAdd");
   var tif = $('.tagsInputField');
-  var allTags = [
-    {name: "tree", id: "11111"},
-    {name: "apple", id: "12345"},
-    {name: "golden", id: "abcde"},
-  ];
-  var matchingTagsList = _.map(allTags, function (t) {
-    return t.name;
-  });
-
-  tif.tagsinput({
-    maxTags: 12,
-    typeahead: {
-      source: function(query) {
-        return matchingTagsList;
-      }
-    }
-  });
-  _.each(allTags, function (t){
-    tif.tagsinput('add', t.name);
-  })
-
+  tif.tagsinput(client.tagsInputOptions());
   console.log("placeResourceAddDialog->rendered");
 };
 

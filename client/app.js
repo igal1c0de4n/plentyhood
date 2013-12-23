@@ -14,7 +14,7 @@ Meteor.startup(function () {
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// main panel
+// places panel
 
 Template.places.isPanelActive = function (name) {
   if (Session.get("disablePanel")) 
@@ -30,6 +30,10 @@ Template.places.isPanelActive = function (name) {
     return !Session.get("selectedPlace") &&
       Session.get("activePanel") == "help";
   }
+};
+
+Template.places.isDialogActive = function () {
+  return !!Session.get("activeDialog");
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -160,33 +164,47 @@ Template.placeResourcesPanel.isOwner = function () {
 // search panel
 
 Template.searchPanel.events({
-  'keypress .search-query' : function(event, template) {
+  'keypress .goSearch' : function(event, template) {
     var places = {};
     if (event.which == App.keyCode.ENTER) {
-      if (event.target.value) {
-        var v = event.target.value.trim().toLowerCase();
-        console.log("searching for", v);
-        var tags = App.collections.Tags.find({title: v}).fetch();
-        if (tags) {
-          console.log("tags search result: ", tags);
-          _.each(tags, function (t) {
-            places[t] = App.collections.Places.find(
-              {'resources.tags' : {'$all': [t._id]}}).fetch()
-            console.log("tag", t._id, places[t]);
-          });
+      var tags = $(".tagsSearchInputField").tagsinput('items');
+      console.log("tags", tags);
+      if (tags.length) {
+        var ids = _.map(tags, function (t) {
+          var v = t.trim().toLowerCase();
+          var o = App.collections.Tags.findOne({title: v});
+          return o ? o._id : undefined;
+        });
+        console.log("ids", ids);
+        var missingTags = _.find(ids, function (id) {
+          return id === undefined;
+        });
+        if (missingTags == undefined) {
+          // all tags found
+          places = App.collections.Places.
+            find({'resources.tags' : {'$all': ids}}).fetch();
         }
         else {
-          console.log("no tags found");
+          // some tags are not even in the database 
+          // - don't bother with query, no places has those resources
+          places = [];
         }
       }
       else {
+        // backdoor cheat to see all places
         places = App.collections.Places.find({}).fetch();
         console.log("search invoked w/o tags");
       }
-      console.log("places search result:", places);
+      console.log("places:", places);
       return false;
     }
   },
 });
 
+Template.searchPanel.rendered = function () {
+  var tif = $('.tagsSearchInputField');
+  tif.tagsinput(client.tagsInputOptions());
+//   console.log("searchPanel->rendered");
+  $("div.bootstrap-tagsinput > input").focus();
+};
 }());
