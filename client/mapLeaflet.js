@@ -71,7 +71,8 @@ Template.leafletMap.rendered = function() {
         console.log("must be logged in to create events");
         return;
       }
-      schedCreateDialog(e.latlng.lat, e.latlng.lng);
+      var coordinates = {lat: e.latlng.lat, lng: e.latlng.lng};
+      schedCreateDialog(coordinates);
     }
   });  
 
@@ -144,7 +145,7 @@ Template.leafletMap.rendered = function() {
     var selected = Session.get("selectedPlace");
     last.selectedPlace = selected;
     _.each(places, function (place) {
-      var latlng = [place.lat, place.lng];
+      var latlng = [place.coordinates.lat, place.coordinates.lng];
       var style = selected == place._id ? 
         markerSelectedStyle : markerUnselectedStyle;
       var m = L.marker(latlng, style).addTo(markerLayer);
@@ -170,8 +171,8 @@ function objectsEqual(o1, o2) {
   return JSON.stringify(o1) == JSON.stringify(o2);
 };
 
-var schedCreateDialog = function (lat, lng) {
-  Session.set("createCoords", {lat: lat, lng: lng});
+var schedCreateDialog = function (coordinates) {
+  Session.set("createCoords", coordinates);
   Session.set("createError", null);
   Session.set("activeDialog", "placeCreate");
 };

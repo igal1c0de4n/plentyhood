@@ -32,7 +32,7 @@ App.collections.Places.allow({
     if (userId !== place.owner)
       return false; // not the owner
 
-    var allowed = ["title", "description", "x", "y", "lat", "lng"];
+    var allowed = ["title", "description", "coordinates"];
     if (_.difference(fields, allowed).length)
       return false; // tried to write to forbidden field
 
@@ -62,8 +62,8 @@ Meteor.methods({
     function isInRange(v, min, max) {
       return v >= min && v <=max;
     }
-    if (!isInRange(options.lat, -180, 180) ||
-       !isInRange(options.lng, -180, 180)) {
+    if (!isInRange(options.coordinates.lat, -180, 180) ||
+       !isInRange(options.coordinates.lng, -180, 180)) {
       throw new Meteor.Error(413, "Bad lat/lng");
     }
     if (options.title.length > 100)
@@ -76,8 +76,7 @@ Meteor.methods({
       owner: this.userId,
       x: options.x,
       y: options.y,
-      lat: options.lat,
-      lng: options.lng,
+      coordinates: options.coordinates,
       title: options.title,
       description: options.description,
       public: !! options.public,

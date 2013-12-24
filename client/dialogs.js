@@ -35,8 +35,7 @@ Template.placeCreateDialog.events({
       Meteor.call('mtcPlaceCreate', {
         title: title,
         description: description,
-        lat: coords.lat,
-        lng: coords.lng,
+        coordinates: coords,
         public: pub
       }, function (error, place) {
         if (error) {
