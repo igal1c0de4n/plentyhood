@@ -20,6 +20,8 @@ Template.leafletMap.destroyed = function() {
   console.log("leafletmap -> destroyed");
   llmap.remove();
   llmap = undefined;
+  this.handlePlacesChanged.stop();
+  this.handleMapChanged.stop();
 };
 
 Template.leafletMap.rendered = function() {
@@ -130,25 +132,21 @@ Template.leafletMap.rendered = function() {
     riseOnHover: true,
   };
 
-  function drawLocations() {
-
+  this.handlePlacesChanged = Deps.autorun(function () {
+    var places = Session.get("mappedPlaces");
+    console.log("handlePlacesChanged", places);
     // before redawing markers, delete the current ones
     // TBD optimization: update only the markers which change
     _.each(markers, function (c) {
       markerLayer.removeLayer(c);
     });
-
-    // TBD: fetch only places in proximity to map center
-    var places = App.collections.Places.find().fetch();
     markers = [];
-    var selected = Session.get('selectedPlace');
+    var selected = Session.get("selectedPlace");
     last.selectedPlace = selected;
     _.each(places, function (place) {
       var latlng = [place.lat, place.lng];
-
       var style = selected == place._id ? 
         markerSelectedStyle : markerUnselectedStyle;
-
       var m = L.marker(latlng, style).addTo(markerLayer);
       m.placeId = place._id;
       m.on('click', function(e) {
@@ -156,18 +154,9 @@ Template.leafletMap.rendered = function() {
       });
       markers.push(m);
     });
-  }
-
-  this.handle = Deps.autorun(function () {
-    var places = App.collections.Places.find().fetch();
-    var selected = Session.get('selectedPlace');
-
-//     console.log("mapHandle: places=" + places.length +
-//                   " selected=" + selected);
-    drawLocations();
   });
 
-  this.handleMapChange = Deps.autorun(function () {
+  this.handleMapChanged = Deps.autorun(function () {
     var view = Session.get('mapView');
     if (!objectsEqual(last.view, view)) {
       llmap.setView(view.latlng, view.zoom);

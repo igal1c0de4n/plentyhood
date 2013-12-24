@@ -175,7 +175,7 @@ Template.searchPanel.events({
           var o = App.collections.Tags.findOne({title: v});
           return o ? o._id : undefined;
         });
-        console.log("ids", ids);
+//         console.log("ids", ids);
         var missingTags = _.find(ids, function (id) {
           return id === undefined;
         });
@@ -195,7 +195,8 @@ Template.searchPanel.events({
         places = App.collections.Places.find({}).fetch();
         console.log("search invoked w/o tags");
       }
-      console.log("places:", places);
+//       console.log("places:", places);
+      Session.set("mappedPlaces", places);
       return false;
     }
   },
