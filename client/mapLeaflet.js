@@ -71,8 +71,7 @@ Template.leafletMap.rendered = function() {
         console.log("must be logged in to create events");
         return;
       }
-      var coordinates = {lat: e.latlng.lat, lng: e.latlng.lng};
-      schedCreateDialog(coordinates);
+      schedCreateDialog(e.latlng);
     }
   });  
 
@@ -145,7 +144,7 @@ Template.leafletMap.rendered = function() {
     var selected = Session.get("selectedPlace");
     last.selectedPlace = selected;
     _.each(places, function (place) {
-      var latlng = [place.coordinates.lat, place.coordinates.lng];
+      var latlng = L.GeoJSON.coordsToLatLng(place.location.coordinates);
       var style = selected == place._id ? 
         markerSelectedStyle : markerUnselectedStyle;
       var m = L.marker(latlng, style).addTo(markerLayer);
@@ -171,8 +170,13 @@ function objectsEqual(o1, o2) {
   return JSON.stringify(o1) == JSON.stringify(o2);
 };
 
-var schedCreateDialog = function (coordinates) {
-  Session.set("createCoords", coordinates);
+var schedCreateDialog = function (latlng) {
+  // mongodb can index GeoJSON locations, convert latlng
+  var geoJsonLoc = {
+    type: "Point",
+    coordinates: [latlng.lng, latlng.lat],
+  };
+  Session.set("placeLocation", geoJsonLoc);
   Session.set("createError", null);
   Session.set("activeDialog", "placeCreate");
 };

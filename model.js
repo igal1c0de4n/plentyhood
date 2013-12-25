@@ -19,7 +19,6 @@ App.collections.Tags.allow({
 /*
   Each place is represented by a document in the Places collection:
     owner: user id
-    x, y: Number (screen coordinates in the interval [0, 1])
     title, description: String
     public: Boolean
     invited: Array of user id's that are invited (only if !public)
@@ -59,13 +58,13 @@ Meteor.methods({
   // options should include: title, description, x, y, public
   mtcPlaceCreate: function (options) {
     options = options || {};
-    function isInRange(v, min, max) {
+    var isInRange = function (v, min, max) {
       return v >= min && v <=max;
-    }
-    if (!isInRange(options.coordinates.lat, -180, 180) ||
-       !isInRange(options.coordinates.lng, -180, 180)) {
-      throw new Meteor.Error(413, "Bad lat/lng");
-    }
+    };
+    _.each(options.location.coordinates, function (c) {
+      if (!isInRange(c, -180, 180))
+        throw new Meteor.Error(413, "Bad lat/lng", c);
+    });
     if (options.title.length > 100)
       throw new Meteor.Error(413, "Title too long");
     if (options.description.length > 1000)
@@ -74,9 +73,7 @@ Meteor.methods({
 
     return App.collections.Places.insert({
       owner: this.userId,
-      x: options.x,
-      y: options.y,
-      coordinates: options.coordinates,
+      location: options.location,
       title: options.title,
       description: options.description,
       public: !! options.public,

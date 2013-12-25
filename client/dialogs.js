@@ -29,13 +29,13 @@ Template.placeCreateDialog.events({
     var title = template.find(".title").value;
     var description = template.find(".description").value;
     var pub = ! template.find(".private").checked;
-    var coords = Session.get("createCoords");
+    var location = Session.get("placeLocation");
 
     if (title.length && description.length) {
       Meteor.call('mtcPlaceCreate', {
         title: title,
         description: description,
-        coordinates: coords,
+        location: location,
         public: pub
       }, function (error, place) {
         if (error) {

@@ -1,5 +1,4 @@
 // server
-
 ;(function () {
   "use strict";
 
@@ -18,33 +17,26 @@ Meteor.publish("tags", function () {
 
 console.log("app env: " + JSON.stringify(process.env.NODE_ENV));
 
-// fixdb - massage db here
-// function() {
-//   _.each(App.collections.Places.find().fetch(), function (p) {
-//     var update = false;
-//     if (p.hasOwnProperty('lng')) { 
-//       console.log("fixing coordiantes");
-//       p.coordinates = {lat: p.lat, lng: p.lng};
-//       if (p.hasOwnProperty('lng')) delete p.lng;
-//       if (p.hasOwnProperty('lat')) delete p.lat;
-//       update = true;
-//     }
-//     if (p.hasOwnProperty('x')) {
-//       delete p.x;
-//       update = true;
-//     }
-//     if (p.hasOwnProperty('y')) {
-//       delete p.y;
-//       update = true;
-//     }
-//     if (p.hasOwnProperty('rsvps')) {
-//       delete p.rsvps;
-//       update = true;
-//     }
-//     if (update) {
-//       console.log("--> updating place", p);
-//       App.collections.Places.update(p._id, p);
-//     }
-//   });
-// };
+var dataMassage = function () {
+  _.each(App.collections.Places.find().fetch(), function (p) {
+    var update = false;
+    if (p.hasOwnProperty('coordinates')) { 
+      console.log("switching coordiantes to GeoJSON");
+      p.location = {
+        type: "Point",
+        coordinates: [p.coordinates.lng, p.coordinates.lat],
+      };
+      if (p.hasOwnProperty('coordinates')) {
+        delete p.coordinates;
+      }
+      update = true;
+    }
+    if (update) {
+      console.log("--> updating place", p);
+      App.collections.Places.update(p._id, p);
+    }
+  });
+};
+// dataMassage();
+
 }());
