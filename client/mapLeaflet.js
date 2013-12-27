@@ -2,25 +2,29 @@
 // Leaflet Map
 ///////////////////////////////////////////////////////////////////////////////
 
-var renderCount; // for troubleshooting extra renders
-var llmap;
+var map = {
+  handle: undefined,
+  renderCount: undefined, // for troubleshooting extra renders
+  defaultZoom: 15,
+  maxZoom: 16, // server does not serve higher zoom level
+  defaultCenter: {
+    // TBD: remove once auto-locate and cross-session last-location is stored
+    // GeoJson for santa clara
+    type: "Point", coordinates: [ -121.95751, 37.35024]
+  },
+};
 
 Template.leafletMap.created = function() {
-  // TBD: remove once auto-locate and cross session last-location is stored
-  var mapViewDefault = { 
-    center: { type: "Point", coordinates: [ -121.95751, 37.35024]},
-    zoom: 13,
-  }; // santa clara
-
   console.log("template leafletMap created");
-  Session.set('mapView', mapViewDefault);
-  renderCount = 0;
+  Session.set('mapCenter', map.defaultCenter);
+  Session.set("mapZoom", map.defaultZoom);
+  map.renderCount = 0;
 };
 
 Template.leafletMap.destroyed = function() {
   console.log("leafletmap -> destroyed");
-  llmap.remove();
-  llmap = undefined;
+  map.handle.remove();
+  map.handle = undefined;
   this.handlePlacesChanged.stop();
   this.handleMapChanged.stop();
 };
@@ -28,46 +32,44 @@ Template.leafletMap.destroyed = function() {
 Template.leafletMap.rendered = function() {
   var self = this;
   var last = {};
-  last.view = {};
-  if (renderCount++ > 0) {
+  last.center = {};
+  if (map.renderCount++ > 0) {
     // workaround for meteor-leaflet issue
-    console.log("leaflet rendered skip", renderCount);
+    //     console.log("leaflet rendered skip", map.renderCount);
     return;
   }
-  //   console.log("render iteration " + renderCount);
-  var view = Session.get('mapView');
-  console.log("map center", view.center.coordinates, "zoom", view.zoom);
+  //   console.log("render iteration " + map.renderCount);
+  var coords = Session.get("mapCenter").coordinates;
+  console.log("map center", coords, "zoom", Session.get("mapZoom"));
   var latlng2GeoJson = function (latlng) {
     return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
   };
-  var llmapOptions = {
-    maxZoom: 16,
+  var initOptions =  {
+    maxZoom: map.maxZoom,
     minZoom: 3,
     noWrap: true,
     zoomControl: false,
   };
-  llmap = L.map('leaflet-map', llmapOptions).
-    setView(L.GeoJSON.coordsToLatLng(view.center.coordinates), view.zoom).
+  map.handle = L.map('leaflet-map', map.initOptions).
+    setView(L.GeoJSON.coordsToLatLng(coords), Session.get("mapZoom")).
     locate({maximumAge : 1000 * 60, setView: false}).
     whenReady(function () { 
     //console.log("leaflet ready")
   });
   L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 18,
+    maxZoom: map.maxZoom,
     attribution : 'Tiles: &copy; Esri, National Geographic'
-  }).addTo(llmap);
-  llmap.addControl(L.control.zoom({position: 'bottomright'}));
+  }).addTo(map.handle);
+  map.handle.addControl(L.control.zoom({position: 'bottomright'}));
   L.control.scale({
     updateWhenIdle: true, metric: false,
-  }).addTo(llmap);
-  llmap.on('moveend', function(e) {
-    var view = {};
-    view.zoom = llmap.getZoom();
-    view.center = latlng2GeoJson(llmap.getCenter());
-    //     console.log('moveend', view.center.coordinates);
-    Session.set('mapView', view);
+  }).addTo(map.handle);
+  map.handle.on('moveend', function(e) {
+    Session.set("mapZoom", map.handle.getZoom());
+    //     console.log('moveend', latlng2GeoJson(map.handle.getCenter()));
+    Session.set('mapCenter', latlng2GeoJson(map.handle.getCenter()));
   });
-  llmap.on('click', function(e) {
+  map.handle.on('click', function(e) {
     //     console.log('clicked at', e.latlng);
     // ctrl is meta key to add a new place
     if (e.originalEvent.ctrlKey === true) {
@@ -79,13 +81,12 @@ Template.leafletMap.rendered = function() {
     }
   });  
   var userLocationMarker;
-  llmap.on('locationfound', function(e) {
-    var view = {};
+  map.handle.on('locationfound', function(e) {
     var newLocation = latlng2GeoJson(e.latlng);
-    if (!_.objectsEqual(last.view.userLocation, newLocation)) {
+    if (!_.objectsEqual(last.userLocation, newLocation)) {
       if (userLocationMarker) {
         // remove previous user location
-        llmap.removeLayer(userLocationMarker);
+        map.handle.removeLayer(userLocationMarker);
       }
       // mark user on the map with circle
       var userLocMarkerOpts = {
@@ -97,23 +98,22 @@ Template.leafletMap.rendered = function() {
       };
       userLocationMarker = 
         new L.CircleMarker(e.latlng, userLocMarkerOpts);
-      userLocationMarker.addTo(llmap);
-//       console.log("updated current location marker to", e.latlng.toString());
-      view.userLocation = newLocation;
+      userLocationMarker.addTo(map.handle);
+//       console.log("updated current loc marker to", e.latlng.toString());
+      last.userLocation = newLocation;
     }
     // pan the map to user location
-    view.center = newLocation;
-    view.zoom = 15;
+    Session.set("mapZoom", map.defaultZoom);
+    Session.set('mapCenter', newLocation);
     console.log('locationfound:', newLocation.coordinates);
-    Session.set('mapView', view);
   });
-  llmap.on('locationerror', function(e) {
-    console.log('locationerror: ' + e.message + " " + e.code);
+  map.handle.on('locationerror', function(e) {
+    console.log('locationerror',e.message, e.code);
   });
   // closure vars
   var markers = [];
   // control all markers via a single layer
-  var markerLayer = L.layerGroup().addTo(llmap);
+  var markerLayer = L.layerGroup().addTo(map.handle);
   var staticRoot = "https://s3.amazonaws.com/plentyhood/"
   var leafletStaticFolder = staticRoot + "leaflet/images/";
   var markerIcon = L.icon({
@@ -133,8 +133,7 @@ Template.leafletMap.rendered = function() {
   this.handlePlacesChanged = Deps.autorun(function () {
     // bth map recenter and tags trigger a new search
     var places = client.getMatchingPlaces(
-      Session.get("mapView").center,
-      Session.get("searchTags"));
+      Session.get("mapCenter"), Session.get("searchTags"));
     //     console.log("handlePlacesChanged", places);
     // before redawing markers, delete the current ones
     // TBD optimization: update only the markers which change
@@ -160,11 +159,14 @@ Template.leafletMap.rendered = function() {
     });
   });
   this.handleMapChanged = Deps.autorun(function () {
-    var view = Session.get('mapView');
-    if (!_.objectsEqual(last.view, view)) {
-      llmap.setView(L.GeoJSON.coordsToLatLng(view.center.coordinates), view.zoom);
+    var center = Session.get('mapCenter');
+    var zoom = Session.get('mapZoom');
+    if (center && !_.objectsEqual(last.center, center)) {
+      map.handle.setView(
+        L.GeoJSON.coordsToLatLng(center.coordinates),
+        zoom);
     }
-    last.view = view;
+    last.center = center;
   });
 };
 
