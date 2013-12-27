@@ -7,7 +7,7 @@ Template.header.userSignedIn = function () {
 
 Template.header.page2class = function (page, cssClass) {
   if (Meteor.Router.page() == page) {
-    console.log("active page", page);
+    //     console.log("active page", page);
     return cssClass;
   }
   return "";

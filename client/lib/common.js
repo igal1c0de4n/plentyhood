@@ -35,7 +35,7 @@ client = {
     var distance = 5000; // meters, since we're working with GeoJSON
     var places;
     if (tags && tags.length) {
-      console.log("tags", tags);
+      //       console.log("tags", tags);
       var ids = _.map(tags, function (t) {
         var v = t.trim().toLowerCase();
         var o = App.collections.Tags.findOne({title: v});
@@ -62,10 +62,10 @@ client = {
       }
     }
     else {
+      console.log("search invoked w/o tags");
       // backdoor cheat to see all places
       places = App.collections.Places.find({
         location: {$near : {$geometry: center, $maxDistance: distance}}}).fetch();
-        //       console.log("search invoked w/o tags");
     }
     //   console.log("places:", places);
     return places;

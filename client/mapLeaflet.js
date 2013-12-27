@@ -6,6 +6,7 @@ var map = {
   handle: undefined,
   renderCount: undefined, // for troubleshooting extra renders
   defaultZoom: 15,
+  minZoomForMarkers: 13,
   maxZoom: 16, // server does not serve higher zoom level
   defaultCenter: {
     // TBD: remove once auto-locate and cross-session last-location is stored
@@ -27,6 +28,7 @@ Template.leafletMap.destroyed = function() {
   map.handle = undefined;
   this.handlePlacesChanged.stop();
   this.handleMapChanged.stop();
+  this.handleZoomChanged.stop();
 };
 
 Template.leafletMap.rendered = function() {
@@ -44,11 +46,15 @@ Template.leafletMap.rendered = function() {
   var latlng2GeoJson = function (latlng) {
     return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
   };
+  var areMapPlacesVisible = function (zoom) { 
+    return zoom >= map.minZoomForMarkers;
+  }
   var initOptions =  {
     maxZoom: map.maxZoom,
     minZoom: 3,
     noWrap: true,
     zoomControl: false,
+    markerZoomAnimation: false,
   };
   map.handle = L.map('leaflet-map', map.initOptions).
     setView(L.GeoJSON.coordsToLatLng(coords), Session.get("mapZoom")).
@@ -65,8 +71,9 @@ Template.leafletMap.rendered = function() {
     updateWhenIdle: true, metric: false,
   }).addTo(map.handle);
   map.handle.on('moveend', function(e) {
-    Session.set("mapZoom", map.handle.getZoom());
-    //     console.log('moveend', latlng2GeoJson(map.handle.getCenter()));
+    var zoom = map.handle.getZoom();
+    Session.set("mapZoom", zoom);
+    //     console.log('map moveend', latlng2GeoJson(map.handle.getCenter()), zoom);
     Session.set('mapCenter', latlng2GeoJson(map.handle.getCenter()));
   });
   map.handle.on('click', function(e) {
@@ -131,32 +138,40 @@ Template.leafletMap.rendered = function() {
     riseOnHover: true,
   };
   this.handlePlacesChanged = Deps.autorun(function () {
-    // bth map recenter and tags trigger a new search
-    var places = client.getMatchingPlaces(
-      Session.get("mapCenter"), Session.get("searchTags"));
-    //     console.log("handlePlacesChanged", places);
-    // before redawing markers, delete the current ones
-    // TBD optimization: update only the markers which change
-    _.each(markers, function (c) {
-      markerLayer.removeLayer(c);
-    });
-    markers = [];
-    // TDB: move selectedPlace to a new Deps.autorun as there's no
-    // need to refilter and search for places when selected place 
-    // changes. Just redraw two markers
-    var selected = Session.get("selectedPlace");
-    last.selectedPlace = selected;
-    _.each(places, function (place) {
-      var latlng = L.GeoJSON.coordsToLatLng(place.location.coordinates);
-      var style = selected == place._id ? 
-        markerSelectedStyle : markerUnselectedStyle;
-      var m = L.marker(latlng, style).addTo(markerLayer);
-      m.placeId = place._id;
-      m.on('click', function(e) {
-        Session.set("selectedPlace", this.placeId);
-      });
-      markers.push(m);
-    });
+    var removeMarkers = function () {
+        _.each(markers, function (c) {
+          markerLayer.removeLayer(c);
+        });
+        markers = [];
+    };
+    if (Session.get("mapZoomedEnough")) {
+      // map recenter and tags trigger a new search
+      var places = client.getMatchingPlaces(
+        Session.get("mapCenter"), Session.get("searchTags"));
+        //     console.log("handlePlacesChanged", places);
+        // before redawing markers, delete the current ones
+        // TBD optimization: update only the markers which change
+        removeMarkers();
+        // TDB: move selectedPlace to a new Deps.autorun as there's no
+        // need to refilter and search for places when selected place 
+        // changes. Just redraw two markers
+        var selected = Session.get("selectedPlace");
+        last.selectedPlace = selected;
+        _.each(places, function (place) {
+          var latlng = L.GeoJSON.coordsToLatLng(place.location.coordinates);
+          var style = selected == place._id ? 
+            markerSelectedStyle : markerUnselectedStyle;
+          var m = L.marker(latlng, style).addTo(markerLayer);
+          m.placeId = place._id;
+          m.on('click', function(e) {
+            Session.set("selectedPlace", this.placeId);
+          });
+          markers.push(m);
+        });
+    }
+    else {
+      removeMarkers();
+    }
   });
   this.handleMapChanged = Deps.autorun(function () {
     var center = Session.get('mapCenter');
@@ -167,6 +182,11 @@ Template.leafletMap.rendered = function() {
         zoom);
     }
     last.center = center;
+  });
+
+  this.handleZoomChanged = Deps.autorun(function () {
+    Session.set("mapZoomedEnough",
+      areMapPlacesVisible(Session.get("mapZoom")));
   });
 };
 

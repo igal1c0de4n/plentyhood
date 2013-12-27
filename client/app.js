@@ -17,8 +17,12 @@ Meteor.startup(function () {
 // places panel
 
 Template.places.isPanelActive = function (name) {
-  if (Session.get("disablePanel")) 
+  if (Session.get("disablePanel")) {
     return false;
+  }
+  if (name == "search") {
+    return Session.get("mapZoomedEnough");
+  }
   if (name == "place") {
     return !!Session.get("selectedPlace") && !Session.get("editPlace");
   }
@@ -42,6 +46,10 @@ Template.panelHelp.anyPlaces = function () {
   return App.collections.Places.find().count() > 0;
 };
 
+Template.panelHelp.mapZoomedEnough = function () {
+  return Session.get("mapZoomedEnough");
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // place panel
 
@@ -63,7 +71,6 @@ Template.panelPlace.events({
     console.log("implementation tbd");
     return false;
   },
-
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -164,7 +171,8 @@ Template.placeResourcesPanel.isOwner = function () {
 Template.searchPanel.events({
   'click .goSearch' : function(event, template) {
     var tags = $(".tagsSearchInputField").tagsinput('items');
-    Sesstion.set("searchTags", tags);
+    Session.set("searchTags", tags);
+    console.log("search tags", tags);
   },
 });
 
@@ -173,11 +181,6 @@ Template.searchPanel.rendered = function () {
   tif.tagsinput(client.tagsInputOptions());
   //   console.log("searchPanel->rendered");
   $("div.bootstrap-tagsinput > input").focus();
-};
-
-Template.searchPanel.destroyed = function() {
-  console.log("searchPanel-> destroyed");
-  this.handleTagsChanged.stop();
 };
 
 }());

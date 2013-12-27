@@ -2,7 +2,9 @@
 {{> header}}
 {{> leafletMap}}
 {{#unless isDialogActive}}
+{{#if isPanelActive "search"}}
 {{> searchPanel}}
+{{/if }}
 {{#if isPanelActive "help"}}
 {{> panelHelp}}
 {{/if}}
@@ -36,6 +38,7 @@
 
 <template name="panelHelp">
 <div class="panelHelp floatingPanel">
+  {{#if mapZoomedEnough}}
   <label>
     <em>
       {{#if anyPlaces}}
@@ -55,6 +58,11 @@
       {{/if}}
     </em>
   </label>
+  {{else}}
+  <label>
+    <em> <i class="icon-info-sign"></i> Zoom in to search and see places </em>
+  </label>
+  {{/if}}
 </div>
 </template>
 
