@@ -29,4 +29,45 @@ client = {
       }
     };
   },
+
+  getMatchingPlaces: function (center, tags) {
+    // TBD: auto calculate from zoom level
+    var distance = 5000; // meters, since we're working with GeoJSON
+    var places;
+    if (tags && tags.length) {
+      console.log("tags", tags);
+      var ids = _.map(tags, function (t) {
+        var v = t.trim().toLowerCase();
+        var o = App.collections.Tags.findOne({title: v});
+        return o ? o._id : undefined;
+      });
+      //         console.log("ids", ids);
+      var missingTags = _.find(ids, function (id) {
+        return id === undefined;
+      });
+      if (missingTags == undefined) {
+        // all tags found
+        places = App.collections.Places.find({
+          // note: in the example at http://docs.mongodb.org 
+          // the location of the curly braces is wrong -
+          // it excludes $maxDistance
+          location: {$near : {$geometry: center, $maxDistance: distance}},
+          'resources.tags' : {'$all': ids}
+        }).fetch();
+      }
+      else {
+        // some tags are not even in the database 
+        // - don't bother with query, no places has those resources
+        places = [];
+      }
+    }
+    else {
+      // backdoor cheat to see all places
+      places = App.collections.Places.find({
+        location: {$near : {$geometry: center, $maxDistance: distance}}}).fetch();
+        //       console.log("search invoked w/o tags");
+    }
+    //   console.log("places:", places);
+    return places;
+  },
 };

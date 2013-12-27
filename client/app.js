@@ -19,7 +19,6 @@ Meteor.startup(function () {
 Template.places.isPanelActive = function (name) {
   if (Session.get("disablePanel")) 
     return false;
-
   if (name == "place") {
     return !!Session.get("selectedPlace") && !Session.get("editPlace");
   }
@@ -78,7 +77,7 @@ Template.details.creatorName = function () {
 };
 
 Template.details.placeLocationGet = function () {
-//   return "(" + this.lat + "," + this.lng + ")";
+  //   return "(" + this.lat + "," + this.lng + ")";
   return "(tbd, lookup from GPS)"
 };
 
@@ -125,7 +124,6 @@ Template.placeResourcesPanel.events({
     console.log('adding resource');
     client.schedResourceAddDialog();
   },
-
   'click .placeResourceRemove': function (event, template) {
     var rid = this._id;
     console.log('removing resource', rid);
@@ -145,13 +143,13 @@ Template.placeResourcesPanel.events({
 
 Template.placeResourcesPanel.placeHasResources = function () {
   var place = App.collections.Places.findOne(Session.get("selectedPlace"));
-//   console.log("place: ", place, " resources: ", place.resources);
+  //   console.log("place: ", place, " resources: ", place.resources);
   return !place.resources || place.resources.length === 0 ? false : true;
 };
 
 Template.placeResourcesPanel.placeResources = function () {
   var place = App.collections.Places.findOne(Session.get("selectedPlace"));
-//   console.log("place: ", place, " resources: ", place.resources);
+  //   console.log("place: ", place, " resources: ", place.resources);
   return place.resources;
 };
 
@@ -164,48 +162,22 @@ Template.placeResourcesPanel.isOwner = function () {
 // search panel
 
 Template.searchPanel.events({
-  'keypress .goSearch' : function(event, template) {
-    var places = {};
-    if (event.which == App.keyCode.ENTER) {
-      var tags = $(".tagsSearchInputField").tagsinput('items');
-      console.log("tags", tags);
-      if (tags.length) {
-        var ids = _.map(tags, function (t) {
-          var v = t.trim().toLowerCase();
-          var o = App.collections.Tags.findOne({title: v});
-          return o ? o._id : undefined;
-        });
-//         console.log("ids", ids);
-        var missingTags = _.find(ids, function (id) {
-          return id === undefined;
-        });
-        if (missingTags == undefined) {
-          // all tags found
-          places = App.collections.Places.
-            find({'resources.tags' : {'$all': ids}}).fetch();
-        }
-        else {
-          // some tags are not even in the database 
-          // - don't bother with query, no places has those resources
-          places = [];
-        }
-      }
-      else {
-        // backdoor cheat to see all places
-        places = App.collections.Places.find({}).fetch();
-        console.log("search invoked w/o tags");
-      }
-//       console.log("places:", places);
-      Session.set("mappedPlaces", places);
-      return false;
-    }
+  'click .goSearch' : function(event, template) {
+    var tags = $(".tagsSearchInputField").tagsinput('items');
+    Sesstion.set("searchTags", tags);
   },
 });
 
 Template.searchPanel.rendered = function () {
   var tif = $('.tagsSearchInputField');
   tif.tagsinput(client.tagsInputOptions());
-//   console.log("searchPanel->rendered");
+  //   console.log("searchPanel->rendered");
   $("div.bootstrap-tagsinput > input").focus();
 };
+
+Template.searchPanel.destroyed = function() {
+  console.log("searchPanel-> destroyed");
+  this.handleTagsChanged.stop();
+};
+
 }());

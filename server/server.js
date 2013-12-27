@@ -15,7 +15,10 @@ Meteor.publish("tags", function () {
   return App.collections.Tags.find();
 });
 
+App.collections.Places._ensureIndex({location : "2dsphere"});
 console.log("app env: " + JSON.stringify(process.env.NODE_ENV));
+
+//------------ db migration code -----------
 
 var dataMassage = function () {
   _.each(App.collections.Places.find().fetch(), function (p) {
