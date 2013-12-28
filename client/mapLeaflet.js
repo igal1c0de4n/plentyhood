@@ -54,9 +54,9 @@ Template.leafletMap.rendered = function() {
     minZoom: 3,
     noWrap: true,
     zoomControl: false,
-    markerZoomAnimation: false,
+    markerZoomAnimation: true,
   };
-  map.handle = L.map('leaflet-map', map.initOptions).
+  map.handle = L.map('leaflet-map', initOptions).
     setView(L.GeoJSON.coordsToLatLng(coords), Session.get("mapZoom")).
     locate({maximumAge : 1000 * 60, setView: false}).
     whenReady(function () { 
