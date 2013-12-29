@@ -25,6 +25,12 @@ _.mixin({
     // note this only compare fields, not methods
     return JSON.stringify(o1) == JSON.stringify(o2);
   },
+
+  assert: function (exp, err) {
+    if (!exp) {
+      throw new Meteor.Error(err ? err : "oops, assert failed");
+    }
+  },
 });
 
 }());
