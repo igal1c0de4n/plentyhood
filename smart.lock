@@ -2,8 +2,12 @@
   "meteor": {},
   "dependencies": {
     "basePackages": {
-      "router": {},
-      "roles": {}
+      "router": {
+        "version": "0.5.4.1"
+      },
+      "roles": {
+        "version": "1.2.6"
+      }
     },
     "packages": {
       "router": {
