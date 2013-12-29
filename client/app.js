@@ -84,12 +84,18 @@ Template.details.creatorName = function () {
 };
 
 Template.details.placeLocationGet = function () {
-  //   return "(" + this.lat + "," + this.lng + ")";
-  return "(tbd, lookup from GPS)"
+  return "TBD: lookup from coords"
 };
 
 Template.details.isOwner = function () {
   return this.owner === Meteor.userId();
+};
+
+Template.details.editing = function (what) {
+  if (what == "location") {
+    return !!Session.get("placeEditLocation");
+  }
+  return false;
 };
 
 Template.details.events({
@@ -99,6 +105,16 @@ Template.details.events({
   },
   'click .close': function () {
     Session.set("selectedPlace", undefined);
+    return false;
+  },
+  'click .editLocation': function () {
+    client.placeDragSet(true);
+    Session.set("placeEditLocation", true);
+    return false;
+  },
+  'click .saveLocation': function () {
+    client.placeDragSet(false);
+    Session.set("placeEditLocation", false);
     return false;
   },
 });

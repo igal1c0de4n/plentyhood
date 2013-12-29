@@ -165,6 +165,7 @@ Template.leafletMap.rendered = function() {
           m.placeId = place._id;
           m.on('click', function(e) {
             Session.set("selectedPlace", this.placeId);
+            Session.set("placeEditLocation", undefined);
           });
           markers.push(m);
         });
@@ -185,9 +186,39 @@ Template.leafletMap.rendered = function() {
   });
 
   this.handleZoomChanged = Deps.autorun(function () {
-    Session.set("mapZoomedEnough",
+    Session.set(
+      "mapZoomedEnough",
       areMapPlacesVisible(Session.get("mapZoom")));
   });
+
+  client.placeDragSet = function (enable) {
+    var marker;
+    //     console.log("markers", markers);
+    var placeId = Session.get("selectedPlace");
+    _.find(markers, function (m) {
+      if (m.placeId == placeId) {
+        //         console.log("found marker", m);
+        marker = m;
+      }
+    });
+    _.assert(marker);
+    globalMarker = marker;
+    if (enable) {
+      console.log("enable marker drag", marker);
+      marker.dragging.enable();
+      marker.on('dragend', function (e) {
+        this.dragging.enable();
+        var coords = this.toGeoJSON().geometry.coordinates;
+        console.log("marker", this, "moved to", coords);
+        App.collections.Places.update(
+          {_id: this.placeId},
+          { $set: { 'location.coordinates': coords}});
+      });
+    } else {
+      marker.dragging.disable();
+      marker.on('dragend', undefined);
+    }
+  };
 };
 
 var schedCreateDialog = function (geoJsonLoc) {

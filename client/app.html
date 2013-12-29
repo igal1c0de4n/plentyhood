@@ -109,10 +109,18 @@
   <i class="icon-map-marker"></i>
   <em><b>Location</b></em>
   {{#if isOwner}}
+  {{#if editing "location"}}
+  <input type="button" class="btn btn-mini saveLocation" value="Done">
+  {{else}}
   <input type="button" class="btn btn-mini editLocation" value="Edit">
   {{/if}}
+  {{/if}}
 </div>
+{{#if editing "location"}}
+<div class="indent">You may now reposition the marker</div>
+{{else}}
 <div class="indent">{{placeLocationGet}}</div>
+{{/if}}
 </template>
 
 <template name="placeResourcesPanel">

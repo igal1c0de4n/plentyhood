@@ -31,9 +31,11 @@ App.collections.Places.allow({
     if (userId !== place.owner)
       return false; // not the owner
 
-    var allowed = ["title", "description", "coordinates"];
-    if (_.difference(fields, allowed).length)
+    var allowed = ["title", "description", "location"];
+    if (_.difference(fields, allowed).length) {
+      // console.log("forbidden fields update", fields);
       return false; // tried to write to forbidden field
+    }
 
     // A good improvement would be to validate the type of the new
     // value of the field (and if a string, the length.) In the
