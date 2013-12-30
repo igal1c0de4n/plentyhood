@@ -39,15 +39,15 @@ Template.places.isDialogActive = function () {
   return !!Session.get("activeDialog");
 };
 
+Template.places.mapZoomedEnough = function () {
+  return Session.get("mapZoomedEnough");
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // help panel
 
 Template.panelHelp.anyPlaces = function () {
   return App.collections.Places.find().count() > 0;
-};
-
-Template.panelHelp.mapZoomedEnough = function () {
-  return Session.get("mapZoomedEnough");
 };
 
 ///////////////////////////////////////////////////////////////////////////////
