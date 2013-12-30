@@ -13,6 +13,8 @@ var map = {
     // GeoJson for santa clara
     type: "Point", coordinates: [ -121.95751, 37.35024]
   },
+  selectedPlaceOpacity: 1,
+  unselectedPlaceOpacity: 0.5,
 };
 
 Template.leafletMap.created = function() {
@@ -128,61 +130,85 @@ Template.leafletMap.rendered = function() {
     shadowUrl: leafletStaticFolder + "marker-shadow.png",
     iconAnchor: [12, 41], // half width, full length of marker-icon.png
   });
-  var markerUnselectedStyle = {
-    icon: markerIcon,
-    riseOnHover: true, 
-    opacity: 0.5,
-  };
-  var markerSelectedStyle = {
-    icon: markerIcon,
-    riseOnHover: true,
-  };
+  var markerStyle = {icon: markerIcon, riseOnHover: true,};
+
+  var markers = new HashTable();
+
   this.handlePlacesChanged = Deps.autorun(function () {
+
     var removeMarkers = function () {
-        _.each(markers, function (c) {
-          markerLayer.removeLayer(c);
+        markers.each(function (k, m) {
+          markerLayer.removeLayer(m.lmark);
         });
-        markers = [];
+        markers.clear();
     };
-    if (Session.get("mapZoomedEnough")) {
+
+    var updateMarkers = function () {
       // map recenter and tags trigger a new search
       var places = client.getMatchingPlaces(
         Session.get("mapCenter"), Session.get("searchTags"));
-        //     console.log("handlePlacesChanged", places);
-        // before redawing markers, delete the current ones
-        // TBD optimization: update only the markers which change
-        removeMarkers();
-        // TDB: move selectedPlace to a new Deps.autorun as there's no
-        // need to refilter and search for places when selected place 
-        // changes. Just redraw two markers
-        var selected = Session.get("selectedPlace");
-        last.selectedPlace = selected;
-        _.each(places, function (place) {
-          var latlng = L.GeoJSON.coordsToLatLng(place.location.coordinates);
-          var style = selected == place._id ? 
-            markerSelectedStyle : markerUnselectedStyle;
-          var m = L.marker(latlng, style).addTo(markerLayer);
-          m.placeId = place._id;
-          m.on('click', function(e) {
+      //     console.log("handlePlacesChanged", places);
+      // before redawing markers, delete the current ones
+      // TBD optimization: update only the markers which change
+      //
+      // TDB: move selectedPlace to a new Deps.autorun as there's no
+      // need to refilter and search for places when selected place 
+      // changes. Just redraw two markers
+      var selected = Session.get("selectedPlace");
+
+      markers.each(function (k, m) {
+        // kept makers will marked soon
+        m.keep = false;
+      });
+
+      _.each(places, function (p) {
+        // check if place is alerady on map
+        var id = p._id;
+        var m = markers.getItem(id);
+        if (m) {
+          // place p is already marked on map, preserve existing marker
+          m.keep = true;
+        }
+        else {
+          // no marker for place yet
+          var m = {};
+          var latlng = L.GeoJSON.coordsToLatLng(p.location.coordinates);
+          m.lmark = L.marker(latlng, markerStyle).addTo(markerLayer);
+          m.lmark.placeId = id;
+          m.lmark.on('click', function(e) {
+            console.log("selected place", this.placeId)
             Session.set("selectedPlace", this.placeId);
             Session.set("placeEditLocation", undefined);
           });
-          markers.push(m);
-        });
+          m.keep = true;
+          markers.setItem(id, m);
+        }
+        opacity = selected == id ?
+          map.selectedPlaceOpacity : map.unselectedPlaceOpacity;
+        m.lmark.setOpacity(opacity);
+      });
+
+      // cleanup - remove markers for all places which 
+      // disappeared from the map
+      var removedMarkers = [];
+      markers.each(function (k, m) {
+        if (!m.keep) {
+          // add to list makers
+          // TBD: check if can removeItem here
+          removedMarkers.push(m);
+        }
+      });
+      _.each(removedMarkers, function (m) {
+          markerLayer.removeLayer(m.lmark);
+          markers.removeItem(m.lmark.placeId);
+      });
+    };
+    if (Session.get("mapZoomedEnough")) {
+      updateMarkers();
     }
     else {
       removeMarkers();
     }
-  });
-  this.handleMapChanged = Deps.autorun(function () {
-    var center = Session.get('mapCenter');
-    var zoom = Session.get('mapZoom');
-    if (center && !_.objectsEqual(last.center, center)) {
-      map.handle.setView(
-        L.GeoJSON.coordsToLatLng(center.coordinates),
-        zoom);
-    }
-    last.center = center;
   });
 
   this.handleZoomChanged = Deps.autorun(function () {
@@ -191,32 +217,39 @@ Template.leafletMap.rendered = function() {
       areMapPlacesVisible(Session.get("mapZoom")));
   });
 
-  client.placeDragSet = function (enable) {
-    var marker;
+  client.placeDragSet = function (action) {
+    var updatePlaceCoords = function (id, c) {
+      App.collections.Places.update(
+        {_id: id},
+        { $set: { 'location.coordinates': c}});
+    };
     //     console.log("markers", markers);
     var placeId = Session.get("selectedPlace");
-    _.find(markers, function (m) {
-      if (m.placeId == placeId) {
-        //         console.log("found marker", m);
-        marker = m;
-      }
-    });
-    _.assert(marker);
-    globalMarker = marker;
-    if (enable) {
-      console.log("enable marker drag", marker);
-      marker.dragging.enable();
-      marker.on('dragend', function (e) {
-        this.dragging.enable();
+    var lm = markers.getItem(placeId).lmark;
+    if (action == "edit") {
+      //       console.log("enable marker drag", lm);
+      // store original coords in case user cancels
+      last.coordsBeforeDrag = lm.toGeoJSON().geometry.coordinates;
+      lm.on('dragend', function (e) {
         var coords = this.toGeoJSON().geometry.coordinates;
-        console.log("marker", this, "moved to", coords);
-        App.collections.Places.update(
-          {_id: this.placeId},
-          { $set: { 'location.coordinates': coords}});
+        //         console.log("marker", this, "moved to", coords);
+        updatePlaceCoords(this.placeId, coords);
+
       });
+      lm.dragging.enable();
     } else {
-      marker.dragging.disable();
-      marker.on('dragend', undefined);
+      lm.dragging.disable();
+      lm.off('dragend', undefined);
+      if (action == "cancel") {
+        var sameLocation = _.objectsEqual(
+          lm.toGeoJSON().geometry.coordinates, last.coordsBeforeDrag);
+        if (!sameLocation) {
+          console.log("restoring previous coordinates", last.coordsBeforeDrag);
+          updatePlaceCoords(placeId, last.coordsBeforeDrag);
+          lm.setLatLng(L.GeoJSON.coordsToLatLng(last.coordsBeforeDrag));
+        }
+        delete last.coordsBeforeDrag;
+      }
     }
   };
 };

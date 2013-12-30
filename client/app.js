@@ -108,12 +108,19 @@ Template.details.events({
     return false;
   },
   'click .editLocation': function () {
-    client.placeDragSet(true);
+    client.placeDragSet("edit");
     Session.set("placeEditLocation", true);
     return false;
   },
+
+  'click .cancelEditLocation': function () {
+    client.placeDragSet("cancel");
+    Session.set("placeEditLocation", false);
+    return false;
+  },
+
   'click .saveLocation': function () {
-    client.placeDragSet(false);
+    client.placeDragSet("done");
     Session.set("placeEditLocation", false);
     return false;
   },
