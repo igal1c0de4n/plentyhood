@@ -29,7 +29,6 @@ Template.leafletMap.destroyed = function() {
   map.handle.remove();
   map.handle = undefined;
   this.handlePlacesChanged.stop();
-  this.handleMapChanged.stop();
   this.handleZoomChanged.stop();
 };
 

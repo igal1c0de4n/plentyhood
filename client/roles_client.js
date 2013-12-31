@@ -5,7 +5,7 @@
 App.signout = function () {
   console.log('logging out...');
   Meteor.logout(function () {
-    console.log('...done');
+    //     console.log('...done');
     Meteor.navigateTo('/');
   });
 };
