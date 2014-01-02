@@ -2,8 +2,6 @@
   "use strict";
 
 Meteor.subscribe("directory");
-Meteor.subscribe("places");
-Meteor.subscribe("tags");
 Session.set("activePanel", "help");
 
 // If no place selected, select one.

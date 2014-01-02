@@ -6,9 +6,13 @@ Meteor.publish("directory", function () {
   return Meteor.users.find({}, {fields: {emails: 1, profile: 1}});
 });
 
-Meteor.publish("places", function () {
-  return App.collections.Places.find(
-    {$or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
+Meteor.publish("places", function (box) {
+  if (box) {
+  return App.collections.Places.find({
+    location: {$geoWithin : {$box: box}},
+    $or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
+  }
+  return underfined;
 });
 
 Meteor.publish("tags", function () {

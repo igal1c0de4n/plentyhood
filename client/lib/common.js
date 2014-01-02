@@ -30,10 +30,12 @@ client = {
     };
   },
 
-  getMatchingPlaces: function (center, tags) {
+  getMatchingPlaces: function () {
     // TBD: auto calculate from zoom level
     var distance = 5000; // meters, since we're working with GeoJSON
     var places;
+    var tags = Session.get("searchTags");
+    var center = Session.get("mapCenter");
     if (tags && tags.length) {
       //       console.log("tags", tags);
       var ids = _.map(tags, function (t) {
@@ -48,10 +50,7 @@ client = {
       if (missingTags == undefined) {
         // all tags found
         places = App.collections.Places.find({
-          // note: in the example at http://docs.mongodb.org 
-          // the location of the curly braces is wrong -
-          // it excludes $maxDistance
-          location: {$near : {$geometry: center, $maxDistance: distance}},
+          location: {$near : {$geometry: center}},
           'resources.tags' : {'$all': ids}
         }).fetch();
       }
@@ -62,10 +61,11 @@ client = {
       }
     }
     else {
-      console.log("search invoked w/o tags");
       // backdoor cheat to see all places
       places = App.collections.Places.find({
-        location: {$near : {$geometry: center, $maxDistance: distance}}}).fetch();
+        location: {$near : {$geometry: center}},
+      }).fetch();
+      //       console.log("search invoked w/o tags");
     }
     //   console.log("places:", places);
     return places;

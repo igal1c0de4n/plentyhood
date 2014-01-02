@@ -30,6 +30,7 @@ Template.leafletMap.destroyed = function() {
   map.handle = undefined;
   this.handlePlacesChanged.stop();
   this.handleZoomChanged.stop();
+  this.handleSubscriptions.stop();
 };
 
 Template.leafletMap.rendered = function() {
@@ -42,13 +43,22 @@ Template.leafletMap.rendered = function() {
     return;
   }
   //   console.log("render iteration " + map.renderCount);
-  var coords = Session.get("mapCenter").coordinates;
-  console.log("map center", coords, "zoom", Session.get("mapZoom"));
+  latLng2GeoJson = function () {
+    return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
+  };
   var latlng2GeoJson = function (latlng) {
     return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
   };
   var areMapPlacesVisible = function (zoom) { 
     return zoom >= map.minZoomForMarkers;
+  }
+  var updateMapBox = function () {
+    var box = map.handle.getBounds();
+    var boxGeoJSON = _.map(box, function (ll) {
+      var c = latlng2GeoJson(ll).coordinates;
+      return c;
+    });
+    Session.set("mapBox", boxGeoJSON);
   }
   var initOptions =  {
     maxZoom: map.maxZoom,
@@ -57,6 +67,8 @@ Template.leafletMap.rendered = function() {
     zoomControl: false,
     markerZoomAnimation: true,
   };
+  var coords = Session.get("mapCenter").coordinates;
+  //console.log("map center", coords, "zoom", Session.get("mapZoom"));
   map.handle = L.map('leaflet-map', initOptions).
     setView(L.GeoJSON.coordsToLatLng(coords), Session.get("mapZoom")).
     locate({maximumAge : 1000 * 60, setView: false}).
@@ -76,6 +88,7 @@ Template.leafletMap.rendered = function() {
     Session.set("mapZoom", zoom);
     //     console.log('map moveend', latlng2GeoJson(map.handle.getCenter()), zoom);
     Session.set('mapCenter', latlng2GeoJson(map.handle.getCenter()));
+    updateMapBox();
   });
   map.handle.on('click', function(e) {
     //     console.log('clicked at', e.latlng);
@@ -112,6 +125,7 @@ Template.leafletMap.rendered = function() {
     }
     // pan the map to user location
     Session.set("mapZoom", map.defaultZoom);
+    updateMapBox();
     Session.set('mapCenter', newLocation);
     console.log('locationfound:', newLocation.coordinates);
   });
@@ -144,8 +158,7 @@ Template.leafletMap.rendered = function() {
 
     var updateMarkers = function () {
       // map recenter and tags trigger a new search
-      var places = client.getMatchingPlaces(
-        Session.get("mapCenter"), Session.get("searchTags"));
+      var places = client.getMatchingPlaces();
       //     console.log("handlePlacesChanged", places);
       // before redawing markers, delete the current ones
       // TBD optimization: update only the markers which change
@@ -210,6 +223,14 @@ Template.leafletMap.rendered = function() {
     }
   });
 
+  this.handleSubscriptions  = Deps.autorun(function () {
+    var box = Session.get("mapBox");
+    if (box) {
+      Meteor.subscribe("places", box);
+    }
+    Meteor.subscribe("tags");
+  });
+
   this.handleZoomChanged = Deps.autorun(function () {
     Session.set(
       "mapZoomedEnough",
@@ -233,7 +254,6 @@ Template.leafletMap.rendered = function() {
         var coords = this.toGeoJSON().geometry.coordinates;
         //         console.log("marker", this, "moved to", coords);
         updatePlaceCoords(this.placeId, coords);
-
       });
       lm.dragging.enable();
     } else {
