@@ -22,7 +22,7 @@ client = {
         }
       },
       tagClass: function (item) {
-        console.log("tagClass", item);
+        //         console.log("tagClass", item);
         var v = item.trim().toLowerCase();
         var o = App.collections.Tags.findOne({title: v});
         return o ? 'label label-info' : 'label label-warning';
@@ -32,7 +32,6 @@ client = {
 
   getMatchingPlaces: function () {
     // TBD: auto calculate from zoom level
-    var distance = 5000; // meters, since we're working with GeoJSON
     var places;
     var tags = Session.get("searchTags");
     var center = Session.get("mapCenter");
