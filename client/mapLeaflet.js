@@ -52,13 +52,31 @@ Template.leafletMap.rendered = function() {
   var areMapPlacesVisible = function (zoom) { 
     return zoom >= map.minZoomForMarkers;
   }
-  var updateMapBox = function () {
-    var box = map.handle.getBounds();
-    var boxGeoJSON = _.map(box, function (ll) {
-      var c = latlng2GeoJson(ll).coordinates;
-      return c;
-    });
-    Session.set("mapBox", boxGeoJSON);
+  var updateMapBounds = function () {
+    var b = map.handle.getBounds();
+    var drawBounds = Session.get("drawBounds");
+    // increase size of bounds by phi for more fluent user experience
+    var kmPerDegree = 111.2;
+    var marginKm = 1;
+    var phi = marginKm / kmPerDegree;
+    var bounds = [
+      [b.getWest() - phi, b.getSouth() - phi],
+      [b.getEast() + phi, b.getNorth() + phi],
+    ];
+    if (drawBounds) {
+      // debug 
+      if (last.rect) {
+        map.handle.removeLayer(last.rect);
+        delete last.rect;
+      }
+      var rb = L.latLngBounds(
+        L.latLng(bounds[0][1], bounds[0][0]),
+        L.latLng(bounds[1][1], bounds[1][0])
+      );
+      last.rect = L.rectangle(rb, {color: "#ff7800", weight: 2}).addTo(map.handle);
+    }
+    //     console.log("bounds", bounds, b);
+    Session.set("mapBounds", bounds);
   }
   var initOptions =  {
     maxZoom: map.maxZoom,
@@ -88,7 +106,7 @@ Template.leafletMap.rendered = function() {
     Session.set("mapZoom", zoom);
     //     console.log('map moveend', latlng2GeoJson(map.handle.getCenter()), zoom);
     Session.set('mapCenter', latlng2GeoJson(map.handle.getCenter()));
-    updateMapBox();
+    updateMapBounds();
   });
   map.handle.on('click', function(e) {
     //     console.log('clicked at', e.latlng);
@@ -125,7 +143,7 @@ Template.leafletMap.rendered = function() {
     }
     // pan the map to user location
     Session.set("mapZoom", map.defaultZoom);
-    updateMapBox();
+    updateMapBounds();
     Session.set('mapCenter', newLocation);
     console.log('locationfound:', newLocation.coordinates);
   });
@@ -224,9 +242,9 @@ Template.leafletMap.rendered = function() {
   });
 
   this.handleSubscriptions  = Deps.autorun(function () {
-    var box = Session.get("mapBox");
-    if (box) {
-      Meteor.subscribe("places", box);
+    var b = Session.get("mapBounds");
+    if (b) {
+      Meteor.subscribe("places", b);
     }
     Meteor.subscribe("tags");
   });

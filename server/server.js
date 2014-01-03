@@ -6,10 +6,10 @@ Meteor.publish("directory", function () {
   return Meteor.users.find({}, {fields: {emails: 1, profile: 1}});
 });
 
-Meteor.publish("places", function (box) {
-  if (box) {
+Meteor.publish("places", function (bounds) {
+  if (bounds) {
   return App.collections.Places.find({
-    location: {$geoWithin : {$box: box}},
+    location: {$geoWithin : {$box: bounds}},
     $or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
   }
   return underfined;
