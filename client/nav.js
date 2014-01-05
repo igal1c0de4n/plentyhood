@@ -12,3 +12,10 @@ Template.header.page2class = function (page, cssClass) {
   }
   return "";
 };
+
+Template.header.getFbUser = function () {
+  var user = Meteor.user();
+  //console.log("getFbUser", user);
+  var s = user.services;
+  return s && s.facebook ? s.facebook.username : undefined;
+}

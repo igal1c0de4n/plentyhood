@@ -206,7 +206,7 @@ Template.leafletMap.rendered = function() {
           m.lmark = L.marker(latlng, markerStyle).addTo(markerLayer);
           m.lmark.placeId = id;
           m.lmark.on('click', function(e) {
-            console.log("selected place", this.placeId)
+            //             console.log("selected place", this.placeId)
             Session.set("selectedPlace", this.placeId);
             Session.set("placeEditLocation", undefined);
           });

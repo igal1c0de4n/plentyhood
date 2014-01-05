@@ -18,20 +18,18 @@ function emailVerified (user) {
 
 Meteor.Router.add({
   '/': function () {
-    var user;
 //     console.log('router root');
     if (Meteor.loggingIn()) {
 //       console.log('home: loading');
       return 'loading';
     }
-    user = Meteor.user();
+    var user = Meteor.user();
     if (user) {
-//       console.log('home: user found');
-//       console.log(user.roles);
-       if (!emailVerified(user)) {
-         console.log('home: awaiting-verification');
-         return 'awaiting-verification';
-       }
+//       console.log("user", user);
+//        if (!emailVerified(user)) {
+//          console.log('home: awaiting-verification');
+//          return 'awaiting-verification';
+//        }
     }
     return 'start';
   },
@@ -41,14 +39,6 @@ Meteor.Router.add({
   '/admin': function () {
     if (Roles.userIsInRole(Meteor.user(), 'admin')) {
       return 'admin';
-    }
-    return 'notfound';
-  },
-    
-  '/manage': function () {
-         console.log('manage route');
-    if (Roles.userIsInRole(Meteor.user(), ['admin','manage-users'])) {
-      return 'manage';
     }
     return 'notfound';
   },
@@ -64,20 +54,15 @@ Meteor.Router.filters({
       return 'loading';
     } else {
       user = Meteor.user();
-
       if (!user) {
-
         console.log('filter: not signed in');
         return 'notfound';
-
       }
-      if (!emailVerified(user)) {
-
-        console.log('filter: awaiting-verification');
-        return 'awaiting-verification';
-
-      } 
-//       console.log('filter: done');
+// Disable email verification for now
+//       if (!emailVerified(user)) {
+//         console.log('filter: awaiting-verification');
+//         return 'awaiting-verification';
+//       } 
       return page;
     }
   }

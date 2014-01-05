@@ -2,6 +2,7 @@
   "use strict";
 
 Meteor.subscribe("directory");
+Meteor.subscribe("userDetails");
 Session.set("activePanel", "help");
 
 // If no place selected, select one.

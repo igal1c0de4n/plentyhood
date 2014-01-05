@@ -6,13 +6,18 @@ Meteor.publish("directory", function () {
   return Meteor.users.find({}, {fields: {emails: 1, profile: 1}});
 });
 
+Meteor.publish("userDetails", function () {
+  return Meteor.users.find(
+    {_id: this.userId}, 
+    {fields: {profile: 1, emails: 1, services: 1}});
+});
+
 Meteor.publish("places", function (bounds) {
   if (bounds) {
-  return App.collections.Places.find({
-    location: {$geoWithin : {$box: bounds}},
-    $or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
+    return App.collections.Places.find({
+      location: {$geoWithin : {$box: bounds}},
+      $or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
   }
-  return underfined;
 });
 
 Meteor.publish("tags", function () {

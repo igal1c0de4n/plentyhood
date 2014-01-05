@@ -3,7 +3,7 @@
   "use strict";
 
 App.signout = function () {
-  console.log('logging out...');
+  console.log('logging out', Meteor.user().profile.name);
   Meteor.logout(function () {
     //     console.log('...done');
     Meteor.navigateTo('/');

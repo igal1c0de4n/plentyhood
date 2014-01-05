@@ -16,27 +16,22 @@ if (!console || !console.log) {
 
 ////////////////////////////////////////////////////////////////////
 // Startup
-//
 
 Meteor.startup(function () {
-
-  ////////////////////////////////////////////////////////////////////
   // Create Test Users
-
   if (Meteor.users.find().fetch().length === 0) {
     console.log('Creating users: ');
     var users = [
-        {name:"Normal User",email:"normal@example.com",roles:[]},
-        {name:"Manage-Users User",email:"manage@example.com",roles:['manage-users']},
-        {name:"Admin User",email:"admin@example.com",roles:['admin']}
-      ];
+      {name:"User",email:"user@ph.earth",roles:[]},
+      {name:"Admin",email:"admin@ph.earth",roles:['admin']}
+    ];
     _.each(users, function (userData) {
       var id,
-          user;
+      user;
       console.log(userData);
       id = Accounts.createUser({
         email: userData.email,
-        password: "apple1",
+        password: "sharewme",
         profile: { name: userData.name }
       });
       // email verification
@@ -44,18 +39,16 @@ Meteor.startup(function () {
       Roles.addUsersToRoles(id, userData.roles);
     });
   }
-
-  ////////////////////////////////////////////////////////////////////
-  // Prevent non-authorized users from creating new users
-
-  Accounts.validateNewUser(function (user) {
-    var loggedInUser = Meteor.user();
-    if (Roles.userIsInRole(loggedInUser, ['admin','manage-users'])) {
-      return true;
+  Accounts.onCreateUser(function (options, user) {
+    console.log("onCreateUser options", options);
+    console.log("onCreateUser user", user);
+    //     user.services = options.services;
+    if (options.profile) {
+      // store for profile picture etc
+      user.profile = options.profile;
     }
-    throw new Meteor.Error(403, "Not authorized to create new users");
+    return user;
   });
-
 });
 
 ////////////////////////////////////////////////////////////////////
@@ -68,7 +61,6 @@ Meteor.publish("users", function () {
     return Meteor.users.find({}, {fields: {emails: 1, profile: 1, roles: 1}});
   } 
   this.stop();
-  return;
 });
 
 }());

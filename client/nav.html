@@ -32,7 +32,8 @@
 </template>
 
 <template name="loading">
-<h1>Loading...</h1>
+{{> header}}
+<h3>Loading...</h3>
 </template>
 
 <template name="awaiting-verification">
@@ -62,8 +63,15 @@
     <ul class="nav pull-right">
       {{#if userSignedIn}}
       <li class="dropdown pull-right">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        {{rolesDispName}}<b class="caret"></b>
+      <a href="#" class="dropdown-toggle userNavMenu" data-toggle="dropdown">
+        {{#if getFbUser}}
+        <img 
+        src="//graph.facebook.com/{{getFbUser}}/picture" 
+        Title="{{rolesDispName}}"/>
+        {{else}}
+        {{rolesDispName}}
+        {{/if}}
+        <b class="caret"></b>
       </a>
       <ul class="dropdown-menu">
         <li><a class="signout" href="/signout">Sign out</a></li>
@@ -104,16 +112,21 @@
   and well-worth it for you!
   </p>
   <h3>How can I use this site?</h3>
-  <p>Create an account or login with any of these users: </p>
+  <p>
+  Create an account, login with Facebook or use one of the demo users 
+  (psw <em>sharewme</em>):</p>
   <ul>
-    <li>normal@example.com</li>
-    <li>view@example.com</li>
-    <li>manage@example.com</li>
-    <li>admin@example.com</li>
+    <li>user@ph.earth</li>
+    <li>admin@ph.earth</li>
   </ul>
-  <p>The generic password is: <em>apple1</em></p>
-  <p><small>Current vertion is pre-alpha. Security is not strictly enforced. 
-    Expect bugs abd missing features!</small></p>
+  <p><small>
+    <strong>Note:</strong>
+    <em>
+      current app vertion is approaching alpha. 
+      Security is not yet strictly enforced.<br/>
+      Expect bugs and missing features, thanks for the understanding!
+    </em>
+  </small></p>
 </div>
 </template>
 

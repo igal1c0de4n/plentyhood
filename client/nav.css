@@ -72,3 +72,12 @@
 .security-note {
   margin-top:10em;
 }
+
+.navbar img {
+  max-height: 30px;
+  margin-top: -5px;
+}
+
+a.userNavMenu {
+  background-color: transparent !important;
+}
