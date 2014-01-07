@@ -6,10 +6,14 @@ The app wroks with the user's location to enable access to resources which are c
 
 Feature roadmap
 ---------------
+- Deploy on EC2 with nginx
+  - deployinstance git
 - UI
-  - Come up with Mobile ui
-  - Allow adding a new place by press and hold on touch screens 
-    (ctrl+click cannot work)
+  - Mobile ui
+    - Display 'unsupported'
+    - Support!
+      - Allow adding a new place by press and hold on touch screens 
+        (no ctrl+click)
 
 - Add features to 'place':
 	- Resources
@@ -17,15 +21,14 @@ Feature roadmap
       - Quantity
       - Calendar per resource (?)
   - Location
-    - Drag
     - Support adding a place at specific address (via nominatim). 
       Example here: http://derickrethans.nl/leaflet-and-nominatim.html
   - Place
     - Auto-suggest current location as location
     - Add 'needs' field (points to entries in both services and resources
   - Friends
-    - Add 'friends group' for place (or may per user?)
+    - Add 'friends group' for place (or per user?)
 - Services
-	- Add dialog to add services similar to resources
-	- Add 'offered services' field to 'user'
+	- Add services offered by user, use place as location
 		- options: hire, volunteer
+
