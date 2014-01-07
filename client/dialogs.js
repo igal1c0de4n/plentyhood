@@ -22,6 +22,9 @@ var bsModalOnHide = function (name) {
 
 Template.placeCreateDialog.rendered = function () {
   bsModalOnShow("placeCreate");
+  $("#eModalDialog").on('shown', function () {
+    $("input.title").focus();
+  });
 };
 
 Template.placeCreateDialog.events({
