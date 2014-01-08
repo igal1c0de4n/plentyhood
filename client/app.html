@@ -23,8 +23,11 @@
 
 <template name="searchPanel">
 <div class="searchPanel">
-  <input class="tagsSearchInputField" type="text" placeholder="Search">
-  <input type="button" class="btn btn-default goSearch" value="Go">
+  <input class="tagsSearchInputField" type="text" placeholder="Enter tags">
+  <a href="#" class="btn btn-success goSearch">
+    <i class="icon-white icon-search"></i>
+    Search
+  </a> 
 </div>
 </template>
 
@@ -32,12 +35,6 @@
 {{#constant}}
 <div id="leaflet-map" class="leflet-map"></div>
 {{/constant}}
-</template>
-
-<template name="panelPlaceEdit">
-<div class="panelPlaceEdit floatingPanel">
-  abcd
-</div>
 </template>
 
 <template name="panelZoomedOut">
@@ -81,13 +78,6 @@
   {{> sharedPanel}}
   {{/unless}}
   {{#if isOwner}}
-  <div class="row">
-    <div class="alert alert-info span2">
-      <small>
-        Need to <a href="#" class="removePlace">delete this place</a>?
-      </small>
-    </div>
-  </div>
   {{/if}}
   {{/with}}
 </div>
@@ -105,6 +95,9 @@
 </label>
 <div class="indent">
   <small>{{creatorName}}</small> 
+  <span>
+    <small><a href="#" class="removePlace">Delete</a></small>
+  </span>
 </div>
 <div>
   <i class="icon-comment"></i>
@@ -161,17 +154,23 @@
 
 <template name="sharedPanel">
 <div class="sharedPanel well well-small">
-<div class="muted usersList"><b>Friends:</b></div>
-{{#each outstandingInvitations}}
-<div>{{invitationName}}</div>
-{{/each}}
-{{#if nobody}}
-<div>Nobody.</div>
-{{/if}}
-{{#if canInvite}}
-<div class="invite">
-  <a href="#" class="btn btn-mini invite">Invite More</a>
-</div>
-{{/if}}
+  <div class="row">
+    <div class="span2">
+      <div class="muted usersList"><b>Friends</b></div>
+      <div class="invite">
+        <a href="#" class="btn btn-mini invite">Invite More</a>
+      </div>
+    </div>
+    <div class="span2">
+      {{#each outstandingInvitations}}
+      <div>{{invitationName}}</div>
+      {{/each}}
+      {{#if nobody}}
+      <div>Nobody.</div>
+      {{/if}}
+      {{#if canInvite}}
+      {{/if}}
+    </div>
+  </div>
 </div>
 </template>

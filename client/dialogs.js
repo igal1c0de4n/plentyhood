@@ -20,49 +20,80 @@ var bsModalOnHide = function (name) {
   $('#eModalDialog').modal('hide');
 }
 
-Template.placeCreateDialog.rendered = function () {
-  bsModalOnShow("placeCreate");
+Template.placeEditDialog.rendered = function () {
+  bsModalOnShow("placeEdit");
   $("#eModalDialog").on('shown', function () {
     $("input.title").focus();
   });
 };
 
-Template.placeCreateDialog.events({
+Template.placeEditDialog.events({
   'click .save': function (event, template) {
     var title = template.find(".title").value;
     var description = template.find(".description").value;
     var pub = ! template.find(".private").checked;
     var location = Session.get("placeLocation");
-
     if (title.length && description.length) {
-      Meteor.call('mtcPlaceCreate', {
+      var placeId = Session.get("selectedPlace");
+      var doc = {
         title: title,
         description: description,
         location: location,
         public: pub
-      }, function (error, place) {
+      };
+      if (placeId) {
+        doc.placeId = placeId;
+      }
+      Meteor.call('mtcPlaceUpdate', doc, function (error, place) {
         if (error) {
-          console.log("placeCreate failed!", error);
+          console.log("placeEdit failed!", error);
         }
         else {
-          Session.set("selectedPlace", place);
-          if (! pub && Meteor.users.find().count() > 1)
+          if (!placeId) {
+            Session.set("selectedPlace", place);
+          }
+          if (!pub && Meteor.users.find().count() > 1) {
             openInviteDialog();
+          }
         }
       });
-      bsModalOnHide("placeCreate");
+      bsModalOnHide("placeEdit");
     } else {
       Session.set("createError",
                   "It needs a title and a description, or why bother?");
     }
   },
-
   'click .cancel': function () {
     bsModalOnHide();
   }
 });
 
-Template.placeCreateDialog.error = function () {
+Template.placeEditDialog.selectedPlace = function () {
+  return !!Session.get("selectedPlace");
+};
+
+Template.placeEditDialog.isPrivate = function () {
+  var id = Session.get("selectedPlace");
+  if (id) {
+    return !App.collections.Places.findOne(id).public;
+  }
+};
+
+Template.placeEditDialog.title = function () {
+  var id = Session.get("selectedPlace");
+  if (id) {
+    return App.collections.Places.findOne(id).title;
+  }
+};
+
+Template.placeEditDialog.description = function () {
+  var id = Session.get("selectedPlace");
+  if (id) {
+    return App.collections.Places.findOne(id).description;
+  }
+};
+
+Template.placeEditDialog.error = function () {
   return Session.get("createError");
 };
 
@@ -110,8 +141,8 @@ Template.dialogs.isPlaceResourceAddActive = function () {
   return Session.get("activeDialog") == "placeResourceAdd";
 };
 
-Template.dialogs.isPlaceCreateActive = function () {
-  return Session.get("activeDialog") == "placeCreate";
+Template.dialogs.isPlaceEditActive = function () {
+  return Session.get("activeDialog") == "placeEdit";
 };
 
 Template.dialogs.isInviteActive = function () {

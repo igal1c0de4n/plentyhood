@@ -58,29 +58,40 @@ Meteor.methods({
   },
 
   // options should include: title, description, x, y, public
-  mtcPlaceCreate: function (options) {
+  mtcPlaceUpdate: function (options) {
     options = options || {};
-    var isInRange = function (v, min, max) {
-      return v >= min && v <=max;
-    };
-    _.each(options.location.coordinates, function (c) {
-      if (!isInRange(c, -180, 180))
-        throw new Meteor.Error(413, "Bad lat/lng", c);
-    });
     if (options.title.length > 100)
       throw new Meteor.Error(413, "Title too long");
     if (options.description.length > 1000)
       throw new Meteor.Error(413, "Description too long");
     verifyLoggedIn.call(this);
-
-    return App.collections.Places.insert({
-      owner: this.userId,
-      location: options.location,
-      title: options.title,
-      description: options.description,
-      public: !! options.public,
-      invited: [],
-    });
+    if (options.placeId) {
+      // update existing place
+      return App.collections.Places.update(options.placeId, { 
+        $set: {
+          title: options.title,
+          description: options.description,
+          public: !! options.public,
+        }
+      });
+    } else {
+      // new place
+      var isInRange = function (v, min, max) {
+        return v >= min && v <=max;
+      };
+      _.each(options.location.coordinates, function (c) {
+        if (!isInRange(c, -180, 180))
+          throw new Meteor.Error(413, "Bad lat/lng", c);
+      });
+      return App.collections.Places.insert({
+        owner: this.userId,
+        location: options.location,
+        title: options.title,
+        description: options.description,
+        public: !! options.public,
+        invited: [],
+      });
+    }
   },
 
   mtcInvite: function (placeId, userId) {

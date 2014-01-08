@@ -292,7 +292,8 @@ Template.leafletMap.rendered = function() {
 };
 
 var schedCreateDialog = function (geoJsonLoc) {
+  Session.set("selectedPlace", undefined);
   Session.set("placeLocation", geoJsonLoc);
   Session.set("createError", null);
-  Session.set("activeDialog", "placeCreate");
+  Session.set("activeDialog", "placeEdit");
 };

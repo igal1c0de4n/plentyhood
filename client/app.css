@@ -70,12 +70,12 @@ body {
   margin: 10px 10px 10px 0;
 }
 
-.sharedPanel .usersList {
-  margin-bottom: 5px;
+.sharedPanel {
+  margin-bottom: 0px;
 }
 
-.sharedPanel .invite {
-  text-align: center;
+.sharedPanel .usersList {
+  margin-bottom: 5px;
 }
 
 input.chosen {

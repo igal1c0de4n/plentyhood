@@ -111,16 +111,18 @@ Template.details.events({
     Session.set("placeEditLocation", true);
     return false;
   },
-
   'click .cancelEditLocation': function () {
     client.placeDragSet("cancel");
     Session.set("placeEditLocation", false);
     return false;
   },
-
   'click .saveLocation': function () {
     client.placeDragSet("done");
     Session.set("placeEditLocation", false);
+    return false;
+  },
+  'click .editPlace': function () {
+    Session.set("activeDialog", "placeEdit");
     return false;
   },
 });

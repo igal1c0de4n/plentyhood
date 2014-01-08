@@ -3,8 +3,8 @@
 <div class="modal fade" id="eModalDialog" tabindex='-1'>
   <div class="modal-dialog">
     <div class="modal-content">
-      {{#if isPlaceCreateActive}}
-      {{> placeCreateDialog}}
+      {{#if isPlaceEditActive}}
+      {{> placeEditDialog}}
       {{/if}}
       {{#if isInviteActive}}
       {{> inviteDialog}}
@@ -18,28 +18,32 @@
 {{/if}}
 </template>
 
-<template name="placeCreateDialog">
+<template name="placeEditDialog">
 <div class="modal-header">
   <button type="button" class="close cancel">&times;</button>
-  <h3>Add Place</h3>
+  <h3> {{#if selectedPlace}} Edit {{else}} Add {{/if}} Place</h3>
 </div>
 <div class="modal-body">
   {{#if error}}
   <div class="alert alert-error">{{error}}</div>
   {{/if}}
   <label><i class="icon-bookmark"></i>Title</label>
-  <input type="text" class="title span5">
-  <label>Description</label>
+  <input type="text" class="title span5" value="{{title}}">
+  <label>
+    <i class="icon-comment"></i>
+    Description
+  </label>
   <textarea rows="3" class="fullWidth description" 
-    placeholder="Add interesting details"></textarea>
+    placeholder="Add interesting details">{{description}}</textarea>
   <label class="checkbox">
-    <input type="checkbox" class="private">
+    <i class="icon-lock"></i>
+    <input type="checkbox" class="private" {{#if isPrivate}}checked{{/if}}>
     Private place &mdash; friends only
   </label>
 </div>
 <div class="modal-footer">
   <a href="#" class="btn cancel">Cancel</a>
-  <a href="#" class="btn btn-primary save">Add place</a>
+  <a href="#" class="btn btn-primary save">Save</a>
 </div>
 </template>
 
