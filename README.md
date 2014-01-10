@@ -32,3 +32,9 @@ Feature roadmap
 	- Add services offered by user, use place as location
 		- options: hire, volunteer
 
+License
+-------
+Appropriate license will be decided soon. Meanwhile please consider this codebase 
+private. As such, even though it is published, there is no permission to make public, 
+commecrial or private use of this code base. 
+Please contact if you would like to cooperate on this project.
