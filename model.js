@@ -145,10 +145,11 @@ Meteor.methods({
     });
 
     if (options.title && options.tags.length) {
+      var resourceId = (new Meteor.Collection.ObjectID())._str;
       App.collections.Places.update(options.placeId, { 
         $addToSet: { 
           resources: { 
-            _id: (new Meteor.Collection.ObjectID())._str, 
+            _id: resourceId,
             title: options.title, 
             description: options.description,
             public: options.public,
@@ -156,6 +157,7 @@ Meteor.methods({
           }
         }
       });
+      return resourceId;
     }
     else {
       throw new Meteor.Error(403, "missing options");
@@ -209,13 +211,13 @@ var placeOwnerConfirm = function (p) {
 }
 
 var placeHasResource = function (place, rid) {
-    var ridList = _.find(place.resources, function (r) {
-      if (r._id == rid) {
-        console.log("place has resource", r._id, r.title);
-        return true; 
-      }
-    });
-    return !!ridList;
+  var ridList = _.find(place.resources, function (r) {
+    if (r._id == rid) {
+      //         console.log("place has resource", r._id, r.title);
+      return true; 
+    }
+  });
+  return !!ridList;
 }
 
 var verifyLoggedIn = function () {
