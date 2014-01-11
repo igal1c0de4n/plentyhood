@@ -139,15 +139,15 @@ Template.dialogs.isDialogActive = function () {
 };
 
 Template.dialogs.isPlaceResourceAddActive = function () {
-  return Session.get("activeDialog") == "placeResourceAdd";
+  return Session.equals("activeDialog", "placeResourceAdd");
 };
 
 Template.dialogs.isPlaceEditActive = function () {
-  return Session.get("activeDialog") == "placeEdit";
+  return Session.equals("activeDialog", "placeEdit");
 };
 
 Template.dialogs.isInviteActive = function () {
-  return Session.get("activeDialog") == "invite";
+  return Session.equals("activeDialog", "invite");
 };
 
 ///////////////////////////////////////////////////////////////////////////////

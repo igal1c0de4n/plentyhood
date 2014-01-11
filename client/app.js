@@ -30,7 +30,7 @@ Template.places.isPanelActive = function (name) {
   }
   if (name == "help") {
     return !Session.get("selectedPlace") &&
-      Session.get("activePanel") == "help";
+      Session.equals("activePanel", "help");
   }
 };
 
@@ -230,7 +230,7 @@ Template.placeResourcesPanel.resourceDescription = function () {
 };
 
 Template.placeResourcesPanel.markSelected = function (rid) {
-  return rid == Session.get("selectedResource") ? "selected" : "";
+  return Session.equals("selectedResource", rid) ? "selected" : "";
 };
 
 ///////////////////////////////////////////////////////////////////////////////
