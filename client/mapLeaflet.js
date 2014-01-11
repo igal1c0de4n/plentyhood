@@ -122,7 +122,7 @@ Template.leafletMap.rendered = function() {
   var userLocationMarker;
   map.handle.on('locationfound', function(e) {
     var newLocation = latlng2GeoJson(e.latlng);
-    if (!_.objectsEqual(last.userLocation, newLocation)) {
+    if (!_.isEqual(last.userLocation, newLocation)) {
       if (userLocationMarker) {
         // remove previous user location
         map.handle.removeLayer(userLocationMarker);
@@ -279,7 +279,7 @@ Template.leafletMap.rendered = function() {
       lm.dragging.disable();
       lm.off('dragend', undefined);
       if (action == "cancel") {
-        var sameLocation = _.objectsEqual(
+        var sameLocation = _.isEqual(
           lm.toGeoJSON().geometry.coordinates, last.coordsBeforeDrag);
         if (!sameLocation) {
           console.log("restoring previous coordinates", last.coordsBeforeDrag);
