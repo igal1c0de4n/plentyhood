@@ -69,4 +69,10 @@ client = {
     //   console.log("places:", places);
     return places;
   },
+
+  placeSet: function (p) {
+    Session.set("placeEditLocation", undefined);
+    Session.set("selectedResource", undefined);
+    Session.set("selectedPlace", p);
+  },
 };

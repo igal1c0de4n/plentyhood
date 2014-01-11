@@ -63,7 +63,7 @@ Template.panelPlace.isOwner = function () {
 Template.panelPlace.events({
   'click .removePlace': function () {
     App.collections.Places.remove(this._id);
-    Session.set("selectedPlace", undefined);
+    client.placeSet();
     return false;
   },
   'click .movePlaceOnMap': function () {
@@ -83,7 +83,7 @@ Template.details.creatorName = function () {
 };
 
 Template.details.placeLocationGet = function () {
-  return "TBD: lookup from coords"
+  return "NA (coords lookup tbd)"
 };
 
 Template.details.isOwner = function () {
@@ -103,7 +103,7 @@ Template.details.events({
     return false;
   },
   'click .close': function () {
-    Session.set("selectedPlace", undefined);
+    client.placeSet();
     return false;
   },
   'click .editLocation': function () {
@@ -151,12 +151,12 @@ Template.sharedPanel.canInvite = function () {
 // place resource panel
 
 Template.placeResourcesPanel.events({
-  'click .placeResourceAdd': function (event, template) {
+  'click #resourceAdd': function (event, template) {
     console.log('adding resource');
     client.schedResourceAddDialog();
   },
-  'click .placeResourceRemove': function (event, template) {
-    var rid = this._id;
+  'click #resourceRemove': function (event, template) {
+    var rid = Session.get("selectedResource");
     console.log('removing resource', rid);
     Meteor.call("mtcPlaceResourceRemove", { 
       placeId: Session.get("selectedPlace"),
@@ -166,9 +166,14 @@ Template.placeResourcesPanel.events({
         console.log("error: " + error);
       }
       else {
+        Session.set("selectedResource", undefined);
         console.log("resource", rid, "removed");
       }
     });
+  },
+  'change #resourceSelect': function (event, template) {
+    //     console.log("selectedResource", event.target.value);
+    Session.set("selectedResource", event.target.value);
   },
 });
 
@@ -181,12 +186,51 @@ Template.placeResourcesPanel.placeHasResources = function () {
 Template.placeResourcesPanel.placeResources = function () {
   var place = App.collections.Places.findOne(Session.get("selectedPlace"));
   //   console.log("place: ", place, " resources: ", place.resources);
-  return place.resources;
+  var r = place.resources;
+  return r ? r.sort(_.dynamicSort("title")) : undefined;
 };
 
 Template.placeResourcesPanel.isOwner = function () {
   var place = App.collections.Places.findOne(Session.get("selectedPlace"));
+  //   console.log("place", place);
   return place.owner === Meteor.userId();
+};
+
+var selectedResourceGet = function () {
+  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
+  var resList = place.resources;
+  var rid = Session.get("selectedResource");
+  var r = _.find(resList, function (r) {
+    return r._id == rid;
+  });
+  return r;
+}
+
+Template.placeResourcesPanel.resourceTagsGet = function () {
+  var tags = "";
+  var firstTime = true;
+  _.each(selectedResourceGet().tags, function (t) {
+    if (firstTime) {
+      firstTime = false;
+    }
+    else {
+      tags += ",";
+    }
+    tags += App.collections.Tags.findOne(t).title;
+  });
+  return tags;
+};
+
+Template.placeResourcesPanel.isResourceSelected = function () {
+  return !!Session.get("selectedResource") && !!selectedResourceGet();
+};
+
+Template.placeResourcesPanel.resourceDescription = function () {
+  return selectedResourceGet().description;
+};
+
+Template.placeResourcesPanel.markSelected = function (rid) {
+  return rid == Session.get("selectedResource") ? "selected" : "";
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,16 +238,23 @@ Template.placeResourcesPanel.isOwner = function () {
 
 Template.searchPanel.events({
   'click .goSearch' : function(event, template) {
-    var tags = $(".tagsSearchInputField").tagsinput('items');
+    var tags = $("#tagsSearchInputField").tagsinput('items');
     Session.set("searchTags", tags);
     console.log("search tags", tags);
   },
 });
 
 Template.searchPanel.rendered = function () {
-  var tif = $('.tagsSearchInputField');
+  var tif = $('#tagsSearchInputField');
+  // workaround: if the template is being re-rendered
+  // the input element already has a 'tagsinput' data.
+  // this tagsinput is already initialized, so we have to
+  // discard of it before we initialize it again
+  // (if not tagsinput errs while relating to the init object 
+  // as a function name)
+  tif.removeData('tagsinput');
   tif.tagsinput(client.tagsInputOptions());
-  //   console.log("searchPanel->rendered");
+  //   console.log("searchPanel->rendered initializing tags", tif);
   $("div.bootstrap-tagsinput > input").focus();
 };
 

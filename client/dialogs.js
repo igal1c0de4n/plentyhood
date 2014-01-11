@@ -50,7 +50,8 @@ Template.placeEditDialog.events({
         }
         else {
           if (!placeId) {
-            Session.set("selectedPlace", place);
+            client.placeSet(place);
+            Session.set("searchTags", undefined);
           }
           if (!pub && Meteor.users.find().count() > 1) {
             openInviteDialog();
@@ -158,15 +159,21 @@ Template.placeResourceAddDialog.saveDisabled = function () {
 
 client.schedResourceAddDialog = function () {
   Session.set("placeResourceAddError", null);
-  Session.set("selectedResourceId", null);
   Session.set("activeDialog","placeResourceAdd");
 };
 
 Template.placeResourceAddDialog.rendered = function () {
   bsModalOnShow("placeResourceAdd");
   var tif = $('.tagsInputField');
+  tif.removeData('tagsinput');
   tif.tagsinput(client.tagsInputOptions());
-  console.log("placeResourceAddDialog->rendered");
+  //   console.log("placeResourceAddDialog->rendered");
+};
+
+Template.placeResourceAddDialog.created = function () {
+  $("#eModalDialog").on('shown', function () {
+    $("input.title").focus();
+  });
 };
 
 Template.placeResourceAddDialog.events({
@@ -187,13 +194,14 @@ Template.placeResourceAddDialog.events({
         tags: tags,
         description: description,
         public: pub,
-      }, function (error) {
+      }, function (error, result) {
         if (error) {
           console.log("error: " + error);
           Session.set("placeResourceAddError", error.toString());
         }
         else {
-          console.log("resource added");
+          console.log("added resource", result);
+          Session.set("selectedResource", result);
           bsModalOnHide();
         }
       });

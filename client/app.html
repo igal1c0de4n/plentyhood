@@ -23,7 +23,8 @@
 
 <template name="searchPanel">
 <div class="searchPanel">
-  <input class="tagsSearchInputField" type="text" placeholder="Enter tags">
+  <input id="tagsSearchInputField" type="text" 
+  placeholder="Enter tags" data-role="tagsinput">
   <a href="#" class="btn btn-success goSearch">
     <i class="icon-white icon-search"></i>
     Search
@@ -72,13 +73,15 @@
 <template name="panelPlace">
 <div class="panelPlace floatingPanel">
   {{#with selectedPlace}}
-  {{> details}}
-  {{> placeResourcesPanel}}
+  <div class="simpleBorder">
+    {{> details}}
+  </div>
+  <div class="simpleBorder">
+    {{> placeResourcesPanel}}
+  </div>
   {{#unless public}}
   {{> sharedPanel}}
   {{/unless}}
-  {{#if isOwner}}
-  {{/if}}
   {{/with}}
 </div>
 </template>
@@ -100,11 +103,6 @@
   </span>
 </div>
 <div>
-  <i class="icon-comment"></i>
-  <em><b>About</b></em></div>
-</div>
-<div class="indent">{{description}}</div>
-<div>
   <i class="icon-map-marker"></i>
   <em><b>Location</b></em>
   {{#if isOwner}}
@@ -121,6 +119,11 @@
 {{else}}
 <div class="indent">{{placeLocationGet}}</div>
 {{/if}}
+<div>
+  <i class="icon-comment"></i>
+  <em><b>About</b></em>
+</div>
+<div class="indent">{{description}}</div>
 </template>
 
 <template name="placeResourcesPanel">
@@ -131,24 +134,27 @@
   <i class="icon-minus-sign"></i>
   {{/if}}
   <em><b>Resources</b></em>
-  {{#if isOwner}}
-  <input type="button" class="btn btn-mini placeResourceAdd" value="Add">
-  {{/if}}
 </label>
 {{#if placeHasResources}}
-{{#each placeResources}}
-<label for="" class="indent">
-  {{#if isOwner}}
-  <button type="button" aria-hidden="true" 
-    class="close placeResourceRemove pull-left">
-    &times;
-  </button>
-  {{else}}
-  <i class="icon-ok"></i>
-  {{/if}}
+<select id="resourceSelect" class="selectpicker">
+  <option disabled>Select resource</option>
+  {{#each placeResources}}
+  <option value="{{this._id}}" {{markSelected this._id}}>
   {{this.title}}
-</label>
-{{/each}}
+  </option>
+  {{/each}}
+</select>
+{{#if isResourceSelected}}
+<p>Desc: {{resourceDescription}}</p>
+<p>Tags: {{resourceTagsGet}}</p>
+{{/if}}
+{{/if}}
+{{#if isOwner}}
+<a href="#" class="btn" id="resourceAdd">Add</a>
+{{#if isResourceSelected}}
+<a href="#" class="btn" id="resourceEdit">Edit</a>
+<a href="#" class="btn" id="resourceRemove">Delete</a>
+{{/if}}
 {{/if}}
 </template>
 

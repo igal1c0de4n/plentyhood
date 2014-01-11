@@ -14,7 +14,7 @@ html, body, .fill {
   position: fixed;
   top: 50px;
   right: 10px;
-  padding: 10px;
+  padding: 5px;
   background-color: white;
   opacity: 0.9;
   /* TBD: add css transitions 
@@ -140,4 +140,11 @@ pull-right {
 
 .searchPanel .bootstrap-tagsinput {
   width: 250px;
+}
+
+.simpleBorder {
+  border: 1px solid #ddd;
+  padding: 5px;
+  margin: 0;
+  margin-top: 5px;
 }

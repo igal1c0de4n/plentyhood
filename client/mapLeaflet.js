@@ -207,8 +207,7 @@ Template.leafletMap.rendered = function() {
           m.lmark.placeId = id;
           m.lmark.on('click', function(e) {
             //             console.log("selected place", this.placeId)
-            Session.set("selectedPlace", this.placeId);
-            Session.set("placeEditLocation", undefined);
+            client.placeSet(this.placeId);
           });
           m.keep = true;
           markers.setItem(id, m);
@@ -244,6 +243,8 @@ Template.leafletMap.rendered = function() {
   this.handleSubscriptions  = Deps.autorun(function () {
     var b = Session.get("mapBounds");
     if (b) {
+      // TBD: some db restructuring is necessary for good security.
+      // create resources db and have ids references in place array
       Meteor.subscribe("places", b);
     }
     Meteor.subscribe("tags");
@@ -292,7 +293,7 @@ Template.leafletMap.rendered = function() {
 };
 
 var schedCreateDialog = function (geoJsonLoc) {
-  Session.set("selectedPlace", undefined);
+  client.placeSet();
   Session.set("placeLocation", geoJsonLoc);
   Session.set("createError", null);
   Session.set("activeDialog", "placeEdit");
