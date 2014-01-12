@@ -254,6 +254,7 @@ Template.searchPanel.rendered = function () {
   // (if not tagsinput errs while relating to the init object 
   // as a function name)
   tif.removeData('tagsinput');
+  $(".bootstrap-tagsinput").remove();
   tif.tagsinput(client.tagsInputOptions());
   $("div.bootstrap-tagsinput > input").focus();
 };
