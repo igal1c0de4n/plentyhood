@@ -9,8 +9,8 @@
       {{#if isInviteActive}}
       {{> inviteDialog}}
       {{/if}}
-      {{#if isPlaceResourceAddActive}}
-      {{> placeResourceAddDialog}}
+      {{#if isPlaceResourceUpdateActive}}
+      {{> resourceUpdateDialog}}
       {{/if}}
     </div>
   </div>
@@ -67,23 +67,24 @@
 </div>
 </template>
 
-<template name="placeResourceAddDialog">
+<template name="resourceUpdateDialog">
 <div class="modal-header">
   <button type="button" class="close cancel">&times;</button>
-  <h3>Add Resource</h3>
+  <h3>{{#if createNew}}Add{{else}}Edit{{/if}} Resource</h3>
 </div>
 <div class="modal-body">
   {{#if error}}
   <div class="alert alert-error">{{error}}</div>
   {{/if}}
   <label><i class="icon-bookmark"></i> Title</label>
-  <input type="text" class="fullWidth title" placeholder="Short title">
+  <input type="text" class="fullWidth title" placeholder="Short title" 
+  value="{{title}}">
   <div class="verticalMargin">
     <label class="tagsLabel">
       <i class="icon-tags"></i>
       Tags
     </label>
-    <input class="tagsInputField" type="text" 
+    <input class="tagsInputField" type="text" value="{{tags}}"
     placeholder="Add tags" data-role="tagsinput">
   </div>
   <label>
@@ -92,10 +93,10 @@
     <small>[optional]</small>
   </label>
   <textarea rows="3" class="fullWidth description" 
-    placeholder="Add interesting details"></textarea>
+    placeholder="Add interesting details">{{description}}</textarea>
   <div class="verticalMargin">
     <label class="checkbox">
-      <input type="checkbox" class="private">
+      <input type="checkbox" class="private" {{#if isPrivate}}checked{{/if}}>
       Private &mdash; friends only
       <i class="icon-lock"></i>
     </label>

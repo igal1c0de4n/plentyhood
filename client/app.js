@@ -150,10 +150,16 @@ Template.sharedPanel.canInvite = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // place resource panel
 
+var schedResourceUpdateDialog = function (isNew) {
+  Session.set("resourceUpdateError", null);
+  Session.set("activeDialog","resourceUpdate");
+  Session.set("resourceCreateNew", isNew);
+};
+
 Template.placeResourcesPanel.events({
   'click #resourceAdd': function (event, template) {
     console.log('adding resource');
-    client.schedResourceAddDialog();
+    schedResourceUpdateDialog(true);
   },
   'click #resourceRemove': function (event, template) {
     var rid = Session.get("selectedResource");
@@ -170,6 +176,10 @@ Template.placeResourcesPanel.events({
         console.log("resource", rid, "removed");
       }
     });
+  },
+  'click #resourceEdit': function (event, template) {
+    console.log('editing resource');
+    schedResourceUpdateDialog(false);
   },
   'change #resourceSelect': function (event, template) {
     //     console.log("selectedResource", event.target.value);
@@ -196,20 +206,10 @@ Template.placeResourcesPanel.isOwner = function () {
   return place.owner === Meteor.userId();
 };
 
-var selectedResourceGet = function () {
-  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
-  var resList = place.resources;
-  var rid = Session.get("selectedResource");
-  var r = _.find(resList, function (r) {
-    return r._id == rid;
-  });
-  return r;
-}
-
 Template.placeResourcesPanel.resourceTagsGet = function () {
   var tags = "";
   var firstTime = true;
-  _.each(selectedResourceGet().tags, function (t) {
+  _.each(client.selectedResourceGet().tags, function (t) {
     if (firstTime) {
       firstTime = false;
     }
@@ -222,11 +222,11 @@ Template.placeResourcesPanel.resourceTagsGet = function () {
 };
 
 Template.placeResourcesPanel.isResourceSelected = function () {
-  return !!Session.get("selectedResource") && !!selectedResourceGet();
+  return !!Session.get("selectedResource") && !!client.selectedResourceGet();
 };
 
 Template.placeResourcesPanel.resourceDescription = function () {
-  return selectedResourceGet().description;
+  return client.selectedResourceGet().description;
 };
 
 Template.placeResourcesPanel.markSelected = function (rid) {
@@ -245,6 +245,7 @@ Template.searchPanel.events({
 });
 
 Template.searchPanel.rendered = function () {
+  // console.log("searchPanel->rendered");
   var tif = $('#tagsSearchInputField');
   // workaround: if the template is being re-rendered
   // the input element already has a 'tagsinput' data.
@@ -254,7 +255,6 @@ Template.searchPanel.rendered = function () {
   // as a function name)
   tif.removeData('tagsinput');
   tif.tagsinput(client.tagsInputOptions());
-  //   console.log("searchPanel->rendered initializing tags", tif);
   $("div.bootstrap-tagsinput > input").focus();
 };
 

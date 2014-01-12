@@ -4,7 +4,7 @@
 var unsetActiveDialog = function (name) {
   var currActiveDialog = Session.get("activeDialog");
   if (currActiveDialog && (currActiveDialog == name || !name)) {
-    console.log("removing active dialog:", currActiveDialog);
+    //     console.log("removing active dialog:", currActiveDialog);
     Session.set("activeDialog", undefined);
   }
 };
@@ -138,8 +138,8 @@ Template.dialogs.isDialogActive = function () {
   return !!Session.get("activeDialog");
 };
 
-Template.dialogs.isPlaceResourceAddActive = function () {
-  return Session.equals("activeDialog", "placeResourceAdd");
+Template.dialogs.isPlaceResourceUpdateActive = function () {
+  return Session.equals("activeDialog", "resourceUpdate");
 };
 
 Template.dialogs.isPlaceEditActive = function () {
@@ -153,69 +153,102 @@ Template.dialogs.isInviteActive = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // Add resource dialog
 
-Template.placeResourceAddDialog.saveDisabled = function () {
-  return Session.get("saveDisabled") ? "disabled" : "";
-}
 
-client.schedResourceAddDialog = function () {
-  Session.set("placeResourceAddError", null);
-  Session.set("activeDialog","placeResourceAdd");
+var isCreateNewResource = function () {
+  return Session.equals("resourceCreateNew", true);
 };
 
-Template.placeResourceAddDialog.rendered = function () {
-  bsModalOnShow("placeResourceAdd");
+Template.resourceUpdateDialog.createNew = function () {
+  return isCreateNewResource();
+};
+
+Template.resourceUpdateDialog.title = function () {
+  return isCreateNewResource() ? "" : client.selectedResourceGet().title;
+};
+
+Template.resourceUpdateDialog.description = function () {
+  return isCreateNewResource() ? "" : client.selectedResourceGet().description;
+};
+
+Template.resourceUpdateDialog.isPrivate = function () {
+  return isCreateNewResource() ? "" : !client.selectedResourceGet().public;
+};
+
+Template.resourceUpdateDialog.tags = function () {
+  if (isCreateNewResource()) {
+    return "";
+  }
+  var tagsStr = "";
+  _.each(client.selectedResourceGet().tags, function (t) {
+    if (tagsStr) {
+      tagsStr += ",";
+    }
+    var name = App.collections.Tags.findOne(t).title;
+    //     console.log("tag", t, name);
+    tagsStr += name;
+  });
+  return tagsStr;
+};
+
+Template.resourceUpdateDialog.saveDisabled = function () {
+  return Session.get("saveDisabled") ? "disabled" : "";
+};
+
+Template.resourceUpdateDialog.rendered = function () {
+  bsModalOnShow("resourceUpdate");
   var tif = $('.tagsInputField');
   tif.removeData('tagsinput');
   tif.tagsinput(client.tagsInputOptions());
-  //   console.log("placeResourceAddDialog->rendered");
-};
-
-Template.placeResourceAddDialog.created = function () {
   $("#eModalDialog").on('shown', function () {
     $("input.title").focus();
   });
+  //   console.log("resourceUpdateDialog->rendered");
 };
 
-Template.placeResourceAddDialog.events({
+Template.resourceUpdateDialog.events({
   'click .save': function (event, template) {
-    console.log("placeResourceAddDialog->save");
+    //     console.log("resourceUpdateDialog->save");
     if (!_.isUndefined(event.target.attributes.disabled)) {
       return;
     }
     var title = template.find(".title").value;
     var description = template.find(".description").value;
-    var pub = ! template.find(".private").checked;
+    var pub = !template.find(".private").checked;
     var tags = $(".tagsInputField").tagsinput('items');
-    console.log("title", title, "description", description, "pub", pub, "tags", tags);
+    //     console.log("title", title, "description", description, 
+    //     "pub", pub, "tags", tags);
+    var args = { 
+      placeId: Session.get("selectedPlace"),
+      title: title,
+      tags: tags,
+      description: description,
+      public: pub,
+    }
+    if (!isCreateNewResource()) {
+      args.resourceId = Session.get("selectedResource");
+    }
     if (title && tags.length) {
-      Meteor.call("mtcPlaceResourceAdd", { 
-        placeId: Session.get("selectedPlace"),
-        title: title,
-        tags: tags,
-        description: description,
-        public: pub,
-      }, function (error, result) {
+      Meteor.call("mtcResourceUpdate", args, function (error, result) {
         if (error) {
           console.log("error: " + error);
-          Session.set("placeResourceAddError", error.toString());
+          Session.set("resourceUpdateError", error.toString());
         }
         else {
-          console.log("added resource", result);
+          console.log("added/updated resource", result);
           Session.set("selectedResource", result);
           bsModalOnHide();
         }
       });
     } else {
-      Session.set("placeResourceAddError", "Title and tags must be provided");
+      Session.set("resourceUpdateError", "Title and tags must be provided");
     }
   },
-
   'click .cancel': function () {
     bsModalOnHide();
   }
 });
 
-Template.placeResourceAddDialog.error = function () {
-  return Session.get("placeResourceAddError");
+Template.resourceUpdateDialog.error = function () {
+  return Session.get("resourceUpdateError");
 };
 

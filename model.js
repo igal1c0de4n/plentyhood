@@ -122,7 +122,7 @@ Meteor.methods({
     }
   },
 
-  mtcPlaceResourceAdd: function (options) {
+  mtcResourceUpdate: function (options) {
     options = options || {};
 
     verifyLoggedIn.call(this);
@@ -132,6 +132,8 @@ Meteor.methods({
     var tagIdsList = _.map(options.tags, function (tagTitle) {
       var t = App.collections.Tags.findOne({title: tagTitle});
       if (t) {
+        // bug: only inc popularity if new resource or if tag does not 
+        // already exist in resource
         t.popularity++;
         console.log("tag:", tagTitle, "exists, popularity:", t.popularity);
         App.collections.Tags.update(t._id, t);
@@ -141,11 +143,24 @@ Meteor.methods({
       console.log("creating new tag:", tagTitle);
       var newTagId = App.collections.Tags.insert(
         {title: tagTitle.trim().toLowerCase(), popularity: 1});
-      return newTagId;
+        return newTagId;
     });
 
     if (options.title && options.tags.length) {
-      var resourceId = (new Meteor.Collection.ObjectID())._str;
+      var resourceId;
+      if (options.resourceId) {
+        resourceId = options.resourceId;
+        console.log("updating resource", options.resourceId);
+        // this is god-hackish but it will have to do until resources 
+        // have their own collection
+        App.collections.Places.update(options.placeId, { 
+          $pull: { resources: { _id: resourceId }}
+        });
+      }
+      else {
+        resourceId = (new Meteor.Collection.ObjectID())._str;
+        console.log("creating new resource", options.resourceId);
+      }
       App.collections.Places.update(options.placeId, { 
         $addToSet: { 
           resources: { 
