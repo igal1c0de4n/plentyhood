@@ -142,9 +142,12 @@ pull-right {
   width: 250px;
 }
 
+.marginTop {
+  margin-top: 5px !important;
+}
+
 .simpleBorder {
   border: 1px solid #ddd;
   padding: 5px;
   margin: 0;
-  margin-top: 5px;
 }
