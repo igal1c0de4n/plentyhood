@@ -77,12 +77,7 @@ client = {
   },
 
   selectedResourceGet: function () {
-    var place = App.collections.Places.findOne(Session.get("selectedPlace"));
-    var resList = place.resources;
     var rid = Session.get("selectedResource");
-    var r = _.find(resList, function (r) {
-      return r._id == rid;
-    });
-    return r;
+    return rid ? App.collections.Resources.findOne(rid) : undefined; 
   },
 };

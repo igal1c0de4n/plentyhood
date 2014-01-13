@@ -158,12 +158,12 @@ var schedResourceUpdateDialog = function (isNew) {
 
 Template.placeResourcesPanel.events({
   'click #resourceAdd': function (event, template) {
-    console.log('adding resource');
+    // console.log('adding resource');
     schedResourceUpdateDialog(true);
   },
   'click #resourceRemove': function (event, template) {
     var rid = Session.get("selectedResource");
-    console.log('removing resource', rid);
+    // console.log('removing resource', rid);
     Meteor.call("mtcPlaceResourceRemove", { 
       placeId: Session.get("selectedPlace"),
       resourceId: rid,
@@ -173,12 +173,12 @@ Template.placeResourcesPanel.events({
       }
       else {
         Session.set("selectedResource", undefined);
-        console.log("resource", rid, "removed");
+        // console.log("resource", rid, "removed");
       }
     });
   },
   'click #resourceEdit': function (event, template) {
-    console.log('editing resource');
+    // console.log('editing resource');
     schedResourceUpdateDialog(false);
   },
   'change #resourceSelect': function (event, template) {
@@ -196,8 +196,12 @@ Template.placeResourcesPanel.placeHasResources = function () {
 Template.placeResourcesPanel.placeResources = function () {
   var place = App.collections.Places.findOne(Session.get("selectedPlace"));
   //   console.log("place: ", place, " resources: ", place.resources);
-  var r = place.resources;
-  return r ? r.sort(_.dynamicSort("title")) : undefined;
+  if (place.resources) {
+    var rnames = _.map(place.resources, function (rid) {
+      return App.collections.Resources.findOne(rid);
+    });
+    return rnames.sort(_.dynamicSort("title"));
+  }
 };
 
 Template.placeResourcesPanel.isOwner = function () {

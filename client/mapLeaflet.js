@@ -246,8 +246,9 @@ Template.leafletMap.rendered = function() {
       // TBD: some db restructuring is necessary for good security.
       // create resources db and have ids references in place array
       Meteor.subscribe("places", b);
+      Meteor.subscribe("tags");
+      Meteor.subscribe("resources");
     }
-    Meteor.subscribe("tags");
   });
 
   this.handleZoomChanged = Deps.autorun(function () {

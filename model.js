@@ -3,6 +3,18 @@
 
 // Loaded on both the client and the server
 
+App.collections.Resources.allow({
+  insert: function (userId) {
+    return false; 
+  },
+  update: function (userId) {
+    return false;
+  },
+  remove: function (userId) {
+    return false;
+  },
+});
+
 App.collections.Tags.allow({
   insert: function (userId) {
     return false; 
@@ -31,7 +43,7 @@ App.collections.Places.allow({
     if (userId !== place.owner)
       return false; // not the owner
 
-    var allowed = ["title", "description", "location"];
+    var allowed = ["title", "description", "location", "resources"];
     if (_.difference(fields, allowed).length) {
       // console.log("forbidden fields update", fields);
       return false; // tried to write to forbidden field
@@ -124,55 +136,64 @@ Meteor.methods({
 
   mtcResourceUpdate: function (options) {
     options = options || {};
-
     verifyLoggedIn.call(this);
-    var p = placeGet(options.placeId);
-    placeOwnerConfirm.call(this, p);
-
     var tagIdsList = _.map(options.tags, function (tagTitle) {
       var t = App.collections.Tags.findOne({title: tagTitle});
       if (t) {
         // bug: only inc popularity if new resource or if tag does not 
         // already exist in resource
         t.popularity++;
-        console.log("tag:", tagTitle, "exists, popularity:", t.popularity);
+        // console.log("tag", tagTitle, "exists, popularity:", t.popularity);
         App.collections.Tags.update(t._id, t);
         return t._id;
       }
       // must be new tag
-      console.log("creating new tag:", tagTitle);
+      // console.log("creating new tag:", tagTitle);
       var newTagId = App.collections.Tags.insert(
         {title: tagTitle.trim().toLowerCase(), popularity: 1});
         return newTagId;
     });
-
     if (options.title && options.tags.length) {
-      var resourceId;
-      if (options.resourceId) {
-        resourceId = options.resourceId;
-        console.log("updating resource", options.resourceId);
-        // this is god-hackish but it will have to do until resources 
-        // have their own collection
-        App.collections.Places.update(options.placeId, { 
-          $pull: { resources: { _id: resourceId }}
+      var resourceId = options.resourceId;
+      if (resourceId) {
+        // console.log("updating resource", resourceId);
+        App.collections.Resources.update(resourceId, { 
+          title: options.title, 
+          description: options.description,
+          public: options.public,
+          tags: tagIdsList,
         });
       }
       else {
-        resourceId = (new Meteor.Collection.ObjectID())._str;
-        console.log("creating new resource", options.resourceId);
-      }
-      App.collections.Places.update(options.placeId, { 
-        $addToSet: { 
-          resources: { 
-            _id: resourceId,
+        // no resource id -- new resource
+        resourceId = App.collections.Resources.insert({
             title: options.title, 
             description: options.description,
             public: options.public,
             tags: tagIdsList,
-          }
-        }
-      });
+        });
+        // console.log("mtcResourceUpdate->resource", resourceId);
+      }
       return resourceId;
+    }
+    else {
+      throw new Meteor.Error(403, "missing options");
+    }
+  },
+
+  mtcPlaceResourceAdd: function (options) {
+    options = options || {};
+    verifyLoggedIn.call(this);
+    var p = placeGet(options.placeId);
+    placeOwnerConfirm.call(this, p);
+    var placeId = options.placeId;
+    var resourceId = options.resourceId;
+    // console.log("mtcPlaceResourceAdd", resourceId, placeId);
+    if (placeId && resourceId) {
+      App.collections.Places.update(placeId, { 
+        $addToSet: { resources: resourceId}
+      });
+      // console.log("added resource", resourceId, "to place", placeId);
     }
     else {
       throw new Meteor.Error(403, "missing options");
@@ -181,25 +202,18 @@ Meteor.methods({
 
   mtcPlaceResourceRemove: function (options) {
     options = options || {};
-
     verifyLoggedIn.call(this);
-
-    var p = placeGet(options.placeId);
-
+    var placeId = options.placeId;
+    var resourceId = options.resourceId;
+    var p = placeGet(placeId);
     placeOwnerConfirm.call(this, p);
-
-    if (!placeHasResource(p, options.resourceId)) {
-      throw new Meteor.Error(403, "resource " + 
-                             options.resourceId + " is not in place "
-                            + options.placeId);
+    if (!placeHasResource(p, resourceId)) {
+      throw new Meteor.Error(
+        403, "resource", resourceId, "is not in place", placeId);
     }
     else {
-      App.collections.Places.update(options.placeId, { 
-        $pull: { 
-          resources: { 
-            _id: options.resourceId, 
-          }
-        }
+      App.collections.Places.update(placeId, {
+        $pull: { resources: resourceId }
       });
     }
   }
@@ -226,13 +240,13 @@ var placeOwnerConfirm = function (p) {
 }
 
 var placeHasResource = function (place, rid) {
-  var ridList = _.find(place.resources, function (r) {
-    if (r._id == rid) {
+  var foundId = _.find(place.resources, function (r) {
+    if (r == rid) {
       //         console.log("place has resource", r._id, r.title);
       return true; 
     }
   });
-  return !!ridList;
+  return !!foundId;
 }
 
 var verifyLoggedIn = function () {

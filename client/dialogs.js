@@ -46,7 +46,7 @@ Template.placeEditDialog.events({
       }
       Meteor.call('mtcPlaceUpdate', doc, function (error, place) {
         if (error) {
-          console.log("placeEdit failed!", error);
+          // console.log("placeEdit failed!", error);
         }
         else {
           if (!placeId) {
@@ -198,6 +198,7 @@ Template.resourceUpdateDialog.rendered = function () {
   bsModalOnShow("resourceUpdate");
   var tif = $('.tagsInputField');
   tif.removeData('tagsinput');
+  $(".bootstrap-tagsinput").remove();
   tif.tagsinput(client.tagsInputOptions());
   $("#eModalDialog").on('shown', function () {
     $("input.title").focus();
@@ -217,8 +218,9 @@ Template.resourceUpdateDialog.events({
     var tags = $(".tagsInputField").tagsinput('items');
     //     console.log("title", title, "description", description, 
     //     "pub", pub, "tags", tags);
+    var placeId = Session.get("selectedPlace");
     var args = { 
-      placeId: Session.get("selectedPlace"),
+      placeId: placeId,
       title: title,
       tags: tags,
       description: description,
@@ -228,14 +230,31 @@ Template.resourceUpdateDialog.events({
       args.resourceId = Session.get("selectedResource");
     }
     if (title && tags.length) {
-      Meteor.call("mtcResourceUpdate", args, function (error, result) {
+      Meteor.call("mtcResourceUpdate", args, function (error, resourceId) {
         if (error) {
-          console.log("error: " + error);
+          // console.log("error: ", error);
           Session.set("resourceUpdateError", error.toString());
+          return;
         }
-        else {
-          console.log("added/updated resource", result);
-          Session.set("selectedResource", result);
+        // console.log("updated resource", resourceId);
+        Session.set("selectedResource", resourceId);
+        if (isCreateNewResource()) {
+          // user asked to add a new resource, so add it to place
+          // console.log("resourceUpdateDialog->save about to add", placeId, resourceId);
+          Meteor.call("mtcPlaceResourceAdd", {
+            placeId: placeId,
+            resourceId: resourceId,
+          }, function (error) {
+            if (error) {
+              // console.log("error: " + error);
+              Session.set("resourceUpdateError", error.toString());
+            }
+            else {
+              // console.log("added resource", resourceId, "to place", placeId);
+              bsModalOnHide();
+            }
+          });
+        } else {
           bsModalOnHide();
         }
       });
