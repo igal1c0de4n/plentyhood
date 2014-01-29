@@ -56,7 +56,12 @@ App.collections.Places.allow({
   },
   remove: function (userId, place) {
     // You can only remove places that you created
-    return place.owner === userId;
+    if (place.owner === userId) {
+      return true;
+    } 
+    var adminUser = Meteor.users.findOne({ "profile.name": "Admin"});
+    console.log("user", userId, "admin", adminUser._id)
+    return userId == adminUser._id;
   }
 });
 
