@@ -47,71 +47,79 @@
 </template>
 
 <template name="header">
-<div class="navbar navbar-inverse navbar-navbar-fixed-top 
-  {{page2class "places" "navbar-w-map"}}">
-  <div class="navbar-inner {{page2class "places" "navbar-inner-w-map"}}">
-    <a class="brand" href="/">Plentyhood</a>
-    <ul class="nav">
-      <li  class="{{page2class "places" "active"}}"><a href="/places">Places</a></li>
-      {{#if isInRole 'admin'}}
-      <li class="{{page2class "admin" "active"}}"><a href="/admin">Admin</a></li>
-      {{/if}}
-      {{#if isInRole 'admin,manage-users'}}
-      <li class="{{page2class "manage" "active"}}"><a href="/manage">Users</a></li>
-      {{/if}}
-    </ul>
-    <ul class="nav pull-right">
-      {{#if userSignedIn}}
-      <li class="dropdown pull-right">
-      <a href="#" class="dropdown-toggle userNavMenu" data-toggle="dropdown">
-        {{#if getFbUser}}
-        <img 
-        src="//graph.facebook.com/{{getFbUser}}/picture" 
-        Title="{{rolesDispName}}"/>
-        {{else}}
-        {{rolesDispName}}
+<nav class="navbar navbar-inverse {{page2class "places" "navbar-fixed-top"}}" 
+  role="navigation" >
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" 
+        data-target="#navcol">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Plentyhood</a>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="navcol">
+      <ul class="nav navbar-nav">
+        <li  class="{{page2class "places" "active"}}"><a href="/places">Places</a></li>
+        <li  class="{{page2class "about" "active"}}"><a href="/about">About</a></li>
+        {{#if isInRole 'admin'}}
+        <li class="{{page2class "admin" "active"}}"><a href="/admin">Admin</a></li>
         {{/if}}
-        <b class="caret"></b>
-      </a>
-      <ul class="dropdown-menu">
-        <li><a class="signout" href="/signout">Sign out</a></li>
+        {{#if isInRole 'admin,manage-users'}}
+        <li class="{{page2class "manage" "active"}}"><a href="/manage">Users</a></li>
+        {{/if}}
       </ul>
-      </li>
-      {{else}}
-      <li>{{loginButtons align="right"}}</li>
-      {{/if}}
-    </ul>
-  </div>
-</div>
+      <ul class="nav navbar-nav navbar-right">
+        {{#if currentUser}}
+        <li class="dropdown">
+        <a href="#" class="dropdown-toggle userNavMenu" data-toggle="dropdown">
+          {{rolesDispName}}
+          <b class="caret"></b>
+          {{#if getFbUser}}
+          <img src="//graph.facebook.com/{{getFbUser}}/picture" Title="{{rolesDispName}}"/>
+          {{/if}}
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="signout" href="/signout">Sign out</a></li>
+        </ul>
+        </li>
+        {{else}}
+        <li>{{loginButtons align="right"}}</li>
+        {{/if}}
+        <!-- eventually replace w/own login controls as in: -->
+        <!-- https://www.eventedmind.com/tracks/feed-archive/meteor-customizing-login -->
+        <!--   <li><a href="#">Link</a></li> -->
+        <!--   <li class="dropdown"> -->
+        <!--     <a href="#" class="dropdown-toggle" data-toggle="dropdown"> -->
+        <!--       Dropdown <b class="caret"></b> -->
+        <!--     </a> -->
+        <!--     <ul class="dropdown-menu"> -->
+        <!--       <li><a href="#">Action</a></li> -->
+        <!--       <li><a href="#">Another action</a></li> -->
+        <!--       <li><a href="#">Something else here</a></li> -->
+        <!--       <li class="divider"></li> -->
+        <!--       <li><a href="#">Separated link</a></li> -->
+        <!--     </ul> -->
+        <!--   </li> -->
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
 </template>
 
 <template name="noteOfTheDay">
 <p>Note of the day: {{note}}</p>
 </template>
 
-<template name="start">
+<template name="about">
 {{> header}}
 <div class="container">
-  <h3>Plentyhood?</h3>
-  <p> Plentiful neighborHood. 
-  It's about easily sharing nearby resources: 
-  tools, produce, gardens, services and more. 
-  </p>
-  <p>
-  The app facilitates cooperation within a local community using the user's location 
-  to enable access to resources which are closer and relevant. 
-  </p>
-  <p>
-  Looking for a resource your friends may have and use once a year? 
-  Search for it through relevant tags and request it!
-  </p>
-  <p>
-  Have resources to give, lend, sell, or rent? 
-  Create your place, add resources and tag them. 
-  Access to your resource could be most welcome by someone in need,
-  and well-worth it for you!
-  </p>
-  <h3>How can I use this site?</h3>
+  <h2>About Plentyhood</h2>
+  <p>tbd</p>
+  <h3>Want to try it out?</h3>
   <p>
   Create an account, login with Facebook or use one of the demo users 
   (psw <em>sharewme</em>):</p>

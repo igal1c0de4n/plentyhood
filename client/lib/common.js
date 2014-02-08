@@ -5,29 +5,27 @@ client = {
     return user.emails[0].address;
   },
 
-  tagsInputOptions: function () {
+  tagsInputOptions: {
     // TBD: sort by popularity of tag
-    return {
-      maxTags: 12,
-      typeahead: {
-        source: function(query) {
-          var foundTags = App.collections.Tags.
-            find({title: new RegExp("^" + query.toLowerCase())}).
-            fetch();
-          var tags = _.map(foundTags, function (t) {
-            return t.title;
-          });
-          //           console.log("typeahead.source", tags);
-          return tags;
-        }
-      },
-      tagClass: function (item) {
-        //         console.log("tagClass", item);
-        var v = item.trim().toLowerCase();
-        var o = App.collections.Tags.findOne({title: v});
-        return o ? 'label label-info' : 'label label-warning';
+    minLength: 2,
+    maxTags: 12,
+    typeahead: {
+      source: function(query) {
+        var foundTags = App.collections.Tags.
+          find({title: new RegExp("^" + query.toLowerCase())}).fetch();
+        var tags = _.map(foundTags, function (t) {
+          return t.title;
+        });
+        // console.log("typeahead.source", tags);
+        return tags;
       }
-    };
+    },
+    tagClass: function (item) {
+      // console.log("tagClass", item);
+      var v = item.trim().toLowerCase();
+      var o = App.collections.Tags.findOne({title: v});
+      return o ? 'label label-primary' : 'label label-warning';
+    }
   },
 
   getMatchingPlaces: function () {
@@ -36,13 +34,13 @@ client = {
     var tags = Session.get("searchTags");
     var center = Session.get("mapCenter");
     if (tags && tags.length) {
-      //       console.log("tags", tags);
+      // console.log("tags", tags);
       var ids = _.map(tags, function (t) {
         var v = t.trim().toLowerCase();
         var o = App.collections.Tags.findOne({title: v});
         return o ? o._id : undefined;
       });
-      //         console.log("ids", ids);
+      // console.log("ids", ids);
       var missingTags = _.find(ids, function (id) {
         return id === undefined;
       });
@@ -64,9 +62,9 @@ client = {
       places = App.collections.Places.find({
         location: {$near : {$geometry: center}},
       }).fetch();
-      //       console.log("search invoked w/o tags");
+      // console.log("search invoked w/o tags");
     }
-    //   console.log("places:", places);
+    // console.log("places:", places);
     return places;
   },
 

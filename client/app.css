@@ -5,18 +5,20 @@ html, body, .fill {
 
 .searchPanel {
   position: fixed;
-  top: 50px;
+  top: 60px;
   left: 10px;
   z-index: 1;
 }
 
 .floatingPanel {
   position: fixed;
-  top: 50px;
+  top: 60px;
   right: 10px;
   padding: 5px;
   background-color: white;
   opacity: 0.9;
+  -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   /* TBD: add css transitions 
    * It only work if the element future size is known in advance, not in auto
    * (there's a workaround)
@@ -34,16 +36,12 @@ html, body, .fill {
 
 #leaflet-map {
   height: 100%;
+  width: 100%;
 }
 
 body {
   padding: 0;
   margin: 0;
-  /* tbd: set map.height to (window.height - navbar.height)
-  meanwhile, workaround which hides the bottom part of the map 
-  and the leaflet(c) part
-   */
-  /*    overflow: hidden; */
 }
 
 .indent {
@@ -80,24 +78,6 @@ body {
 
 input.chosen {
   font-weight: bold;
-}
-
-h1 {
-  font-size: 30px;
-}
-
-h2 {
-  font-size: 25px;
-}
-
-h3 {
-  margin: 0;
-  font-size: 20px;
-  line-height: 30px;
-}
-
-h1, h2, h3 {
-  color: #252;
 }
 
 .attribution {

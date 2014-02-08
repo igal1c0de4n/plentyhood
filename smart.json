@@ -1,6 +1,11 @@
 {
   "packages": {
-    "router": { "version": "0.5.4.1" },
-    "roles": { "version": "1.2.6" }
+    "router": {
+      "version": "0.5.4.1"
+    },
+    "roles": {
+      "version": "1.2.6"
+    },
+    "bootstrap-3": {}
   }
 }

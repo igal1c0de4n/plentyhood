@@ -1,12 +1,3 @@
-@media (min-width: 1200px) {
-  .container, 
-  .navbar-static-top .container, 
-  .navbar-fixed-top .container, 
-  .navbar-fixed-bottom .container {
-    width: 99% !important;
-  }
-}
-
 .navbar-inner {
   max-height: 40px;
 }
@@ -19,7 +10,7 @@
 }
 
 #login-buttons a {
-  padding: 10px 15px 10px;
+  padding: 15px 15px 15px;
   color: #999999;
   line-height: 0;
   text-decoration: none;
@@ -74,10 +65,17 @@
 }
 
 .navbar img {
-  max-height: 30px;
-  margin-top: -5px;
+  max-height: 45px;
+  border-radius: 23px;
 }
 
 a.userNavMenu {
   background-color: transparent !important;
+  padding-top: 3px !important;
+  padding-bottom: 0px !important;
+  padding-right: 3px !important;
+}
+
+.navbar-nav.navbar-right:last-child {
+  margin: 0;
 }

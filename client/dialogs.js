@@ -199,7 +199,7 @@ Template.resourceUpdateDialog.rendered = function () {
   var tif = $('.tagsInputField');
   tif.removeData('tagsinput');
   $(".bootstrap-tagsinput").remove();
-  tif.tagsinput(client.tagsInputOptions());
+  tif.tagsinput(client.tagsInputOptions);
   $("#eModalDialog").on('shown', function () {
     $("input.title").focus();
   });

@@ -6,7 +6,6 @@
 preserve-inputs
 accounts-ui
 accounts-password
-bootstrap
 email
 accounts-facebook
 accounts-twitter
@@ -16,3 +15,4 @@ router
 page-js-ie-support
 HTML5-History-API
 roles
+bootstrap-3

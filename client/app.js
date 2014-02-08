@@ -19,16 +19,16 @@ Template.places.isPanelActive = function (name) {
   if (Session.get("disablePanel")) {
     return false;
   }
-  if (name == "search") {
+  if (name === "search") {
     return Session.get("mapZoomedEnough");
   }
-  if (name == "place") {
+  if (name === "place") {
     return !!Session.get("selectedPlace") && !Session.get("editPlace");
   }
-  if (name == "edit") {
+  if (name === "edit") {
     return !!Session.get("editPlace");
   }
-  if (name == "help") {
+  if (name === "help") {
     return !Session.get("selectedPlace") &&
       Session.equals("activePanel", "help");
   }
@@ -259,8 +259,8 @@ Template.searchPanel.rendered = function () {
   // as a function name)
   tif.removeData('tagsinput');
   $(".bootstrap-tagsinput").remove();
-  tif.tagsinput(client.tagsInputOptions());
-  $("div.bootstrap-tagsinput > input").focus();
+  tif.tagsinput(client.tagsInputOptions);
+  $(".bootstrap-tagsinput > input").focus().attr("autocomplete","off");
 };
 
 }());

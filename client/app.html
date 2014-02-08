@@ -21,7 +21,7 @@
 <template name="searchPanel">
 <div class="searchPanel">
   <input id="tagsSearchInputField" type="text" 
-  placeholder="Enter tags" data-role="tagsinput">
+  placeholder="Enter tags" data-role="tagsinput"/>
   <a href="#" class="btn btn-success goSearch">
     <i class="icon-white icon-search"></i>
     Search
@@ -31,7 +31,7 @@
 
 <template name="leafletMap">
 {{#constant}}
-<div id="leaflet-map" class="leflet-map"></div>
+<div id="leaflet-map"></div>
 {{/constant}}
 </template>
 
@@ -70,7 +70,7 @@
 <template name="panelPlace">
 <div class="panelPlace floatingPanel">
   {{#with selectedPlace}}
-  <div class="simpleBorder">
+  <div class="">
     {{> details}}
   </div>
   <div class="simpleBorder marginTop">
