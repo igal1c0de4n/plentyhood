@@ -31,10 +31,11 @@ Meteor.Router.add({
 //          return 'awaiting-verification';
 //        }
     }
-    return 'start';
+    return 'landing';
   },
 
-  '/start': 'start',
+  '/about': 'about',
+  '/landing': 'landing',
   '/places': 'places',
   '/admin': function () {
     if (Roles.userIsInRole(Meteor.user(), 'admin')) {
@@ -70,7 +71,7 @@ Meteor.Router.filters({
 
 // make sure user has logged in for all appropriate routes
 Meteor.Router.filter('checkLoggedIn', {
-  except:['start', 'places', 'loading', 'not-found']
+  except:['about', 'places', 'loading', 'not-found', 'landing']
 });
 
 }());
