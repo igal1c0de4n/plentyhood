@@ -1,4 +1,25 @@
 <template name="landing">
+{{#if ready}}
+{{> showLandingPage}}
+{{else}}
+<div class="container">
+  <div class="row clearfix">
+    <div class="col-xs-12 col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8 column">
+      <div class="wait jumbotron">
+        <h2><span>Doing Something Smart</span></h2>
+        <p>
+        <span>
+          <p> Please wait a moment...  </p>
+        </span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{{/if}}
+</template>
+
+<template name="showLandingPage">
 <div class="container">
   <div class="row clearfix">
     <div class="col-xs-12 col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8 column">
@@ -11,7 +32,7 @@
         </ol>
         <div class="carousel-inner">
           <div class="item">
-            <img alt="" src="images/ph_apple_tree.jpg">
+            <img alt="" src="{{resUrl "img/land/ph_apple_tree.jpg"}}">
             <div class="carousel-caption">
               <h4>Gardens, Fruit Trees</h4>
               <p> Ah, apples -- This tree can benefit so many 
@@ -19,7 +40,7 @@
             </div>
           </div>
           <div class="item">
-            <img alt="" src="images/ph_books.jpg">
+            <img alt="" src="{{resUrl "img/land/ph_books.jpg"}}">
             <div class="carousel-caption">
               <h4>Buying new is so old</h4>
               <p>A book triggers your curiosity -- 
@@ -27,7 +48,7 @@
             </div>
           </div>
           <div class="item active">
-            <img alt="" src="images/ph_power_tools.jpg">
+            <img alt="" src="{{resUrl "img/land/ph_power_tools.jpg"}}">
             <div class="carousel-caption">
               <h4>Tools</h4>
               <p>
@@ -73,7 +94,7 @@
       </div>
       <div class="row clearfix">
         <div class="col-sm-4 column">
-          <img alt="Toolbox" src="images/ph_toolbox_w320.jpg" height="200px">
+          <img alt="" src="{{resUrl "img/land/ph_toolbox_w320.jpg"}}" height="200px">
         </div>
         <div class="col-sm-8 column">
           <h2>
@@ -101,7 +122,7 @@
           </p>
         </div>
         <div class="col-sm-4 column">
-          <img alt="" src="images/ph_girl_w_produce3.jpg" height="200px">
+          <img alt="" src="{{resUrl "img/land/ph_girl_w_produce3.jpg"}}" height="200px">
         </div>
       </div>
       <h3>FAQs</h3>

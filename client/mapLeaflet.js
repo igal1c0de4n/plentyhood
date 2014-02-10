@@ -18,7 +18,7 @@ var map = {
 };
 
 Template.leafletMap.created = function() {
-  console.log("template leafletMap created");
+  // console.log("template leafletMap created");
   Session.set('mapCenter', map.defaultCenter);
   Session.set("mapZoom", map.defaultZoom);
   map.renderCount = 0;
@@ -154,11 +154,10 @@ Template.leafletMap.rendered = function() {
   var markers = [];
   // control all markers via a single layer
   var markerLayer = L.layerGroup().addTo(map.handle);
-  var staticRoot = "https://s3.amazonaws.com/plentyhood/"
-  var leafletStaticFolder = staticRoot + "leaflet/images/";
+  var path = client.getResourceUrl("img/leaflet/");
   var markerIcon = L.icon({
-    iconUrl: leafletStaticFolder + "marker-icon.png",
-    shadowUrl: leafletStaticFolder + "marker-shadow.png",
+    iconUrl: path + "marker-icon.png",
+    shadowUrl: path + "marker-shadow.png",
     iconAnchor: [12, 41], // half width, full length of marker-icon.png
   });
   var markerStyle = {icon: markerIcon, riseOnHover: true,};
@@ -187,7 +186,7 @@ Template.leafletMap.rendered = function() {
       var selected = Session.get("selectedPlace");
 
       markers.each(function (k, m) {
-        // kept makers will marked soon
+        // default is not keep markers. Kept makers will be specifically marked
         m.keep = false;
       });
 

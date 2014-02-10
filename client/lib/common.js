@@ -1,4 +1,34 @@
+;(function () {
+  "use strict";
+
+  // console.log("client starting");
+  // this is to prevent static resources from being fetched
+  // before the static resources providing method is established
+  Session.set("staticContentReady", undefined);
+  // If no place selected, select one.
+  Meteor.startup(function () {
+    Meteor.call("mtcIsDevEnv", function (error, result) {
+      console.log("app in dev mode: ", result);
+      client.staticContentPath = result ? "" : "https://s3.amazonaws.com/plentyhood/";
+      Session.set("staticContentReady", result);
+    });
+  });
+
+}());
+
 client = {
+  isStaticContentReady: function () {
+    return !_.isUndefined(Session.get("staticContentReady"));
+  },
+
+  getResourceUrl: function (path) {
+    if (_.isUndefined(client.staticContentPath)) {
+      throw new Error("access to static url while provider not set");
+    }
+    // console.log("getResourceUrl", client.staticContentPath, path);
+    return client.staticContentPath + path;
+  },
+
   displayName: function (user) {
     if (user.profile && user.profile.name)
       return user.profile.name;

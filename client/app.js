@@ -5,13 +5,6 @@ Meteor.subscribe("directory");
 Meteor.subscribe("userDetails");
 Session.set("activePanel", "help");
 
-// If no place selected, select one.
-Meteor.startup(function () {
-  Meteor.call("mtcIsDevEnv", function (error, result) {
-    console.log("app in dev mode: ", result);
-  });
-});
-
 ///////////////////////////////////////////////////////////////////////////////
 // places panel
 
@@ -40,6 +33,10 @@ Template.places.isDialogActive = function () {
 
 Template.places.mapZoomedEnough = function () {
   return Session.get("mapZoomedEnough");
+};
+
+Template.places.canLoadMap = function () {
+  return client.isStaticContentReady();
 };
 
 ///////////////////////////////////////////////////////////////////////////////

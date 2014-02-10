@@ -1,6 +1,8 @@
 <template name="places">
 {{> header}}
+{{#if canLoadMap}}
 {{> leafletMap}}
+{{/if}}
 {{#unless isDialogActive}}
 {{#if mapZoomedEnough}}
 {{#if isPanelActive "search"}}
