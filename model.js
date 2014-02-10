@@ -67,10 +67,11 @@ App.collections.Places.allow({
 
 Meteor.methods({
 
-  mtcNodeEnvGet: function() {
+  mtcIsDevEnv: function() {
     // console.log(process.env);
-    if (Meteor.isServer) {
-      return JSON.stringify(process.env.NODE_ENV);
+    if(!this.isSimulation){
+      // called from the server
+      return server.isDevEnv();
     }
   },
 

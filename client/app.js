@@ -7,8 +7,8 @@ Session.set("activePanel", "help");
 
 // If no place selected, select one.
 Meteor.startup(function () {
-  Meteor.call("mtcNodeEnvGet", function (error, result) {
-    console.log("app environment: " + result);
+  Meteor.call("mtcIsDevEnv", function (error, result) {
+    console.log("app in dev mode: ", result);
   });
 });
 

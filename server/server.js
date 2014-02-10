@@ -1,4 +1,13 @@
 // server
+server = {
+  isDevEnv: function(){
+    // console.log("ROOT_URL", process.env.ROOT_URL, "NODE_ENV", process.env.NODE_ENV);
+    return process.env.ROOT_URL === "http://localhost:3000/" && 
+      // allow command line override with --env=production
+      process.env.NODE_ENV === 'development';
+  }
+};
+
 ;(function () {
   "use strict";
 
@@ -29,7 +38,7 @@ Meteor.publish("resources", function () {
 });
 
 App.collections.Places._ensureIndex({location : "2dsphere"});
-console.log("app env: " + JSON.stringify(process.env.NODE_ENV));
+console.log("app in", server.isDevEnv() ? "development" : "staging", "mode");
 
 //------------ db migration code -----------
 
