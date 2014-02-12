@@ -5,6 +5,7 @@
   // this is to prevent static resources from being fetched
   // before the static resources providing method is established
   Session.set("staticContentReady", undefined);
+  Session.set("searchTags", undefined);
   // If no place selected, select one.
   Meteor.startup(function () {
     Meteor.call("mtcIsDevEnv", function (error, result) {
@@ -13,7 +14,6 @@
       Session.set("staticContentReady", result);
     });
   });
-
 }());
 
 client = {
@@ -60,30 +60,58 @@ client = {
 
   getMatchingPlaces: function () {
     // TBD: auto calculate from zoom level
-    var places;
+    var places = [];
     var tags = Session.get("searchTags");
     var center = Session.get("mapCenter");
     if (tags && tags.length) {
-      // console.log("tags", tags);
-      var ids = _.map(tags, function (t) {
+      console.log("getMatchingPlaces->tags", tags);
+      var tids = _.map(tags, function (t) {
         var v = t.trim().toLowerCase();
         var o = App.collections.Tags.findOne({title: v});
         return o ? o._id : undefined;
       });
-      // console.log("ids", ids);
-      var missingTags = _.find(ids, function (id) {
-        return id === undefined;
+      console.log("tids", tids);
+      var missingTags = _.find(tids, function (id) {
+        return _.isUndefined(id);
       });
       if (missingTags == undefined) {
-        // all tags found
-        places = App.collections.Places.find({
-          location: {$near : {$geometry: center}},
-          'resources.tags' : {'$all': ids}
-        }).fetch();
+        // console.log("all tags found");
+        App.collections.Places.find({
+          location: {$near : {$geometry: center}, $maxDistance: 5000},
+        }).forEach(function (place){
+          // console.log("looking in place", place);
+          _.map(place.resources, function (rid){
+            var resource = App.collections.Resources.findOne(rid);
+            var tagsAreMissing = _.find(tids, function(tid){
+              var found = _.find(resource.tags, function(t){
+                return t === tid;
+              });
+              return !found;
+            });
+            if (!tagsAreMissing) {
+              // found a resource with all the tags
+              // console.log("resource", resource.title, 
+              //             "at place", place.title, "meets search criteria!");
+              places.push(place);
+            }
+          })
+        });
+        // TBD: improve search performance by duplicating place 
+        // location in every resource, and using:
+        //
+        // resources = App.collections.Resources.find({
+        //   location: {$near : {$geometry: center}, $maxDistance: ...},
+        //   'tags' : {'$all': tids}
+        // })
       }
       else {
+        // this should be an illegal search, once the tagsinput field
+        // prevents inserting non-existant tags
+        // TBD: throw error instead
+        //
         // some tags are not even in the database 
         // - don't bother with query, no places has those resources
+        // console.log("search for non-existing tags!");
         places = [];
       }
     }
@@ -94,7 +122,7 @@ client = {
       }).fetch();
       // console.log("search invoked w/o tags");
     }
-    // console.log("places:", places);
+    // console.log("places", places);
     return places;
   },
 
