@@ -25,7 +25,7 @@
   <input id="tagsSearchInputField" type="text" 
   placeholder="Enter tags" data-role="tagsinput"/>
   <a href="#" class="btn btn-success goSearch">
-    <i class="icon-white icon-search"></i>
+    <span class="glyphicon glyphicon-white glyphicon-search"></span>
     Search
   </a> 
 </div>
@@ -40,32 +40,34 @@
 <template name="panelZoomedOut">
 <div class="floatingPanel">
   <label>
-    <em> <i class="icon-info-sign"></i> Zoom in to search and see places </em>
+    <em> 
+      <span class="glyphicon glyphicon-info-sign"></span>
+      Zoom in to search and see places 
+    </em>
   </label>
 </div>
 </template>
 
 <template name="panelHelp">
 <div class="panelHelp floatingPanel">
-  <label>
-    <em>
+  <h4>
       {{#if anyPlaces}}
-      <i class="icon-th-list"></i> Select a place to see details
+      <span class="glyphicon glyphicon-th-list"></span>
+      Select a place to see details
       {{else}}
-      <i class="icon-minus-sign"></i> No places yet, but stay tuned!
+      <span class="glyphicon glyphicon-minus-sign"></span>
+      No places yet, but stay tuned!
       {{/if}}
-    </em>
-  </label>
-  <label>
-    <em>
+  </h4>
+  <h4>
       {{#if currentUser}}
-      <i class="icon-home"></i> Ctrl + click the map to post a new place
+      <span class="glyphicon glyphicon-screenshot"></span>
+      Ctrl + click the map to post a new place
       {{else}}
-      <i class="icon-user"></i>
+      <span class="glyphicon glyphicon-user"></span>
       Sign in to post a new place
       {{/if}}
-    </em>
-  </label>
+  </h4>
 </div>
 </template>
 
@@ -75,68 +77,67 @@
   <div class="">
     {{> details}}
   </div>
-  <div class="simpleBorder marginTop">
+  <div class="marginTop">
     {{> placeResourcesPanel}}
   </div>
-  {{#unless public}}
-  {{> sharedPanel}}
-  {{/unless}}
   {{/with}}
 </div>
 </template>
 
+  <!-- {{#unless public}} -->
+  <!-- {{> sharedPanel}} -->
+  <!-- {{/unless}} -->
+
 <template name="details">
-<label>
-  <i class="icon-bookmark"></i>
-  <b>{{title}}</b>
-  <em>- {{#if public}}Public{{else}}Private{{/if}}</em>
+<div class="bottomBorder">
+  <span class="glyphicon glyphicon-bookmark"></span>
+  <h4 class="inline"> {{title}} 
+  <button type="button" aria-hidden="true" class="close" data-dismiss="">&times;</button>
+  </h4>
   {{#if isOwner}}
-  <input type="button" class="btn btn-mini editPlace" value="Edit">
+  <input type="button" class="btn btn-xs editPlace" value="Edit">
+  <input type="button" class="btn btn-xs removePlace" value="Delete">
   {{/if}}
-  <button type="button" aria-hidden="true" class="close">&times;</button>
-</label>
-<div class="indent">
-  <small>{{creatorName}}</small> 
-  <span>
-    <small><a href="#" class="removePlace">Delete</a></small>
-  </span>
 </div>
-<div>
-  <i class="icon-map-marker"></i>
-  <em><b>Location</b></em>
+<div class="bottomBorder">
+  <small><em>
+      {{#if public}}Public{{else}}Private{{/if}} place, managed by {{creatorName}}
+  </em></small> 
+</div>
+<div class="bottomBorder">
+  <span class="glyphicon glyphicon-map-marker"></span>
+  Location
   {{#if isOwner}}
   {{#if editing "location"}}
-  <input type="button" class="btn btn-mini saveLocation" value="Done">
-  <input type="button" class="btn btn-mini cancelEditLocation" value="Cancel">
+  <input type="button" class="btn btn-xs saveLocation" value="Done">
+  <input type="button" class="btn btn-xs cancelEditLocation" value="Cancel">
   {{else}}
-  <input type="button" class="btn btn-mini editLocation" value="Edit">
+  <input type="button" class="btn btn-xs editLocation" value="Edit">
   {{/if}}
   {{/if}}
+  {{#if editing "location"}}
+  <div class="indent">You may now reposition the marker</div>
+  {{else}}
+  <div class="indent">{{placeLocationGet}}</div>
+  {{/if}}
 </div>
-{{#if editing "location"}}
-<div class="indent">You may now reposition the marker</div>
-{{else}}
-<div class="indent">{{placeLocationGet}}</div>
-{{/if}}
-<div>
-  <i class="icon-comment"></i>
-  <em><b>About</b></em>
+<div class="bottomBorder">
+  <span class="glyphicon glyphicon-comment"></span>About
+  <div>{{description}}</div>
 </div>
-<div class="indent">{{description}}</div>
 </template>
 
 <template name="placeResourcesPanel">
-<label>
-  {{#if placeHasResources}}
-  <i class="icon-th-list"></i>
-  {{else}}
-  <i class="icon-minus-sign"></i>
+<div>
+  <span class="glyphicon glyphicon-th-large"></span>
+  Resources
+  {{#if isOwner}}
+  <input type="button" id="resourceAdd" class="btn btn-xs" value="Add">
   {{/if}}
-  <em><b>Resources</b></em>
-</label>
+</div>
 {{#if placeHasResources}}
-<select id="resourceSelect" class="selectpicker">
-  <option disabled>Select resource</option>
+<select id="resourceSelect" class="form-control">
+  <option disabled>Select</option>
   {{#each placeResources}}
   <option value="{{this._id}}" {{markSelected this._id}}>
   {{this.title}}
@@ -144,15 +145,19 @@
   {{/each}}
 </select>
 {{#if isResourceSelected}}
-<p>Desc: {{resourceDescription}}</p>
-<p>Tags: {{resourceTagsGet}}</p>
+<p id="resourceDesc">
+<span class="glyphicon glyphicon-paperclip"></span>
+{{resourceDescription}}
+</p>
+<p id="resourceTags">
+<span class="glyphicon glyphicon-tags"></span> {{resourceTagsGet}}
+</p>
 {{/if}}
 {{/if}}
 {{#if isOwner}}
-<a href="#" class="btn" id="resourceAdd">Add</a>
 {{#if isResourceSelected}}
-<a href="#" class="btn" id="resourceEdit">Edit</a>
-<a href="#" class="btn" id="resourceRemove">Delete</a>
+<input type="button" id="resourceEdit" class="btn btn-xs" value="Edit Resource">
+<input type="button" id="resourceRemove" class="btn btn-xs" value="Delete Resource">
 {{/if}}
 {{/if}}
 </template>
@@ -163,7 +168,7 @@
     <div class="span2">
       <div class="muted usersList"><b>Friends</b></div>
       <div class="invite">
-        <a href="#" class="btn btn-mini invite">Invite More</a>
+        <a href="#" class="btn btn-xs invite">Invite More</a>
       </div>
     </div>
     <div class="span2">

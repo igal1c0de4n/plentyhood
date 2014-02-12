@@ -59,8 +59,20 @@ Template.panelPlace.isOwner = function () {
 
 Template.panelPlace.events({
   'click .removePlace': function () {
-    App.collections.Places.remove(this._id);
-    client.placeSet();
+    var id = this._id;
+    var placeTitle = App.collections.Places.findOne(id).title;
+    console.log("request to remove place", id, placeTitle);
+    $.confirm({
+      text: "Really delete place '" + placeTitle + "'?",
+      title: "Confirmation required",
+      confirm: function(button) {
+        console.log("confirmed!");
+        App.collections.Places.remove(id);
+        client.placeSet();
+      },
+      confirmButton: "Yes",
+      cancelButton: "No",
+    });
     return false;
   },
   'click .movePlaceOnMap': function () {
@@ -74,9 +86,7 @@ Template.panelPlace.events({
 
 Template.details.creatorName = function () {
   var owner = Meteor.users.findOne(this.owner);
-  if (owner._id === Meteor.userId())
-    return "my place";
-  return "User: " + client.displayName(owner);
+  return owner._id === Meteor.userId() ? "me" : client.displayName(owner);
 };
 
 Template.details.placeLocationGet = function () {
@@ -215,9 +225,9 @@ Template.placeResourcesPanel.resourceTagsGet = function () {
       firstTime = false;
     }
     else {
-      tags += ",";
+      tags += ", ";
     }
-    tags += App.collections.Tags.findOne(t).title;
+    tags += _.capitalize(App.collections.Tags.findOne(t).title);
   });
   return tags;
 };

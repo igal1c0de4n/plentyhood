@@ -12,9 +12,9 @@ html, body, .fill {
 
 .floatingPanel {
   position: fixed;
-  top: 60px;
+  top: 100px;
   right: 10px;
-  padding: 5px;
+  padding: 0 15px;
   background-color: white;
   opacity: 0.9;
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
@@ -26,12 +26,8 @@ html, body, .fill {
   /* 	transition:width 2s, height 2s, background-color 2s, transform 2s; */
 }
 
-.panelHelp {
-  width: 270px;
-}
-
 .panelPlace {
-  width: 250px;
+  padding: 15px;
 }
 
 #leaflet-map {
@@ -46,6 +42,10 @@ body {
 
 .indent {
   margin-left: 10px;
+}
+
+.glyphicon {
+  margin-right: 7px;
 }
 
 .header {
@@ -107,18 +107,14 @@ input.chosen {
 
 .bootstrap-tagsinput {
   margin-bottom: 0;
-  width: 95%;
-}
-
-.fullWidth {
-  width: 95%;
+  width: 100%;
 }
 
 .placeResourceRemove {
   margin-right: 5px;
 }
 
-.searchPanel .bootstrap-tagsinput {
+.searchPanel  > .bootstrap-tagsinput {
   width: 250px;
 }
 
@@ -126,8 +122,24 @@ input.chosen {
   margin-top: 5px !important;
 }
 
-.simpleBorder {
-  border: 1px solid #ddd;
-  padding: 5px;
-  margin: 0;
+.bottomBorder {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+
+h4.inline {
+  display: inline !important;
+}
+
+#resourceSelect {
+  margin: 7px 0;
+}
+
+#resourceDesc, #resourceTags {
+  max-width: 250px;
+}
+
+button.close {
+  margin-left: 20px;
 }
