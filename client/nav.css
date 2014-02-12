@@ -64,18 +64,20 @@
   margin-top:10em;
 }
 
-.navbar img {
-  max-height: 45px;
-  border-radius: 23px;
-}
-
 a.userNavMenu {
   background-color: transparent !important;
   padding-top: 3px !important;
   padding-bottom: 0px !important;
   padding-right: 3px !important;
+  float: right;
 }
 
 .navbar-nav.navbar-right:last-child {
   margin: 0;
+}
+
+img.avatar {
+  margin: 5px;
+  max-height: 35px;
+  border-radius: 5px;
 }
