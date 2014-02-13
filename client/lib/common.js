@@ -126,14 +126,21 @@ client = {
     return places;
   },
 
-  placeSet: function (p) {
+  placeSet: function (id) {
     Session.set("placeEditLocation", undefined);
     Session.set("selectedResource", undefined);
-    Session.set("selectedPlace", p);
+    var place = _.isUndefined(id) ? 
+      undefined : App.collections.Places.findOne(id);
+    Session.set("selectedPlace", place);
   },
 
   selectedResourceGet: function () {
     var rid = Session.get("selectedResource");
     return rid ? App.collections.Resources.findOne(rid) : undefined; 
+  },
+
+  selectedPlaceId: function () {
+    var selectedPlace = Session.get("selectedPlace");
+    return selectedPlace ? selectedPlace._id : undefined;
   },
 };

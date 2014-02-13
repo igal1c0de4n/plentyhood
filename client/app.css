@@ -45,7 +45,7 @@ body {
 }
 
 .glyphicon {
-  margin-right: 7px;
+  margin-right: 6px;
 }
 
 .header {
@@ -142,4 +142,8 @@ h4.inline {
 
 button.close {
   margin-left: 20px;
+}
+
+a.btn-link {
+  padding: 6px 0;
 }

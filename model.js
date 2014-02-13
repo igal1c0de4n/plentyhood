@@ -101,6 +101,7 @@ Meteor.methods({
         if (!isInRange(c, -180, 180))
           throw new Meteor.Error(413, "Bad lat/lng", c);
       });
+      // returns the ._id of the inserted document
       return App.collections.Places.insert({
         owner: this.userId,
         location: options.location,

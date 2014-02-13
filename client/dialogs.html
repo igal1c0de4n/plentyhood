@@ -22,7 +22,7 @@
 <template name="placeEditDialog">
 <div class="modal-header">
   <button type="button" class="close cancel">&times;</button>
-  <h4 class="modal-title"> {{#if selectedPlace}} Edit {{else}} Add {{/if}} Place</h4>
+  <h4 class="modal-title"> {{#if isPlaceSelected}} Edit {{else}} Add {{/if}} Place</h4>
 </div>
 <div class="modal-body">
   {{#if error}}

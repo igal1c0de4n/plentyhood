@@ -34,7 +34,7 @@ Template.placeEditDialog.events({
     var pub = ! template.find(".private").checked;
     var location = Session.get("placeLocation");
     if (title.length && description.length) {
-      var placeId = Session.get("selectedPlace");
+      var placeId = client.selectedPlaceId();
       var doc = {
         title: title,
         description: description,
@@ -51,6 +51,7 @@ Template.placeEditDialog.events({
         else {
           if (!placeId) {
             client.placeSet(place);
+            // make sure that place shows on map
             Session.set("searchTags", undefined);
           }
           if (!pub && Meteor.users.find().count() > 1) {
@@ -69,28 +70,28 @@ Template.placeEditDialog.events({
   }
 });
 
-Template.placeEditDialog.selectedPlace = function () {
+Template.placeEditDialog.isPlaceSelected = function () {
   return !!Session.get("selectedPlace");
 };
 
 Template.placeEditDialog.isPrivate = function () {
-  var id = Session.get("selectedPlace");
-  if (id) {
-    return !App.collections.Places.findOne(id).public;
+  var p = Session.get("selectedPlace");
+  if (p) {
+    return !p.public;
   }
 };
 
 Template.placeEditDialog.title = function () {
-  var id = Session.get("selectedPlace");
-  if (id) {
-    return App.collections.Places.findOne(id).title;
+  var p = Session.get("selectedPlace");
+  if (p) {
+    return p.title;
   }
 };
 
 Template.placeEditDialog.description = function () {
-  var id = Session.get("selectedPlace");
-  if (id) {
-    return App.collections.Places.findOne(id).description;
+  var p = Session.get("selectedPlace");
+  if (p) {
+    return p.description;
   }
 };
 
@@ -107,7 +108,7 @@ var openInviteDialog = function () {
 
 Template.inviteDialog.events({
   'click .invite': function (event, template) {
-    Meteor.call('mtcInvite', Session.get("selectedPlace"), this._id);
+    Meteor.call('mtcInvite', client.selectedPlaceId(), this._id);
   },
   'click .done': function (event, template) {
     bsModalOnHide();
@@ -120,8 +121,8 @@ Template.inviteDialog.rendered = function () {
 };
 
 Template.inviteDialog.uninvited = function () {
-  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
-  if (! place)
+  var place = Session.get("selectedPlace");
+  if (_.isUndefined(place))
     return []; // place hasn't loaded yet
   return Meteor.users.find({$nor: [{_id: {$in: place.invited}},
                                    {_id: place.owner}]});
@@ -218,7 +219,7 @@ Template.resourceUpdateDialog.events({
     var tags = $(".tagsInputField").tagsinput('items');
     //     console.log("title", title, "description", description, 
     //     "pub", pub, "tags", tags);
-    var placeId = Session.get("selectedPlace");
+    var placeId = client.selectedPlaceId();
     var args = { 
       placeId: placeId,
       title: title,

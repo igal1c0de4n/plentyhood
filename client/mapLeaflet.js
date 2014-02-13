@@ -1,3 +1,8 @@
+mapProvider = {};
+
+;(function () {
+  "use strict";
+
 ///////////////////////////////////////////////////////////////////////////////
 // Leaflet Map
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,9 +48,6 @@ Template.leafletMap.rendered = function() {
     return;
   }
   //   console.log("render iteration " + map.renderCount);
-  latLng2GeoJson = function () {
-    return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
-  };
   var latlng2GeoJson = function (latlng) {
     return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
   };
@@ -183,7 +185,7 @@ Template.leafletMap.rendered = function() {
       // TDB: move selectedPlace to a new Deps.autorun as there's no
       // need to refilter and search for places when selected place 
       // changes. Just redraw two markers
-      var selected = Session.get("selectedPlace");
+      var selected = client.selectedPlaceId();
 
       markers.each(function (k, m) {
         // default is not keep markers. Kept makers will be specifically marked
@@ -211,7 +213,7 @@ Template.leafletMap.rendered = function() {
           m.keep = true;
           markers.setItem(id, m);
         }
-        opacity = selected == id ?
+        var opacity = selected == id ?
           map.selectedPlaceOpacity : map.unselectedPlaceOpacity;
         m.lmark.setOpacity(opacity);
       });
@@ -256,14 +258,21 @@ Template.leafletMap.rendered = function() {
       areMapPlacesVisible(Session.get("mapZoom")));
   });
 
-  client.placeDragSet = function (action) {
+  this.handleCenterChange = Deps.autorun(function () {
+    map.handle.setView(
+      L.GeoJSON.coordsToLatLng(Session.get('mapCenter').coordinates), 
+        Session.get('mapZoom'),
+        {animate: true});
+  });
+
+  mapProvider.placeDragSet = function (action) {
     var updatePlaceCoords = function (id, c) {
       App.collections.Places.update(
         {_id: id},
         { $set: { 'location.coordinates': c}});
     };
     //     console.log("markers", markers);
-    var placeId = Session.get("selectedPlace");
+    var placeId = client.selectedPlaceId();
     var lm = markers.getItem(placeId).lmark;
     if (action == "edit") {
       //       console.log("enable marker drag", lm);
@@ -298,3 +307,5 @@ var schedCreateDialog = function (geoJsonLoc) {
   Session.set("createError", null);
   Session.set("activeDialog", "placeEdit");
 };
+
+}());

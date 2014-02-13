@@ -49,8 +49,8 @@ Template.panelHelp.anyPlaces = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // place panel
 
-Template.panelPlace.selectedPlace = function () {
-  return App.collections.Places.findOne(Session.get("selectedPlace"));
+Template.panelPlace.selectedPlaceGet = function () {
+  return Session.get("selectedPlace");
 };
 
 Template.panelPlace.isOwner = function () {
@@ -114,22 +114,28 @@ Template.details.events({
     return false;
   },
   'click .editLocation': function () {
-    client.placeDragSet("edit");
+    mapProvider.placeDragSet("edit");
     Session.set("placeEditLocation", true);
     return false;
   },
   'click .cancelEditLocation': function () {
-    client.placeDragSet("cancel");
+    mapProvider.placeDragSet("cancel");
     Session.set("placeEditLocation", false);
     return false;
   },
   'click .saveLocation': function () {
-    client.placeDragSet("done");
+    mapProvider.placeDragSet("done");
     Session.set("placeEditLocation", false);
     return false;
   },
   'click .editPlace': function () {
     Session.set("activeDialog", "placeEdit");
+    return false;
+  },
+  'click .title': function () {
+    var location = Session.get("mapCenter");
+    location.coordinates = Session.get("selectedPlace").location.coordinates;
+    Session.set('mapCenter', location);
     return false;
   },
 });
@@ -172,7 +178,7 @@ Template.placeResourcesPanel.events({
     var rid = Session.get("selectedResource");
     // console.log('removing resource', rid);
     Meteor.call("mtcPlaceResourceRemove", { 
-      placeId: Session.get("selectedPlace"),
+      placeId: client.selectedPlaceId(),
       resourceId: rid,
     }, function (error) {
       if (error) {
@@ -195,13 +201,13 @@ Template.placeResourcesPanel.events({
 });
 
 Template.placeResourcesPanel.placeHasResources = function () {
-  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
+  var place = Session.get("selectedPlace");
   //   console.log("place: ", place, " resources: ", place.resources);
   return !place.resources || place.resources.length === 0 ? false : true;
 };
 
 Template.placeResourcesPanel.placeResources = function () {
-  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
+  var place = Session.get("selectedPlace");
   //   console.log("place: ", place, " resources: ", place.resources);
   if (place.resources) {
     var rnames = _.map(place.resources, function (rid) {
@@ -212,7 +218,7 @@ Template.placeResourcesPanel.placeResources = function () {
 };
 
 Template.placeResourcesPanel.isOwner = function () {
-  var place = App.collections.Places.findOne(Session.get("selectedPlace"));
+  var place = Session.get("selectedPlace");
   //   console.log("place", place);
   return place.owner === Meteor.userId();
 };

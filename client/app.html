@@ -73,7 +73,7 @@
 
 <template name="panelPlace">
 <div class="panelPlace floatingPanel">
-  {{#with selectedPlace}}
+  {{#with selectedPlaceGet}}
   <div class="">
     {{> details}}
   </div>
@@ -91,8 +91,9 @@
 <template name="details">
 <div class="bottomBorder">
   <span class="glyphicon glyphicon-bookmark"></span>
-  <h4 class="inline"> {{title}} 
-  <button type="button" aria-hidden="true" class="close" data-dismiss="">&times;</button>
+  <h4 class="inline">
+    <a href="#" class="btn btn-link title">{{title}}</a>
+    <button type="button" aria-hidden="true" class="close" data-dismiss="">&times;</button>
   </h4>
   {{#if isOwner}}
   <input type="button" class="btn btn-xs editPlace" value="Edit">
