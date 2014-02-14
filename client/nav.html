@@ -61,7 +61,7 @@
       <a class="navbar-brand" href="/">Plentyhood</a>
     </div>
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="navcol">
+    <div class="collapse navbar-collapse pull-right" id="navcol">
       <ul class="nav navbar-nav">
         <li  class="{{page2class "places" "active"}}"><a href="/places">Places</a></li>
         <li  class="{{page2class "about" "active"}}"><a href="/about">About</a></li>
@@ -76,13 +76,13 @@
         {{#if currentUser}}
         <li class="dropdown">
         <a href="#" class="dropdown-toggle userNavMenu" data-toggle="dropdown">
-          {{rolesDispName}}
-          <b class="caret"></b>
           {{#if getFbUser}}
           <img src="//graph.facebook.com/{{getFbUser}}/picture" 
           Title="{{rolesDispName}}"
           class="avatar"/>
           {{/if}}
+          {{rolesDispName}}
+          <b class="caret"></b>
         </a>
         <ul class="dropdown-menu">
           <li><a class="signout" href="/signout">Sign out</a></li>

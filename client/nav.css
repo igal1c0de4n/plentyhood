@@ -66,10 +66,8 @@
 
 a.userNavMenu {
   background-color: transparent !important;
-  padding-top: 3px !important;
-  padding-bottom: 0px !important;
-  padding-right: 3px !important;
-  float: right;
+  padding: 0px !important;
+  margin-right: 10px;
 }
 
 .navbar-nav.navbar-right:last-child {
@@ -77,7 +75,7 @@ a.userNavMenu {
 }
 
 img.avatar {
-  margin: 5px;
-  max-height: 35px;
-  border-radius: 5px;
+  margin: 8px;
+  max-height: 30px;
+  border-radius: 100px;
 }
