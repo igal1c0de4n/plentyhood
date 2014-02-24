@@ -66,12 +66,11 @@
 
 a.userNavMenu {
   background-color: transparent !important;
-  padding: 0px !important;
+  padding-top: 4px !important;
+  padding-bottom: 0px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
   margin-right: 10px;
-}
-
-.navbar-nav.navbar-right:last-child {
-  margin: 0;
 }
 
 img.avatar {

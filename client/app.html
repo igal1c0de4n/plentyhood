@@ -1,15 +1,18 @@
-<template name="places">
+<template name="main">
 {{> header}}
 {{#if canLoadMap}}
 {{> leafletMap}}
 {{/if}}
 {{#unless isDialogActive}}
 {{#if mapZoomedEnough}}
+{{#if isPanelActive "main"}}
+{{> panelMain}}
+{{/if}}
 {{#if isPanelActive "search"}}
-{{> searchPanel}}
+{{> panelSearch}}
 {{/if }}
-{{#if isPanelActive "help"}}
-{{> panelHelp}}
+{{#if isPanelActive "resultsList"}}
+{{> resultsList}}
 {{/if}}
 {{#if isPanelActive "place"}}
 {{> panelPlace}}
@@ -20,14 +23,62 @@
 {{/unless}}
 </template>
 
-<template name="searchPanel">
-<div class="searchPanel">
+<template name="panelMain">
+<div class="mainPanel floatingPanel">
+    <button class="btn btn-success btn-sm resourcesSearch menuButton">
+      <span class="glyphicon glyphicon-white glyphicon-search"></span>
+      Resources
+    </button>
+    <button class="btn btn-success btn-sm servicesSearch menuButton">
+      <span class="glyphicon glyphicon-white glyphicon-search"></span>
+      Services
+    </button>
+  <hr class="tight">
+  {{> instructions}}
+</div>
+</template>
+
+<template name="panelSearch">
+<div class="panelSearch floatingPanel">
+  <span class="glyphicon glyphicon-chevron-left back"></span>
   <input id="tagsSearchInputField" type="text" 
   placeholder="Enter tags" data-role="tagsinput"/>
-  <a href="#" class="btn btn-success btn-sm goSearch">
+  <button class="btn btn-success btn-sm goSearch">
     <span class="glyphicon glyphicon-white glyphicon-search"></span>
     Search
-  </a> 
+  </button> 
+</div>
+</template>
+
+<template name="resultsList">
+<div class="floatingPanel resultsListContainer">
+  {{#if resourcesFound}}
+  <h4>
+    <span class="glyphicon glyphicon-chevron-left back"></span>
+    Search Results
+  </h4>
+  <table class="table table-hover resultsListTable">
+    <thead>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Tags</th>
+      <th>Place</th>
+    </thead>
+    {{#each results}}
+    <tr class="resultsListRow">
+      <td>{{this.title}}</td>
+      <td>{{this.description}}</td>
+      <td></td>
+      <td></td>
+    </tr>
+    {{/each}}
+  </table>
+  {{else}}
+  <h4>
+    <span class="glyphicon glyphicon-chevron-left back"></span>
+    No Results
+  </h4>
+  {{/if}}
 </div>
 </template>
 
@@ -48,35 +99,40 @@
 </div>
 </template>
 
-<template name="panelHelp">
-<div class="panelHelp floatingPanel">
-  <h4>
-      {{#if anyPlaces}}
-      <span class="glyphicon glyphicon-th-list"></span>
-      Select a place to see details
-      {{else}}
-      <span class="glyphicon glyphicon-minus-sign"></span>
-      Loading places...
-      {{/if}}
-  </h4>
-  <h4>
-      {{#if currentUser}}
-      <span class="glyphicon glyphicon-screenshot"></span>
-      Ctrl + click the map to post a new place
-      {{else}}
-      <span class="glyphicon glyphicon-user"></span>
-      Sign in to post a new place
-      {{/if}}
-  </h4>
+<template name="instructions">
+<div>
+  {{#if anyPlaces}}
+  <span class="glyphicon glyphicon-th-list"></span>
+  Select a place to see details
+  {{else}}
+  <span class="glyphicon glyphicon-info-sign"></span>
+  No places nearby... yet
+  {{/if}}
+</div>
+<div>
+  {{#if currentUser}}
+  <span class="glyphicon glyphicon-screenshot"></span>
+  Ctrl + click the map to post a new place
+  {{else}}
+  <span class="glyphicon glyphicon-user"></span>
+  Sign in to post a new place
+  {{/if}}
 </div>
 </template>
 
 <template name="panelPlace">
 <div class="panelPlace floatingPanel">
   {{#with selectedPlaceGet}}
-  <div class="">
-    {{> details}}
+  <div class="bottomBorder">
+    <span class="glyphicon glyphicon-chevron-left back"></span>
+    <span class="glyphicon glyphicon-bookmark"></span>
+    <h4 class="inline"><a href="#" class="btn btn-link title">{{title}}</a></h4>
+    {{#if isOwner}}
+    <input type="button" class="btn btn-xs editPlace" value="Edit">
+    <input type="button" class="btn btn-xs removePlace" value="Delete">
+    {{/if}}
   </div>
+  {{> details}}
   <div class="marginTop">
     {{> placeResourcesPanel}}
   </div>
@@ -89,17 +145,6 @@
   <!-- {{/unless}} -->
 
 <template name="details">
-<div class="bottomBorder">
-  <span class="glyphicon glyphicon-bookmark"></span>
-  <h4 class="inline">
-    <a href="#" class="btn btn-link title">{{title}}</a>
-    <button type="button" aria-hidden="true" class="close" data-dismiss="">&times;</button>
-  </h4>
-  {{#if isOwner}}
-  <input type="button" class="btn btn-xs editPlace" value="Edit">
-  <input type="button" class="btn btn-xs removePlace" value="Delete">
-  {{/if}}
-</div>
 <div class="bottomBorder">
   <small><em>
       {{#if public}}Public{{else}}Private{{/if}} place, managed by {{creatorName}}
@@ -124,7 +169,7 @@
 </div>
 <div class="bottomBorder">
   <span class="glyphicon glyphicon-comment"></span>About
-  <div>{{description}}</div>
+  <div>{{this.description}}</div>
 </div>
 </template>
 
@@ -146,19 +191,19 @@
   {{/each}}
 </select>
 {{#if isResourceSelected}}
+{{#if resourceDescription}}
 <p id="resourceDesc">
 <span class="glyphicon glyphicon-paperclip"></span>
 {{resourceDescription}}
 </p>
+{{/if}}
 <p id="resourceTags">
 <span class="glyphicon glyphicon-tags"></span> {{resourceTagsGet}}
 </p>
-{{/if}}
-{{/if}}
 {{#if isOwner}}
-{{#if isResourceSelected}}
 <input type="button" id="resourceEdit" class="btn btn-xs" value="Edit Resource">
 <input type="button" id="resourceRemove" class="btn btn-xs" value="Delete Resource">
+{{/if}}
 {{/if}}
 {{/if}}
 </template>

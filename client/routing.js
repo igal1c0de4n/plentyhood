@@ -36,7 +36,7 @@ Meteor.Router.add({
 
   '/about': 'about',
   '/landing': 'landing',
-  '/places': 'places',
+  '/main': 'main',
   '/admin': function () {
     if (Roles.userIsInRole(Meteor.user(), 'admin')) {
       return 'admin';
@@ -71,7 +71,7 @@ Meteor.Router.filters({
 
 // make sure user has logged in for all appropriate routes
 Meteor.Router.filter('checkLoggedIn', {
-  except:['about', 'places', 'loading', 'not-found', 'landing']
+  except:['about', 'main', 'loading', 'not-found', 'landing']
 });
 
 }());

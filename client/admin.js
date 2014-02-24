@@ -26,7 +26,7 @@ Template.admin.rerenderd = function () {
 
 Template.admin.events({
   'keypress .search-query' : function(event, template) {
-    if (event.which == App.keyCode.ENTER) {
+    if (event.which == client.keyCode.ENTER) {
       console.log("search stub for", event.target.value)
       return false;
     }

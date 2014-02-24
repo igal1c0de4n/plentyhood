@@ -1,22 +1,12 @@
-;(function () {
-  "use strict";
-
-  // console.log("client starting");
-  // this is to prevent static resources from being fetched
-  // before the static resources providing method is established
-  Session.set("staticContentReady", undefined);
-  Session.set("searchTags", undefined);
-  // If no place selected, select one.
-  Meteor.startup(function () {
-    Meteor.call("mtcIsDevEnv", function (error, result) {
-      console.log("app in dev mode: ", result);
-      client.staticContentPath = result ? "" : "https://s3.amazonaws.com/plentyhood/";
-      Session.set("staticContentReady", result);
-    });
-  });
-}());
-
 client = {
+
+  keyCode: { 
+    ENTER: 13, 
+    ESCAPE: 27,
+    ARROW_UP: 38,
+    ARROW_DOWN: 40,
+  },
+
   isStaticContentReady: function () {
     return !_.isUndefined(Session.get("staticContentReady"));
   },
@@ -58,74 +48,6 @@ client = {
     }
   },
 
-  getMatchingPlaces: function () {
-    // TBD: auto calculate from zoom level
-    var places = [];
-    var tags = Session.get("searchTags");
-    var center = Session.get("mapCenter");
-    if (tags && tags.length) {
-      console.log("getMatchingPlaces->tags", tags);
-      var tids = _.map(tags, function (t) {
-        var v = t.trim().toLowerCase();
-        var o = App.collections.Tags.findOne({title: v});
-        return o ? o._id : undefined;
-      });
-      console.log("tids", tids);
-      var missingTags = _.find(tids, function (id) {
-        return _.isUndefined(id);
-      });
-      if (missingTags == undefined) {
-        // console.log("all tags found");
-        App.collections.Places.find({
-          location: {$near : {$geometry: center}, $maxDistance: 5000},
-        }).forEach(function (place){
-          // console.log("looking in place", place);
-          _.map(place.resources, function (rid){
-            var resource = App.collections.Resources.findOne(rid);
-            var tagsAreMissing = _.find(tids, function(tid){
-              var found = _.find(resource.tags, function(t){
-                return t === tid;
-              });
-              return !found;
-            });
-            if (!tagsAreMissing) {
-              // found a resource with all the tags
-              // console.log("resource", resource.title, 
-              //             "at place", place.title, "meets search criteria!");
-              places.push(place);
-            }
-          })
-        });
-        // TBD: improve search performance by duplicating place 
-        // location in every resource, and using:
-        //
-        // resources = App.collections.Resources.find({
-        //   location: {$near : {$geometry: center}, $maxDistance: ...},
-        //   'tags' : {'$all': tids}
-        // })
-      }
-      else {
-        // this should be an illegal search, once the tagsinput field
-        // prevents inserting non-existant tags
-        // TBD: throw error instead
-        //
-        // some tags are not even in the database 
-        // - don't bother with query, no places has those resources
-        // console.log("search for non-existing tags!");
-        places = [];
-      }
-    }
-    else {
-      // backdoor cheat to see all places
-      places = App.collections.Places.find({
-        location: {$near : {$geometry: center}},
-      }).fetch();
-      // console.log("search invoked w/o tags");
-    }
-    // console.log("places", places);
-    return places;
-  },
-
   placeSet: function (id) {
     Session.set("placeEditLocation", undefined);
     Session.set("selectedResource", undefined);
@@ -143,4 +65,40 @@ client = {
     var selectedPlace = Session.get("selectedPlace");
     return selectedPlace ? selectedPlace._id : undefined;
   },
+
+  panelsStack: [],
+
+  panelPush: function (panel) {
+    // console.log("pushing panel", panel);
+    client.panelsStack.push(panel);
+    Session.set("panel", panel);
+  },
+
+  panelPop: function () {
+    var stack = client.panelsStack;
+    var prvPanel = stack.pop();
+    var currentPanel = stack[stack.length - 1];
+    // console.log("poped panel '" + prvPanel + "', current panel '" + currentPanel + "'");
+    Session.set("panel", currentPanel);
+  },
 };
+
+;(function () {
+  "use strict";
+
+  // console.log("client starting");
+  // this is to prevent static resources from being fetched
+  // before the static resources providing method is established
+  Session.set("staticContentReady", undefined);
+  Session.set("searchTags", undefined);
+  Session.set("placesSearchResults", undefined);
+  client.panelPush("main");
+  // If no place selected, select one.
+  Meteor.startup(function () {
+    Meteor.call("mtcIsDevEnv", function (error, result) {
+      console.log("app in dev mode: ", result);
+      client.staticContentPath = result ? "" : "https://s3.amazonaws.com/plentyhood/";
+      Session.set("staticContentReady", result);
+    });
+  });
+}());

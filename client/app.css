@@ -3,18 +3,17 @@ html, body, .fill {
   width: 100%;
 }
 
-.searchPanel {
-  position: fixed;
-  top: 60px;
-  left: 10px;
-  z-index: 1;
+.mainPanel {
+  pointer-events: none;
 }
 
 .floatingPanel {
   position: fixed;
-  top: 100px;
-  right: 10px;
-  padding: 0 15px;
+  z-index: 1;
+  top: 62px;
+  left: 10px;
+  display: inline-block;
+  padding: 10px;
   background-color: white;
   opacity: 0.9;
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
@@ -26,6 +25,13 @@ html, body, .fill {
   /* 	transition:width 2s, height 2s, background-color 2s, transform 2s; */
 }
 
+.menuButton {
+  pointer-events: auto;
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
 .panelPlace {
   padding: 15px;
 }
@@ -33,6 +39,7 @@ html, body, .fill {
 #leaflet-map {
   height: 100%;
   width: 100%;
+  z-index: 0;
 }
 
 body {
@@ -51,17 +58,6 @@ body {
 .header {
   padding: 10px 0;
   padding-bottom: 0px;
-}
-
-.mask {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0px;
-  left: 0px;
-  background-color: #000000;
-  opacity: .4;
-  z-index: 1;
 }
 
 .invite-row .invite {
@@ -88,10 +84,6 @@ input.chosen {
   padding-bottom: 0;
 }
 
-.movePlaceOnMap {
-  margin: 0;
-}
-
 .pull-right {
   margin-right: 20px;
 }
@@ -114,7 +106,7 @@ input.chosen {
   margin-right: 5px;
 }
 
-.searchPanel  > .bootstrap-tagsinput {
+.panelSearch  > .bootstrap-tagsinput {
   width: 200px;
 }
 
@@ -141,9 +133,31 @@ h4.inline {
 }
 
 button.close {
-  margin-left: 20px;
+  margin-left: 10px;
+  padding: 5px;
 }
 
 a.btn-link {
   padding: 6px 0;
+}
+
+hr.tight {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+table.resultsListTable {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.selectedTableRow {
+  background-color: #cfc;
+  /* opacity: .5; */
+}
+
+.resultsListContainer {
+  overflow: auto;
+  height: auto;
+  max-height: 75%;
 }

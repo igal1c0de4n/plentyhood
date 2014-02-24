@@ -10,8 +10,8 @@ mapProvider = {};
 var map = {
   handle: undefined,
   renderCount: undefined, // for troubleshooting extra renders
-  defaultZoom: 15,
-  minZoomForMarkers: 13,
+  defaultZoom: 12,
+  minZoomForMarkers: 12,
   maxZoom: 16, // server does not serve higher zoom level
   defaultCenter: {
     // TBD: remove once auto-locate and cross-session last-location is stored
@@ -30,7 +30,7 @@ Template.leafletMap.created = function() {
 };
 
 Template.leafletMap.destroyed = function() {
-  console.log("leafletmap -> destroyed");
+  // console.log("leafletmap -> destroyed");
   map.handle.remove();
   map.handle = undefined;
   this.handlePlacesChanged.stop();
@@ -86,6 +86,7 @@ Template.leafletMap.rendered = function() {
     noWrap: true,
     zoomControl: false,
     markerZoomAnimation: true,
+    keyboard: false,
   };
   var coords = Session.get("mapCenter").coordinates;
   //console.log("map center", coords, "zoom", Session.get("mapZoom"));
@@ -114,8 +115,8 @@ Template.leafletMap.rendered = function() {
     //     console.log('clicked at', e.latlng);
     // ctrl is meta key to add a new place
     if (e.originalEvent.ctrlKey === true) {
-      if(! Meteor.userId()) {
-        console.log("must be logged in to create events");
+      if(!Meteor.userId()) {
+        alert("must be logged in to create place");
         return;
       }
       schedCreateDialog(latlng2GeoJson(e.latlng));
@@ -177,7 +178,7 @@ Template.leafletMap.rendered = function() {
 
     var updateMarkers = function () {
       // map recenter and tags trigger a new search
-      var places = client.getMatchingPlaces();
+      var places = Session.get("placesSearchResults");
       //     console.log("handlePlacesChanged", places);
       // before redawing markers, delete the current ones
       // TBD optimization: update only the markers which change
@@ -207,7 +208,7 @@ Template.leafletMap.rendered = function() {
           m.lmark = L.marker(latlng, markerStyle).addTo(markerLayer);
           m.lmark.placeId = id;
           m.lmark.on('click', function(e) {
-            //             console.log("selected place", this.placeId)
+            // console.log("selected place", this.placeId)
             client.placeSet(this.placeId);
           });
           m.keep = true;
@@ -253,16 +254,17 @@ Template.leafletMap.rendered = function() {
   });
 
   this.handleZoomChanged = Deps.autorun(function () {
-    Session.set(
-      "mapZoomedEnough",
+    Session.set("mapZoomedEnough",
       areMapPlacesVisible(Session.get("mapZoom")));
   });
 
   this.handleCenterChange = Deps.autorun(function () {
-    map.handle.setView(
-      L.GeoJSON.coordsToLatLng(Session.get('mapCenter').coordinates), 
+    if (map.handle) {
+      map.handle.setView(
+        L.GeoJSON.coordsToLatLng(Session.get('mapCenter').coordinates), 
         Session.get('mapZoom'),
         {animate: true});
+    }
   });
 
   mapProvider.placeDragSet = function (action) {
@@ -291,7 +293,7 @@ Template.leafletMap.rendered = function() {
         var sameLocation = _.isEqual(
           lm.toGeoJSON().geometry.coordinates, last.coordsBeforeDrag);
         if (!sameLocation) {
-          console.log("restoring previous coordinates", last.coordsBeforeDrag);
+          // console.log("restoring previous coordinates", last.coordsBeforeDrag);
           updatePlaceCoords(placeId, last.coordsBeforeDrag);
           lm.setLatLng(L.GeoJSON.coordsToLatLng(last.coordsBeforeDrag));
         }

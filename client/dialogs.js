@@ -22,7 +22,7 @@ var bsModalOnHide = function (name) {
 
 Template.placeEditDialog.rendered = function () {
   bsModalOnShow("placeEdit");
-  $("#eModalDialog").on('shown', function () {
+  $("#eModalDialog").on('shown.bs.modal', function () {
     $("input.title").focus();
   });
 };
@@ -44,13 +44,14 @@ Template.placeEditDialog.events({
       if (placeId) {
         doc.placeId = placeId;
       }
-      Meteor.call('mtcPlaceUpdate', doc, function (error, place) {
+      Meteor.call('mtcPlaceUpdate', doc, function (error, pid) {
         if (error) {
-          // console.log("placeEdit failed!", error);
+          console.log("placeEdit failed!", error);
         }
         else {
+          console.log("placeEditDialog.mtcPlaceUpdate", pid);
           if (!placeId) {
-            client.placeSet(place);
+            client.placeSet(pid);
             // make sure that place shows on map
             Session.set("searchTags", undefined);
           }
@@ -58,6 +59,7 @@ Template.placeEditDialog.events({
             openInviteDialog();
           }
         }
+        Session.set("selectedPlace", App.collections.Places.findOne(pid));
       });
       bsModalOnHide("placeEdit");
     } else {
@@ -195,16 +197,24 @@ Template.resourceUpdateDialog.saveDisabled = function () {
   return Session.get("saveDisabled") ? "disabled" : "";
 };
 
+Template.resourceUpdateDialog.created = function () {
+  $("#eModalDialog").on('shown.bs.modal', function () {
+    console.log("resourceUpdateDialog.crated.shown");
+    $("input.title").focus();
+  });
+};
+
 Template.resourceUpdateDialog.rendered = function () {
   bsModalOnShow("resourceUpdate");
   var tif = $('.tagsInputField');
   tif.removeData('tagsinput');
   $(".bootstrap-tagsinput").remove();
   tif.tagsinput(client.tagsInputOptions);
-  $("#eModalDialog").on('shown', function () {
+  $("#eModalDialog").on('shown.bs.modal', function () {
+    console.log("resourceUpdateDialog->shown");
     $("input.title").focus();
   });
-  //   console.log("resourceUpdateDialog->rendered");
+  console.log("resourceUpdateDialog->rendered");
 };
 
 Template.resourceUpdateDialog.events({
@@ -258,6 +268,7 @@ Template.resourceUpdateDialog.events({
         } else {
           bsModalOnHide();
         }
+        client.placeSet(placeId);
       });
     } else {
       Session.set("resourceUpdateError", "Title and tags must be provided");
