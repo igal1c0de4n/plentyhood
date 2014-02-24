@@ -37,7 +37,7 @@ App.collections.Tags.allow({
 */
 App.collections.Places.allow({
   insert: function (userId, place) {
-    return false; // no cowboy inserts -- use mtcPlaceCreate method
+    return false; // no cowboy inserts -- use mtcPlaceUpdate method
   },
   update: function (userId, place, fields, modifier) {
     if (userId !== place.owner)
@@ -85,13 +85,14 @@ Meteor.methods({
     verifyLoggedIn.call(this);
     if (options.placeId) {
       // update existing place
-      return App.collections.Places.update(options.placeId, { 
+      App.collections.Places.update(options.placeId, { 
         $set: {
           title: options.title,
           description: options.description,
           public: !! options.public,
         }
       });
+      return options.placeId;
     } else {
       // new place
       var isInRange = function (v, min, max) {
