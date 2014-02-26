@@ -136,10 +136,16 @@ Template.leafletMap.rendered = function() {
         opacity: 0.9,
         fillOpacity: 0.6,
         radius: 10, 
-        stroke: true
+        stroke: true,
+        clickable: true,
       };
       userLocationMarker = 
         new L.CircleMarker(e.latlng, userLocMarkerOpts);
+      L.featureGroup([userLocationMarker]).
+        bindPopup('Your detected location').
+        on('click', function() { 
+        console.log('location marker clicked'); 
+      });
       userLocationMarker.addTo(map.handle);
 //       console.log("updated current loc marker to", e.latlng.toString());
       last.userLocation = newLocation;
