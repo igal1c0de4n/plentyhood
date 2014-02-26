@@ -188,6 +188,10 @@ Template.resultsList.destroyed = function () {
   $(document).unbind("keyup");
 };
 
+Template.resultsList.tagTitle = function () {
+  return App.collections.Tags.findOne(this).title;
+};
+
 Template.resultsList.rendered = function () {
   var currRow;
 
@@ -215,10 +219,11 @@ Template.resultsList.rendered = function () {
         currRow.selector = "";
       }
       function moveTo(jobj) {
-          if (currRow && jobj.length) {
-            // console.log("moving", currRow, jobj);
-            selectResourceRow(jobj);
-          }
+        // console.log("moveTo", currRow, jobj.length);
+        if (currRow && jobj.length) {
+          // console.log("moving", currRow, jobj);
+          selectResourceRow(jobj);
+        }
       };
       // console.log("resultsListRow.keyup", e.keyCode)
       switch(e.keyCode) {

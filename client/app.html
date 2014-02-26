@@ -64,14 +64,20 @@
       <th>Tags</th>
       <th>Place</th>
     </thead>
+    <tbody>
     {{#each results}}
     <tr class="resultsListRow">
       <td>{{this.title}}</td>
       <td>{{this.description}}</td>
-      <td></td>
+      <td>
+        {{#each this.tags}}
+        <span class="tag label label-primary">{{tagTitle}}</span>
+        {{/each}}
+      </td>
       <td></td>
     </tr>
     {{/each}}
+    </tbody>
   </table>
   {{else}}
   <h4>
