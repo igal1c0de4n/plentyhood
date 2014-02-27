@@ -211,10 +211,10 @@ Template.resourceUpdateDialog.rendered = function () {
   $(".bootstrap-tagsinput").remove();
   tif.tagsinput(client.tagsInputOptions);
   $("#eModalDialog").on('shown.bs.modal', function () {
-    console.log("resourceUpdateDialog->shown");
+    // console.log("resourceUpdateDialog->shown");
     $("input.title").focus();
   });
-  console.log("resourceUpdateDialog->rendered");
+  // console.log("resourceUpdateDialog->rendered");
 };
 
 Template.resourceUpdateDialog.events({
