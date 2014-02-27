@@ -175,7 +175,12 @@ Template.resultsList.events({
 
 Template.resultsList.resourcesFound = function () {
   var results = Session.get("resourcesSearchResults");
+  // console.log("resourcesFound", results);
   return results ? !!results.length : false; 
+};
+
+Template.resultsList.showingAllPlaces = function () {
+  return !Session.get("searchTags").length;
 };
 
 Template.resultsList.results = function () {
