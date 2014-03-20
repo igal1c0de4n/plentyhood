@@ -49,7 +49,7 @@ Template.placeEditDialog.events({
           console.log("placeEdit failed!", error);
         }
         else {
-          console.log("placeEditDialog.mtcPlaceUpdate", pid);
+          // console.log("placeEditDialog.mtcPlaceUpdate", pid);
           if (!placeId) {
             client.placeSet(pid);
             // make sure that place shows on map
@@ -199,7 +199,7 @@ Template.resourceUpdateDialog.saveDisabled = function () {
 
 Template.resourceUpdateDialog.created = function () {
   $("#eModalDialog").on('shown.bs.modal', function () {
-    console.log("resourceUpdateDialog.crated.shown");
+    // console.log("resourceUpdateDialog.created.shown");
     $("input.title").focus();
   });
 };
