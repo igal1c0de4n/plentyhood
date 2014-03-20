@@ -1,7 +1,7 @@
 <template name="admin">
 {{> header}}
 {{#if errorExists}}
-<div class="alert alert-error">{{getError}}</div>
+<div class="bg-danger">{{getError}}</div>
 {{/if}}
 {{#if info}}
 <div class="alert alert-info">{{info}}</div>
