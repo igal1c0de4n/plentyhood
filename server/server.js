@@ -44,23 +44,19 @@ console.log("app in", server.isDevEnv() ? "development" : "staging", "mode");
 
 var dataMassage = function () {
   _.each(App.collections.Places.find().fetch(), function (p) {
-    var update = false;
-    if (p.hasOwnProperty('coordinates')) { 
-      console.log("switching coordiantes to GeoJSON");
-      p.location = {
-        type: "Point",
-        coordinates: [p.coordinates.lng, p.coordinates.lat],
-      };
-      if (p.hasOwnProperty('coordinates')) {
-        delete p.coordinates;
+    _.each(p.resources, function (rid) {
+      var r = App.collections.Resources.findOne(rid);
+      if (!r.placeId) {
+        console.log("set placeId", p._id, "in resource", rid);
+        var ret = App.collections.Resources.update(rid, {$set: {placeId: p._id}});
+      } else {
+        console.log("placeId", p._id, "already in resource", rid);
       }
-      update = true;
-    }
-    if (update) {
-      console.log("--> updating place", p);
-      App.collections.Places.update(p._id, p);
-    }
+    });
   });
+  var ret = App.collections.Resources.update(
+    {place: {$exists: true}}, {$unset: {place: 1}}, {multi: true});
+  var ret = App.collections.Resources.remove({placeId: {$exists: false}});
 };
 // dataMassage();
 
