@@ -144,17 +144,17 @@ Template.leafletMap.rendered = function() {
       L.featureGroup([userLocationMarker]).
         bindPopup('Your detected location').
         on('click', function() { 
-        console.log('location marker clicked'); 
+        // console.log('location marker clicked'); 
       });
       userLocationMarker.addTo(map.handle);
-//       console.log("updated current loc marker to", e.latlng.toString());
+      // console.log("updated current loc marker to", e.latlng.toString());
       last.userLocation = newLocation;
     }
     // pan the map to user location
     Session.set("mapZoom", map.defaultZoom);
     updateMapBounds();
     Session.set('mapCenter', newLocation);
-    console.log('locationfound:', newLocation.coordinates);
+    // console.log('locationfound:', newLocation.coordinates);
   });
   map.handle.on('locationerror', function(e) {
     console.log('locationerror',e.message, e.code);
@@ -213,15 +213,25 @@ Template.leafletMap.rendered = function() {
           var latlng = L.GeoJSON.coordsToLatLng(p.location.coordinates);
           m.lmark = L.marker(latlng, markerStyle).addTo(markerLayer);
           m.lmark.placeId = id;
+          // console.log("setting popup", p.title);
+          m.lmark.bindPopup(
+            L.popup().setContent(p.title),
+            {offset: L.point(1,-19)});
           m.lmark.on('click', function(e) {
             // console.log("selected place", this.placeId)
             client.placeSet(this.placeId);
+            // this.openPopup();
           });
           m.keep = true;
           markers.setItem(id, m);
         }
         var opacity = selected == id ?
           map.selectedPlaceOpacity : map.unselectedPlaceOpacity;
+        if (selected == id) {
+          m.lmark.openPopup();
+        } else {
+          m.lmark.closePopup();
+        }
         m.lmark.setOpacity(opacity);
       });
 
