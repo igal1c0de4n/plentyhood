@@ -53,6 +53,8 @@ client = {
     Session.set("selectedResource", undefined);
     var place = _.isUndefined(id) ? 
       undefined : App.collections.Places.findOne(id);
+    var lastPlace = Session.get("selectedPlace");
+    Session.set("lastSelectedPlaceId", lastPlace ? lastPlace._id : undefined);
     Session.set("selectedPlace", place);
   },
 

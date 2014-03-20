@@ -151,6 +151,7 @@ Template.panelSearch.rendered = function () {
   $(".bootstrap-tagsinput").remove();
   tif.tagsinput(client.tagsInputOptions);
   $(".bootstrap-tagsinput > input").focus().attr("autocomplete","off");
+  Session.set("lastSelectedPlaceId", undefined);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,69 +198,103 @@ Template.resultsList.tagTitle = function () {
   return App.collections.Tags.findOne(this).title;
 };
 
-Template.resultsList.rendered = function () {
-  var currRow;
+Template.resultsList.trSelected = function () {
+  if (Session.get("lastSelectedPlaceId") == this.place) {
+    return "selectedTableRow";
+  }
+};
 
+Template.resultsList.rendered = function () {
+  // console.log("resultsList rendered");
   var table = $('.resultsListTable');
   table.floatThead({
     scrollContainer: function(t){
       return t.closest('.wrapper');
     }
   });
-
+  var getCurRow = function () {
+    var cr = $("table tr.selectedTableRow");
+    if (cr) {
+      // prevent selector from getting cluttered
+      cr.selector = "";
+    }
+    return cr;
+  };
   var selectResourceRow = function (target) {
     var jtarget = $(target);
-    if (currRow != jtarget) {
-      if (currRow) {
-        currRow.removeClass("selectedTableRow");
+    // console.log("target", target, "jtarget", jtarget);
+    var cr = getCurRow();
+    if (cr != jtarget) {
+      if (cr) {
+        cr.removeClass("selectedTableRow");
       }
-      currRow = jtarget;
-      currRow.addClass("selectedTableRow");
+      cr = jtarget;
+      cr.addClass("selectedTableRow");
     }
   };
-
-  $(document).bind({
-    keyup: function(e) {
-      if (currRow) {
-        currRow.selector = "";
-      }
-      function moveTo(jobj) {
-        // console.log("moveTo", currRow, jobj.length);
-        if (currRow && jobj.length) {
-          // console.log("moving", currRow, jobj);
-          selectResourceRow(jobj);
-        }
-      };
-      // console.log("resultsListRow.keyup", e.keyCode)
-      switch(e.keyCode) {
-        case client.keyCode.ARROW_UP:
-          // console.log("arrow_up");
-          if (currRow) {
-          moveTo(currRow.prev());
-        }
-        break;
-        case client.keyCode.ARROW_DOWN: {
-          // console.log("arrow_down");
-          if (currRow) {
-            moveTo(currRow.next());
-          }
-        }
-        break;
-        case client.keyCode.ESCAPE:
-          // console.log("escape");
-          client.panelPop();
-        break;
-      }
-    },
+  var needResponse = false;
+  $(document).on("keydown", function (e) {
+    needResponse = true;
   });
-
+  $(document).on("keyup", function(e) {
+    if (!needResponse) {
+      return;
+    }
+    var r = getCurRow();
+    if (!r)
+      return;
+    function moveTo(jobj) {
+      // console.log("moveTo", r, jobj.length);
+      if (jobj.length) {
+        // console.log("moving", r, jobj);
+        selectResourceRow(jobj);
+      }
+    };
+    // console.log("resultsListRow.keyup", e.keyCode)
+    switch(e.keyCode) {
+      case client.keyCode.ARROW_UP: {
+        // console.log("arrow_up");
+        moveTo(r.prev());
+        break;
+      }
+      case client.keyCode.ARROW_DOWN: {
+        // console.log("arrow_down");
+        moveTo(r.next());
+        break;
+      }
+      case client.keyCode.ESCAPE: {
+        // console.log("escape");
+        client.panelPop();
+        break;
+      }
+      case client.keyCode.ENTER: {
+        var placeId = r[0].dataset.placeid;
+        // console.log("enter", placeId, e);
+        client.placeSet(placeId);
+        break;
+      }
+    }
+  });
   $(".resultsListRow").click(function(e) {
-    // console.log("resultsListRow click", currRow);
+    // console.log("resultsListRow click", e.currentTarget.dataset.placeid);
     selectResourceRow(e.currentTarget);
+    client.placeSet(e.currentTarget.dataset.placeid);
   });
-
-  selectResourceRow($(".resultsListRow").first());
+  var lastSelectedPid = Session.get("lastSelectedPlaceId");
+  if (lastSelectedPid ) {
+    var selector = $('tr[data-placeid="' + lastSelectedPid + '"]');
+    // console.log("lastSelectedPlaceId", lastSelectedPid, selector);
+    selectResourceRow(selector.first());
+  } else {
+    // console.log("lastSelectedPlaceId unset");
+    selectResourceRow($(".resultsListRow").first());
+  }
 }
+
+Template.resultsList.destroyed = function () {
+  // console.log("resultsList destroyed");
+  $(document).off("keyup keydown");
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // instructions panel
