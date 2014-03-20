@@ -60,7 +60,7 @@ App.collections.Places.allow({
       return true;
     } 
     var adminUser = Meteor.users.findOne({ "profile.name": "Admin"});
-    console.log("user", userId, "admin", adminUser._id)
+    // console.log("user", userId, "admin", adminUser._id)
     return userId == adminUser._id;
   }
 });
@@ -170,15 +170,17 @@ Meteor.methods({
           description: options.description,
           public: options.public,
           tags: tagIdsList,
+          placeId: placeId,
         });
       }
       else {
         // no resource id -- new resource
         resourceId = App.collections.Resources.insert({
-            title: options.title, 
-            description: options.description,
-            public: options.public,
-            tags: tagIdsList,
+          title: options.title, 
+          description: options.description,
+          public: options.public,
+          tags: tagIdsList,
+          placeId: options.placeId,
         });
         // console.log("mtcResourceUpdate->resource", resourceId);
       }
