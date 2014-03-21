@@ -91,9 +91,16 @@ client = {
   // console.log("client starting");
   // this is to prevent static resources from being fetched
   // before the static resources providing method is established
-  Session.set("staticContentReady", undefined);
-  Session.set("searchTags", undefined);
-  Session.set("placesSearchResults", undefined);
+  var unsetList = [
+    "staticContentReady",
+    "searchTags",
+    "placesSearchResults",
+    "mapCenter",
+    "mapBounds",
+  ];
+  _.each(unsetList, function (name) {
+    Session.set(name, undefined);
+  });
   client.panelPush("main");
   // If no place selected, select one.
   Meteor.startup(function () {
