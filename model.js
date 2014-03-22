@@ -170,7 +170,7 @@ Meteor.methods({
           description: options.description,
           public: options.public,
           tags: tagIdsList,
-          placeId: placeId,
+          placeId: options.placeId,
         });
       }
       else {
