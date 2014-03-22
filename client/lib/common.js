@@ -95,8 +95,7 @@ client = {
     "staticContentReady",
     "searchTags",
     "placesSearchResults",
-    "mapCenter",
-    "mapBounds",
+    "locationAvailable",
   ];
   _.each(unsetList, function (name) {
     Session.set(name, undefined);

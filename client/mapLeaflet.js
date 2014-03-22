@@ -13,19 +13,17 @@ var map = {
   defaultZoom: 12,
   minZoomForMarkers: 12,
   maxZoom: 16, // server does not serve higher zoom level
-  defaultCenter: {
-    // TBD: remove once auto-locate and cross-session last-location is stored
-    // GeoJson for santa clara
-    type: "Point", coordinates: [ -121.95751, 37.35024]
-  },
+  minZoom: 3,
   selectedPlaceOpacity: 1,
   unselectedPlaceOpacity: 0.5,
+  ancientLevantGJ: {
+    type: "Point",
+    coordinates: [-324.79225158691406, 31.80435146701902],
+  },
 };
 
 Template.leafletMap.created = function() {
   // console.log("template leafletMap created");
-  Session.set('mapCenter', map.defaultCenter);
-  Session.set("mapZoom", map.defaultZoom);
   map.renderCount = 0;
 };
 
@@ -36,6 +34,7 @@ Template.leafletMap.destroyed = function() {
   this.handlePlacesChanged.stop();
   this.handleZoomChanged.stop();
   this.handleSubscriptions.stop();
+  this.handleCenterChange.stop();
 };
 
 Template.leafletMap.rendered = function() {
@@ -44,7 +43,7 @@ Template.leafletMap.rendered = function() {
   last.center = {};
   if (map.renderCount++ > 0) {
     // workaround for meteor-leaflet issue
-    //     console.log("leaflet rendered skip", map.renderCount);
+    // console.log("leaflet rendered skip", map.renderCount);
     return;
   }
   //   console.log("render iteration " + map.renderCount);
@@ -82,23 +81,23 @@ Template.leafletMap.rendered = function() {
   }
   var initOptions =  {
     maxZoom: map.maxZoom,
-    minZoom: 3,
+    minZoom: map.minZoom,
     noWrap: true,
     zoomControl: false,
     markerZoomAnimation: true,
     keyboard: false,
   };
-  var coords = Session.get("mapCenter").coordinates;
-  //console.log("map center", coords, "zoom", Session.get("mapZoom"));
+  // console.log("creating map handle and attempting auto locate");
+  Session.set('mapCenter', undefined);
+  Session.set('mapBounds', undefined);
   map.handle = L.map('leaflet-map', initOptions).
-    setView(L.GeoJSON.coordsToLatLng(coords), Session.get("mapZoom")).
     locate({maximumAge : 1000 * 60, setView: false}).
     whenReady(function () { 
     //console.log("leaflet ready")
   });
   L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: map.maxZoom,
-    attribution : 'Tiles: &copy; Esri, National Geographic'
+    attribution : 'Tiles: &copy; Esri'
   }).addTo(map.handle);
   map.handle.addControl(L.control.zoom({position: 'bottomright'}));
   L.control.scale({
@@ -106,10 +105,10 @@ Template.leafletMap.rendered = function() {
   }).addTo(map.handle);
   map.handle.on('moveend', function(e) {
     var zoom = map.handle.getZoom();
+    var mcc = latlng2GeoJson(map.handle.getCenter());
+    // console.log('map moveend', mcc.coordinates, zoom);
     Session.set("mapZoom", zoom);
-    //     console.log('map moveend', latlng2GeoJson(map.handle.getCenter()), zoom);
-    Session.set('mapCenter', latlng2GeoJson(map.handle.getCenter()));
-    updateMapBounds();
+    Session.set('mapCenter', mcc);
   });
   map.handle.on('click', function(e) {
     //     console.log('clicked at', e.latlng);
@@ -152,12 +151,14 @@ Template.leafletMap.rendered = function() {
     }
     // pan the map to user location
     Session.set("mapZoom", map.defaultZoom);
-    updateMapBounds();
     Session.set('mapCenter', newLocation);
+    Session.set('locationAvailable', true);
     // console.log('locationfound:', newLocation.coordinates);
   });
   map.handle.on('locationerror', function(e) {
-    console.log('locationerror',e.message, e.code);
+    Session.set('mapCenter', map.ancientLevantGJ);
+    Session.set("mapZoom", map.minZoom);
+    // console.log('locationerror', e.message, e.code);
   });
   // closure vars
   var markers = [];
@@ -261,8 +262,8 @@ Template.leafletMap.rendered = function() {
   this.handleSubscriptions  = Deps.autorun(function () {
     var b = Session.get("mapBounds");
     if (b) {
-      // TBD: some db restructuring is necessary for good security.
-      // create resources db and have ids references in place array
+      // console.log("subscribing with bounds", b)
+      // console.log("all places", App.collections.Places.find().fetch());
       Meteor.subscribe("places", b);
       Meteor.subscribe("tags");
       Meteor.subscribe("resources");
@@ -275,11 +276,18 @@ Template.leafletMap.rendered = function() {
   });
 
   this.handleCenterChange = Deps.autorun(function () {
-    if (map.handle) {
+    var mc = Session.get('mapCenter');
+    if (map.handle && mc) {
+      // console.log("setting view center", mc.coordinates);
       map.handle.setView(
-        L.GeoJSON.coordsToLatLng(Session.get('mapCenter').coordinates), 
-        Session.get('mapZoom'),
-        {animate: true});
+        L.GeoJSON.coordsToLatLng(
+          mc.coordinates), 
+          Session.get('mapZoom'),
+          {animate: true}
+      );
+      updateMapBounds();
+    } else {
+      // console.log("skipping setView");
     }
   });
 

@@ -89,7 +89,10 @@ Template.main.rendered = function () {
     Session.set("placesSearchResults", places);
     Session.set("resourcesSearchResults", resources);
   });
+};
 
+Template.main.mapHasCenter = function () {
+  return !!Session.get("mapCenter");
 };
 
 Template.main.isPanelActive = function (panel) {
@@ -338,7 +341,9 @@ Template.panelPlace.events({
   },
   'click .title': function () {
     var location = Session.get("mapCenter");
-    location.coordinates = Session.get("selectedPlace").location.coordinates;
+    var sp = Session.get("selectedPlace");
+    location.coordinates = sp.location.coordinates;
+    // console.log("clicked title of", sp.title);
     Session.set('mapCenter', location);
     return false;
   },
@@ -519,6 +524,13 @@ Template.placeResourcesPanel.resourceDescription = function () {
 
 Template.placeResourcesPanel.markSelected = function (rid) {
   return Session.equals("selectedResource", rid) ? "selected" : "";
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// place panelZoomedOut
+
+Template.panelZoomedOut.locateAvailable = function () {
+  return Session.get("locationAvailable");
 };
 
 }());

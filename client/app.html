@@ -4,27 +4,31 @@
 {{> leafletMap}}
 {{/if}}
 {{#unless isDialogActive}}
-{{#if mapZoomedEnough}}
-{{#if isPanelActive "main"}}
-{{> panelMain}}
-{{/if}}
-{{#if isPanelActive "search"}}
-{{> panelSearch}}
-{{/if }}
-{{#if isPanelActive "resultsList"}}
-{{> resultsList}}
-{{/if}}
-{{#if isPanelActive "place"}}
-{{> panelPlace}}
-{{/if}}
-{{else}}
-{{> panelZoomedOut}}
-{{/if}}
+  {{#if mapHasCenter}}
+    {{#if mapZoomedEnough}}
+      {{#if isPanelActive "main"}}
+      {{> panelMain}}
+      {{/if}}
+      {{#if isPanelActive "search"}}
+      {{> panelSearch}}
+      {{/if }}
+      {{#if isPanelActive "resultsList"}}
+      {{> resultsList}}
+      {{/if}}
+      {{#if isPanelActive "place"}}
+      {{> panelPlace}}
+      {{/if}}
+    {{else}}
+      {{> panelZoomedOut}}
+    {{/if}}
+  {{else}}
+    {{> panelWaitLocation}}
+  {{/if}}
 {{/unless}}
 </template>
 
 <template name="panelMain">
-<div class="mainPanel floatingPanel">
+<div class="floatingPanel castShadow mainPanel">
     <button class="btn btn-success btn-sm resourcesSearch menuButton">
       <span class="glyphicon glyphicon-white glyphicon-search"></span>
       Resources
@@ -39,7 +43,7 @@
 </template>
 
 <template name="panelSearch">
-<div class="panelSearch floatingPanel">
+<div class="floatingPanel castShadow panelSearch">
   <span class="glyphicon glyphicon-chevron-left back"></span>
   <input id="tagsSearchInputField" type="text" 
   placeholder="Enter tags" data-role="tagsinput"/>
@@ -51,7 +55,7 @@
 </template>
 
 <template name="resultsList">
-<div class="floatingPanel resultsListContainer">
+<div class="floatingPanel castShadow resultsListContainer">
   {{#if resourcesFound}}
   <h4>
     <span class="glyphicon glyphicon-chevron-left back"></span>
@@ -95,13 +99,28 @@
 </template>
 
 <template name="panelZoomedOut">
-<div class="floatingPanel">
-  <label>
+<div class="floatingPanel castShadow">
+  <div>
     <em> 
       <span class="glyphicon glyphicon-info-sign"></span>
       Zoom in to search and see places 
     </em>
-  </label>
+  </div>
+  {{#unless locateAvailable}}
+  <div>
+    <em> 
+      <span class="glyphicon glyphicon-question-sign"></span>
+      Auto location unavailable (check your browser settings)
+    </em>
+  </div>
+  {{/unless}}
+</div>
+</template>
+
+<template name="panelWaitLocation">
+<div class="floatingPanel loadAnimation">
+  <h4><em>Finding your location, stand by</em></h4>
+  {{> loadAnimate}}
 </div>
 </template>
 
@@ -127,7 +146,7 @@
 </template>
 
 <template name="panelPlace">
-<div class="panelPlace floatingPanel">
+<div class="floatingPanel castShadow panelPlace">
   {{#with selectedPlaceGet}}
   <div class="bottomBorder">
     <span class="glyphicon glyphicon-chevron-left back"></span>

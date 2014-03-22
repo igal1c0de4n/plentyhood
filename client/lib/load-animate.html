@@ -1,0 +1,388 @@
+<template name="loadAnimate">
+<style>
+#floatingCirclesG{
+  position:relative;
+  width:128px;
+  height:128px;
+  -moz-transform:scale(0.6);
+  -webkit-transform:scale(0.6);
+  -ms-transform:scale(0.6);
+  -o-transform:scale(0.6);
+  transform:scale(0.6);
+}
+
+.f_circleG{
+  position:absolute;
+  background-color:#FFFFFF;
+  height:23px;
+  width:23px;
+  -moz-border-radius:12px;
+  -moz-animation-name:f_fadeG;
+  -moz-animation-duration:1.04s;
+  -moz-animation-iteration-count:infinite;
+  -moz-animation-direction:linear;
+  -webkit-border-radius:12px;
+  -webkit-animation-name:f_fadeG;
+  -webkit-animation-duration:1.04s;
+  -webkit-animation-iteration-count:infinite;
+  -webkit-animation-direction:linear;
+  -ms-border-radius:12px;
+  -ms-animation-name:f_fadeG;
+  -ms-animation-duration:1.04s;
+  -ms-animation-iteration-count:infinite;
+  -ms-animation-direction:linear;
+  -o-border-radius:12px;
+  -o-animation-name:f_fadeG;
+  -o-animation-duration:1.04s;
+  -o-animation-iteration-count:infinite;
+  -o-animation-direction:linear;
+  border-radius:12px;
+  animation-name:f_fadeG;
+  animation-duration:1.04s;
+  animation-iteration-count:infinite;
+  animation-direction:linear;
+}
+
+#frotateG_01{
+  left:0;
+  top:52px;
+  -moz-animation-delay:0.39s;
+  -webkit-animation-delay:0.39s;
+  -ms-animation-delay:0.39s;
+  -o-animation-delay:0.39s;
+  animation-delay:0.39s;
+}
+
+#frotateG_02{
+  left:15px;
+  top:15px;
+  -moz-animation-delay:0.52s;
+  -webkit-animation-delay:0.52s;
+  -ms-animation-delay:0.52s;
+  -o-animation-delay:0.52s;
+  animation-delay:0.52s;
+}
+
+#frotateG_03{
+  left:52px;
+  top:0;
+  -moz-animation-delay:0.65s;
+  -webkit-animation-delay:0.65s;
+  -ms-animation-delay:0.65s;
+  -o-animation-delay:0.65s;
+  animation-delay:0.65s;
+}
+
+#frotateG_04{
+  right:15px;
+  top:15px;
+  -moz-animation-delay:0.78s;
+  -webkit-animation-delay:0.78s;
+  -ms-animation-delay:0.78s;
+  -o-animation-delay:0.78s;
+  animation-delay:0.78s;
+}
+
+#frotateG_05{
+  right:0;
+  top:52px;
+  -moz-animation-delay:0.91s;
+  -webkit-animation-delay:0.91s;
+  -ms-animation-delay:0.91s;
+  -o-animation-delay:0.91s;
+  animation-delay:0.91s;
+}
+
+#frotateG_06{
+  right:15px;
+  bottom:15px;
+  -moz-animation-delay:1.04s;
+  -webkit-animation-delay:1.04s;
+  -ms-animation-delay:1.04s;
+  -o-animation-delay:1.04s;
+  animation-delay:1.04s;
+}
+
+#frotateG_07{
+  left:52px;
+  bottom:0;
+  -moz-animation-delay:1.17s;
+  -webkit-animation-delay:1.17s;
+  -ms-animation-delay:1.17s;
+  -o-animation-delay:1.17s;
+  animation-delay:1.17s;
+}
+
+#frotateG_08{
+  left:15px;
+  bottom:15px;
+  -moz-animation-delay:1.3s;
+  -webkit-animation-delay:1.3s;
+  -ms-animation-delay:1.3s;
+  -o-animation-delay:1.3s;
+  animation-delay:1.3s;
+}
+
+@-moz-keyframes f_fadeG{
+  0%{
+    background-color:#51D604}
+
+  100%{
+    background-color:#FFFFFF}
+
+}
+
+@-webkit-keyframes f_fadeG{
+  0%{
+    background-color:#51D604}
+
+  100%{
+    background-color:#FFFFFF}
+
+}
+
+@-ms-keyframes f_fadeG{
+  0%{
+    background-color:#51D604}
+
+  100%{
+    background-color:#FFFFFF}
+
+}
+
+@-o-keyframes f_fadeG{
+  0%{
+    background-color:#51D604}
+
+  100%{
+    background-color:#FFFFFF}
+
+}
+
+@keyframes f_fadeG{
+  0%{
+    background-color:#51D604}
+
+  100%{
+    background-color:#FFFFFF}
+
+}
+
+</style>
+<div id="floatingCirclesG">
+  <div class="f_circleG" id="frotateG_01">
+  </div>
+  <div class="f_circleG" id="frotateG_02">
+  </div>
+  <div class="f_circleG" id="frotateG_03">
+  </div>
+  <div class="f_circleG" id="frotateG_04">
+  </div>
+  <div class="f_circleG" id="frotateG_05">
+  </div>
+  <div class="f_circleG" id="frotateG_06">
+  </div>
+  <div class="f_circleG" id="frotateG_07">
+  </div>
+  <div class="f_circleG" id="frotateG_08">
+  </div>
+</div>
+</template>
+
+<template name="loadAnimate1">
+<style>
+#fadingBarsG{
+  position:relative;
+  width:331px;
+  height:40px}
+
+.fadingBarsG{
+  position:absolute;
+  top:0;
+  background-color:#FFFF42;
+  width:40px;
+  height:40px;
+  -moz-animation-name:bounce_fadingBarsG;
+  -moz-animation-duration:1.4s;
+  -moz-animation-iteration-count:infinite;
+  -moz-animation-direction:linear;
+  -moz-transform:scale(.3);
+  -webkit-animation-name:bounce_fadingBarsG;
+  -webkit-animation-duration:1.4s;
+  -webkit-animation-iteration-count:infinite;
+  -webkit-animation-direction:linear;
+  -webkit-transform:scale(.3);
+  -ms-animation-name:bounce_fadingBarsG;
+  -ms-animation-duration:1.4s;
+  -ms-animation-iteration-count:infinite;
+  -ms-animation-direction:linear;
+  -ms-transform:scale(.3);
+  -o-animation-name:bounce_fadingBarsG;
+  -o-animation-duration:1.4s;
+  -o-animation-iteration-count:infinite;
+  -o-animation-direction:linear;
+  -o-transform:scale(.3);
+  animation-name:bounce_fadingBarsG;
+  animation-duration:1.4s;
+  animation-iteration-count:infinite;
+  animation-direction:linear;
+  transform:scale(.3);
+}
+
+#fadingBarsG_1{
+  left:0;
+  -moz-animation-delay:0.56s;
+  -webkit-animation-delay:0.56s;
+  -ms-animation-delay:0.56s;
+  -o-animation-delay:0.56s;
+  animation-delay:0.56s;
+}
+
+#fadingBarsG_2{
+  left:41px;
+  -moz-animation-delay:0.7s;
+  -webkit-animation-delay:0.7s;
+  -ms-animation-delay:0.7s;
+  -o-animation-delay:0.7s;
+  animation-delay:0.7s;
+}
+
+#fadingBarsG_3{
+  left:83px;
+  -moz-animation-delay:0.84s;
+  -webkit-animation-delay:0.84s;
+  -ms-animation-delay:0.84s;
+  -o-animation-delay:0.84s;
+  animation-delay:0.84s;
+}
+
+#fadingBarsG_4{
+  left:124px;
+  -moz-animation-delay:0.98s;
+  -webkit-animation-delay:0.98s;
+  -ms-animation-delay:0.98s;
+  -o-animation-delay:0.98s;
+  animation-delay:0.98s;
+}
+
+#fadingBarsG_5{
+  left:166px;
+  -moz-animation-delay:1.12s;
+  -webkit-animation-delay:1.12s;
+  -ms-animation-delay:1.12s;
+  -o-animation-delay:1.12s;
+  animation-delay:1.12s;
+}
+
+#fadingBarsG_6{
+  left:207px;
+  -moz-animation-delay:1.26s;
+  -webkit-animation-delay:1.26s;
+  -ms-animation-delay:1.26s;
+  -o-animation-delay:1.26s;
+  animation-delay:1.26s;
+}
+
+#fadingBarsG_7{
+  left:248px;
+  -moz-animation-delay:1.4s;
+  -webkit-animation-delay:1.4s;
+  -ms-animation-delay:1.4s;
+  -o-animation-delay:1.4s;
+  animation-delay:1.4s;
+}
+
+#fadingBarsG_8{
+  left:290px;
+  -moz-animation-delay:1.54s;
+  -webkit-animation-delay:1.54s;
+  -ms-animation-delay:1.54s;
+  -o-animation-delay:1.54s;
+  animation-delay:1.54s;
+}
+
+@-moz-keyframes bounce_fadingBarsG{
+  0%{
+    -moz-transform:scale(1);
+    background-color:#FFFF42;
+  }
+
+  100%{
+    -moz-transform:scale(.3);
+    background-color:#91FA91;
+  }
+
+}
+
+@-webkit-keyframes bounce_fadingBarsG{
+  0%{
+    -webkit-transform:scale(1);
+    background-color:#FFFF42;
+  }
+
+  100%{
+    -webkit-transform:scale(.3);
+    background-color:#91FA91;
+  }
+
+}
+
+@-ms-keyframes bounce_fadingBarsG{
+  0%{
+    -ms-transform:scale(1);
+    background-color:#FFFF42;
+  }
+
+  100%{
+    -ms-transform:scale(.3);
+    background-color:#91FA91;
+  }
+
+}
+
+@-o-keyframes bounce_fadingBarsG{
+  0%{
+    -o-transform:scale(1);
+    background-color:#FFFF42;
+  }
+
+  100%{
+    -o-transform:scale(.3);
+    background-color:#91FA91;
+  }
+
+}
+
+@keyframes bounce_fadingBarsG{
+  0%{
+    transform:scale(1);
+    background-color:#FFFF42;
+  }
+
+  100%{
+    transform:scale(.3);
+    background-color:#91FA91;
+  }
+
+}
+
+</style>
+<div id="fadingBarsG">
+  <div id="fadingBarsG_1" class="fadingBarsG">
+  </div>
+  <div id="fadingBarsG_2" class="fadingBarsG">
+  </div>
+  <div id="fadingBarsG_3" class="fadingBarsG">
+  </div>
+  <div id="fadingBarsG_4" class="fadingBarsG">
+  </div>
+  <div id="fadingBarsG_5" class="fadingBarsG">
+  </div>
+  <div id="fadingBarsG_6" class="fadingBarsG">
+  </div>
+  <div id="fadingBarsG_7" class="fadingBarsG">
+  </div>
+  <div id="fadingBarsG_8" class="fadingBarsG">
+  </div>
+</div>
+</template>
