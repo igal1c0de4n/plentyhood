@@ -119,6 +119,15 @@ Template.main.canLoadMap = function () {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// panel back button
+
+Template.panelBackButton.events({
+  'click .panelBack' : function(event, template) {
+    client.panelPop();
+  },
+});
+
+///////////////////////////////////////////////////////////////////////////////
 // search panel
 
 Template.panelSearch.events({
@@ -127,9 +136,6 @@ Template.panelSearch.events({
     Session.set("searchTags", tags);
     // console.log("search tags", tags);
     client.panelPush("resultsList");
-  },
-  'click .back' : function(event, template) {
-    client.panelPop();
   },
   'keyup input' : function(event, template) {
     if (event.which == client.keyCode.ESCAPE) {
@@ -163,9 +169,6 @@ Template.panelSearch.rendered = function () {
 Template.resultsList.events({
   'click .result' : function(event, template) {
     // console.log("result", event.target);
-  },
-  'click .back' : function(event, template) {
-    client.panelPop();
   },
   'keyup input' : function(event, template) {
     if (event.which == client.keyCode.ESCAPE) {
@@ -338,10 +341,6 @@ Template.panelPlace.events({
       confirmButton: "Yes",
       cancelButton: "No",
     });
-    return false;
-  },
-  'click .back': function () {
-    client.placeSet();
     return false;
   },
   'click .title': function () {

@@ -29,11 +29,11 @@
 
 <template name="panelMain">
 <div class="floatingPanel castShadow mainPanel">
-    <button class="btn btn-success btn-sm resourcesSearch menuButton">
+    <button class="btn btn-success resourcesSearch menuButton">
       <span class="glyphicon glyphicon-white glyphicon-search"></span>
       Resources
     </button>
-    <button class="btn btn-success btn-sm servicesSearch menuButton">
+    <button class="btn btn-success servicesSearch menuButton">
       <span class="glyphicon glyphicon-white glyphicon-search"></span>
       Services
     </button>
@@ -42,12 +42,18 @@
 </div>
 </template>
 
+<template name="panelBackButton">
+<button class="btn btn-warning panelBack">
+  <span class="glyphicon glyphicon-chevron-left"></span>
+</button> 
+</template>
+
 <template name="panelSearch">
 <div class="floatingPanel castShadow panelSearch">
-  <span class="glyphicon glyphicon-chevron-left back"></span>
+  {{> panelBackButton}}
   <input id="tagsSearchInputField" type="text" 
   placeholder="Enter tags" data-role="tagsinput"/>
-  <button class="btn btn-success btn-sm goSearch">
+  <button class="btn btn-success goSearch">
     <span class="glyphicon glyphicon-white glyphicon-search"></span>
     Search
   </button> 
@@ -58,7 +64,7 @@
 <div class="floatingPanel castShadow resultsListContainer">
   {{#if resourcesFound}}
   <h4>
-    <span class="glyphicon glyphicon-chevron-left back"></span>
+    {{> panelBackButton}}
     Search Results
   </h4>
   <table class="table table-hover resultsListTable">
@@ -85,7 +91,7 @@
   </table>
   {{else}}
   <h4>
-    <span class="glyphicon glyphicon-chevron-left back"></span>
+    {{> panelBackButton}}
     {{#if showingAllPlaces}} Showing all places {{else}} No Results {{/if}}
   </h4>
   {{/if}}
@@ -149,7 +155,7 @@
 <div class="floatingPanel castShadow panelPlace">
   {{#with selectedPlaceGet}}
   <div class="bottomBorder">
-    <span class="glyphicon glyphicon-chevron-left back"></span>
+    {{> panelBackButton}}
     <span class="glyphicon glyphicon-bookmark"></span>
     <h4 class="inline"><a href="#" class="btn btn-link title">{{title}}</a></h4>
     {{#if isOwner}}

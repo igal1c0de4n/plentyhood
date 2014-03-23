@@ -162,3 +162,7 @@ table.resultsListTable {
   height: auto;
   max-height: 75%;
 }
+
+button.panelBack {
+  margin-right: 4px;
+}
