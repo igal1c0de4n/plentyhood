@@ -15,6 +15,7 @@ html, body, .fill {
   display: inline-block;
   padding: 10px;
   background-color: white;
+  /* opacity: 0.9; */
   /* TBD: add css transitions 
    * It only work if the element future size is known in advance, not in auto
    * (there's a workaround)
@@ -23,7 +24,6 @@ html, body, .fill {
 }
 
 .castShadow {
-  opacity: 0.9;
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
