@@ -123,7 +123,13 @@ Template.main.canLoadMap = function () {
 
 Template.panelBackButton.events({
   'click .panelBack' : function(event, template) {
-    client.panelPop();
+    if (Session.get("selectedPlace")) {
+      // console.log("panelBack, deselecting place");
+      client.placeSet();
+    } else {
+      // console.log("panelBack, poping last panel");
+      client.panelPop();
+    }
   },
 });
 
@@ -166,20 +172,6 @@ Template.panelSearch.rendered = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // resultsList panel
 
-Template.resultsList.events({
-  'click .result' : function(event, template) {
-    // console.log("result", event.target);
-  },
-  'keyup input' : function(event, template) {
-    if (event.which == client.keyCode.ESCAPE) {
-      // console.log("escape key");
-      client.panelPop();
-      event.stopPropagation();
-      return false;
-    }
-  },
-});
-
 Template.resultsList.resourcesFound = function () {
   var results = Session.get("resourcesSearchResults");
   // console.log("resourcesFound", results);
@@ -210,6 +202,49 @@ Template.resultsList.trSelected = function () {
   }
 };
 
+var setCenterPlace = function (placeId) {
+  client.placeSet(placeId);
+  var place = App.collections.Places.findOne(placeId);
+  Session.set("mapCenter", place.location);
+}
+
+var getCurRow = function () {
+  var cr = $("table tr.selectedTableRow");
+  if (cr) {
+    // prevent selector from getting cluttered
+    cr.selector = "";
+  }
+  return cr;
+};
+
+var selectResourceRow = function (target) {
+  var jtarget = $(target);
+  // console.log("target", target, "jtarget", jtarget);
+  var cr = getCurRow();
+  if (cr != jtarget) {
+    if (cr) {
+      cr.removeClass("selectedTableRow");
+    }
+    cr = jtarget;
+    cr.addClass("selectedTableRow");
+  }
+};
+
+var resultsListRowAction = function (event) {
+  // console.log("resultsListRow click", e.currentTarget.dataset.placeid);
+  selectResourceRow(event.currentTarget);
+  setCenterPlace(event.currentTarget.dataset.placeid);
+};
+
+Template.resultsList.events({
+  'tap .resultsListRow': function (event, template) {
+    resultsListRowAction(event);
+  },
+  'click .resultsListRow': function (event, template) {
+    resultsListRowAction(event);
+  },
+});
+
 Template.resultsList.rendered = function () {
   // console.log("resultsList rendered");
   var table = $('.resultsListTable');
@@ -218,26 +253,6 @@ Template.resultsList.rendered = function () {
       return t.closest('.wrapper');
     }
   });
-  var getCurRow = function () {
-    var cr = $("table tr.selectedTableRow");
-    if (cr) {
-      // prevent selector from getting cluttered
-      cr.selector = "";
-    }
-    return cr;
-  };
-  var selectResourceRow = function (target) {
-    var jtarget = $(target);
-    // console.log("target", target, "jtarget", jtarget);
-    var cr = getCurRow();
-    if (cr != jtarget) {
-      if (cr) {
-        cr.removeClass("selectedTableRow");
-      }
-      cr = jtarget;
-      cr.addClass("selectedTableRow");
-    }
-  };
   var needResponse = false;
   $(document).on("keydown", function (e) {
     needResponse = true;
@@ -256,11 +271,6 @@ Template.resultsList.rendered = function () {
         selectResourceRow(jobj);
       }
     };
-    var setCenterPlace = function (placeId) {
-      client.placeSet(placeId);
-      var place = App.collections.Places.findOne(placeId);
-      Session.set("mapCenter", place.location);
-    }
     // console.log("resultsListRow.keyup", e.keyCode)
     switch(e.keyCode) {
       case client.keyCode.ARROW_UP: {
@@ -286,11 +296,6 @@ Template.resultsList.rendered = function () {
       }
     }
   });
-  $(".resultsListRow").click(function(e) {
-    // console.log("resultsListRow click", e.currentTarget.dataset.placeid);
-    selectResourceRow(e.currentTarget);
-    setCenterPlace(e.currentTarget.dataset.placeid);
-  });
   var lastSelectedPid = Session.get("lastSelectedPlaceId");
   if (lastSelectedPid ) {
     var selector = $('tr[data-placeid="' + lastSelectedPid + '"]');
@@ -300,7 +305,7 @@ Template.resultsList.rendered = function () {
     // console.log("lastSelectedPlaceId unset");
     selectResourceRow($(".resultsListRow").first());
   }
-}
+};
 
 Template.resultsList.destroyed = function () {
   // console.log("resultsList destroyed");
@@ -373,18 +378,16 @@ Template.panelPlace.events({
 });
 
 Template.panelPlace.rendered = function () {
-  $(document).bind({
-    keyup: function(e) {
-      if (e.keyCode == client.keyCode.ESCAPE) {
-        // console.log("escape");
-        client.placeSet();
-      }
-    },
+  $(document).on("keyup", function(e) {
+    if (e.keyCode == client.keyCode.ESCAPE) {
+      // console.log("escape");
+      client.placeSet();
+    }
   });
 };
 
 Template.panelPlace.destroyed = function () {
-  $(document).unbind("keyup");
+  $(document).off("keyup");
 };
 
 ///////////////////////////////////////////////////////////////////////////////
