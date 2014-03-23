@@ -253,6 +253,11 @@ Template.resultsList.rendered = function () {
         selectResourceRow(jobj);
       }
     };
+    var setCenterPlace = function (placeId) {
+      client.placeSet(placeId);
+      var place = App.collections.Places.findOne(placeId);
+      Session.set("mapCenter", place.location);
+    }
     // console.log("resultsListRow.keyup", e.keyCode)
     switch(e.keyCode) {
       case client.keyCode.ARROW_UP: {
@@ -273,7 +278,7 @@ Template.resultsList.rendered = function () {
       case client.keyCode.ENTER: {
         var placeId = r[0].dataset.placeid;
         // console.log("enter", placeId, e);
-        client.placeSet(placeId);
+        setCenterPlace(placeId);
         break;
       }
     }
@@ -281,7 +286,7 @@ Template.resultsList.rendered = function () {
   $(".resultsListRow").click(function(e) {
     // console.log("resultsListRow click", e.currentTarget.dataset.placeid);
     selectResourceRow(e.currentTarget);
-    client.placeSet(e.currentTarget.dataset.placeid);
+    setCenterPlace(e.currentTarget.dataset.placeid);
   });
   var lastSelectedPid = Session.get("lastSelectedPlaceId");
   if (lastSelectedPid ) {
