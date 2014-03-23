@@ -23,9 +23,12 @@ Meteor.publish("userDetails", function () {
 
 Meteor.publish("places", function (bounds) {
   if (bounds) {
-    return App.collections.Places.find({
+    var cursor = App.collections.Places.find({
       location: {$geoWithin : {$box: bounds}},
-      $or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
+      $or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]
+    });
+    // console.log("publishing", cursor.fetch().length, "places", bounds);
+    return cursor;
   }
 });
 

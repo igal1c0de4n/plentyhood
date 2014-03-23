@@ -18,7 +18,8 @@ var map = {
   unselectedPlaceOpacity: 0.5,
   ancientLevantGJ: {
     type: "Point",
-    coordinates: [-324.79225158691406, 31.80435146701902],
+    // Jerusalem, "cradle of man kind" :)
+    coordinates: [35.21873474121094, 31.78669746847703], 
   },
 };
 
@@ -55,7 +56,6 @@ Template.leafletMap.rendered = function() {
   }
   var updateMapBounds = function () {
     var b = map.handle.getBounds();
-    var drawBounds = Session.get("drawBounds");
     // increase size of bounds by phi for more fluent user experience
     var kmPerDegree = 111.2;
     var marginKm = 1;
@@ -64,7 +64,7 @@ Template.leafletMap.rendered = function() {
       [b.getWest() - phi, b.getSouth() - phi],
       [b.getEast() + phi, b.getNorth() + phi],
     ];
-    if (drawBounds) {
+    if (Session.get("drawBounds")) {
       // debug 
       if (last.rect) {
         map.handle.removeLayer(last.rect);
@@ -82,7 +82,6 @@ Template.leafletMap.rendered = function() {
   var initOptions =  {
     maxZoom: map.maxZoom,
     minZoom: map.minZoom,
-    noWrap: true,
     zoomControl: false,
     markerZoomAnimation: true,
     keyboard: false,
@@ -276,8 +275,19 @@ Template.leafletMap.rendered = function() {
   });
 
   this.handleCenterChange = Deps.autorun(function () {
+    var wrapLongitude = function (d) {
+      // this is kind of a hack to keep the map and all markers between [-180,180]
+      if (d > 180) {
+        d -= 360;
+      }
+      if (d < -180) {
+        d += 360;
+      }
+      return d;
+    };
     var mc = Session.get('mapCenter');
     if (map.handle && mc) {
+      mc.coordinates[0] = wrapLongitude(mc.coordinates[0]);
       // console.log("setting view center", mc.coordinates);
       map.handle.setView(
         L.GeoJSON.coordsToLatLng(
