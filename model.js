@@ -3,7 +3,7 @@
 
 // Loaded on both the client and the server
 
-App.collections.Resources.allow({
+collections.Resources.allow({
   insert: function (userId) {
     return false; 
   },
@@ -15,7 +15,7 @@ App.collections.Resources.allow({
   },
 });
 
-App.collections.Tags.allow({
+collections.Tags.allow({
   insert: function (userId) {
     return false; 
   },
@@ -35,7 +35,7 @@ App.collections.Tags.allow({
     public: Boolean
     invited: Array of user id's that are invited (only if !public)
 */
-App.collections.Places.allow({
+collections.Places.allow({
   insert: function (userId, place) {
     return false; // no cowboy inserts -- use mtcPlaceUpdate method
   },
@@ -85,7 +85,7 @@ Meteor.methods({
     verifyLoggedIn.call(this);
     if (options.placeId) {
       // update existing place
-      App.collections.Places.update(options.placeId, { 
+      collections.Places.update(options.placeId, { 
         $set: {
           title: options.title,
           description: options.description,
@@ -103,7 +103,7 @@ Meteor.methods({
           throw new Meteor.Error(413, "Bad lat/lng", c);
       });
       // returns the ._id of the inserted document
-      return App.collections.Places.insert({
+      return collections.Places.insert({
         owner: this.userId,
         location: options.location,
         title: options.title,
@@ -115,14 +115,14 @@ Meteor.methods({
   },
 
   mtcInvite: function (placeId, userId) {
-    var place = App.collections.Places.findOne(placeId);
+    var place = collections.Places.findOne(placeId);
     if (! place || place.owner !== this.userId)
       throw new Meteor.Error(404, "No such place");
     if (place.public)
       throw new Meteor.Error(400,
                              "That place is public. No need to invite people.");
     if (userId !== place.owner && ! _.contains(place.invited, userId)) {
-      App.collections.Places.update(placeId, { $addToSet: { invited: userId } });
+      collections.Places.update(placeId, { $addToSet: { invited: userId } });
 
       var from = contactEmail(Meteor.users.findOne(this.userId));
       var to = contactEmail(Meteor.users.findOne(userId));
@@ -146,18 +146,18 @@ Meteor.methods({
     options = options || {};
     verifyLoggedIn.call(this);
     var tagIdsList = _.map(options.tags, function (tagTitle) {
-      var t = App.collections.Tags.findOne({title: tagTitle});
+      var t = collections.Tags.findOne({title: tagTitle});
       if (t) {
         // bug: only inc popularity if new resource or if tag does not 
         // already exist in resource
         t.popularity++;
         // console.log("tag", tagTitle, "exists, popularity:", t.popularity);
-        App.collections.Tags.update(t._id, t);
+        collections.Tags.update(t._id, t);
         return t._id;
       }
       // must be new tag
       // console.log("creating new tag:", tagTitle);
-      var newTagId = App.collections.Tags.insert(
+      var newTagId = collections.Tags.insert(
         {title: tagTitle.trim().toLowerCase(), popularity: 1});
         return newTagId;
     });
@@ -165,7 +165,7 @@ Meteor.methods({
       var resourceId = options.resourceId;
       if (resourceId) {
         // console.log("updating resource", resourceId);
-        App.collections.Resources.update(resourceId, { 
+        collections.Resources.update(resourceId, { 
           title: options.title, 
           description: options.description,
           public: options.public,
@@ -175,7 +175,7 @@ Meteor.methods({
       }
       else {
         // no resource id -- new resource
-        resourceId = App.collections.Resources.insert({
+        resourceId = collections.Resources.insert({
           title: options.title, 
           description: options.description,
           public: options.public,
@@ -200,7 +200,7 @@ Meteor.methods({
     var resourceId = options.resourceId;
     // console.log("mtcPlaceResourceAdd", resourceId, placeId);
     if (placeId && resourceId) {
-      App.collections.Places.update(placeId, { 
+      collections.Places.update(placeId, { 
         $addToSet: { resources: resourceId}
       });
       // console.log("added resource", resourceId, "to place", placeId);
@@ -222,7 +222,7 @@ Meteor.methods({
         403, "resource", resourceId, "is not in place", placeId);
     }
     else {
-      App.collections.Places.update(placeId, {
+      collections.Places.update(placeId, {
         $pull: { resources: resourceId }
       });
     }
@@ -235,7 +235,7 @@ var placeGet = function (placeId) {
   if (!placeId) {
     throw new Meteor.Error(403, "null place id");
   }
-  var p = App.collections.Places.findOne(placeId);
+  var p = collections.Places.findOne(placeId);
 
   if (!p) {
     throw new Meteor.Error(403, "place not found");

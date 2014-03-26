@@ -43,7 +43,7 @@ Meteor.Router.add({
     }
     return 'notfound';
   },
-  '/signout': App.signout,
+  '/signout': roles.signout,
   '*': 'notfound',
 });
 

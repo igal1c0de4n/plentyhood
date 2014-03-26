@@ -32,7 +32,7 @@ Template.main.rendered = function () {
       // console.log("tags", tags);
       var tids = _.map(tags, function (t) {
         var v = t.trim().toLowerCase();
-        var o = App.collections.Tags.findOne({title: v});
+        var o = collections.Tags.findOne({title: v});
         return o ? o._id : undefined;
       });
       // console.log("tids", tids);
@@ -41,12 +41,12 @@ Template.main.rendered = function () {
       });
       if (missingTags == undefined) {
         // console.log("all tags found");
-        App.collections.Places.find({
+        collections.Places.find({
           location: {$near : {$geometry: center}, $maxDistance: 5000},
         }).forEach(function (place){
           // console.log("looking in place", place);
           _.map(place.resources, function (rid){
-            var resource = App.collections.Resources.findOne(rid);
+            var resource = collections.Resources.findOne(rid);
             var tagsAreMissing = _.find(tids, function(tid){
               var found = _.find(resource.tags, function(t){
                 return t === tid;
@@ -65,7 +65,7 @@ Template.main.rendered = function () {
         // TBD: improve search performance by duplicating place 
         // location in every resource, and using:
         //
-        // resources = App.collections.Resources.find({
+        // resources = collections.Resources.find({
         //   location: {$near : {$geometry: center}, $maxDistance: ...},
         //   'tags' : {'$all': tids}
         // })
@@ -82,7 +82,7 @@ Template.main.rendered = function () {
     }
     else {
       // backdoor cheat to see all places
-      places = App.collections.Places.find({
+      places = collections.Places.find({
         location: {$near : {$geometry: center}},
       }).fetch();
       // console.log("search invoked w/o tags");
@@ -194,7 +194,7 @@ Template.resultsList.results = function () {
 };
 
 Template.resultsList.tagTitle = function () {
-  return App.collections.Tags.findOne(this).title;
+  return collections.Tags.findOne(this).title;
 };
 
 Template.resultsList.trSelected = function () {
@@ -205,7 +205,7 @@ Template.resultsList.trSelected = function () {
 
 var setCenterPlace = function (placeId) {
   client.placeSet(placeId);
-  var place = App.collections.Places.findOne(placeId);
+  var place = collections.Places.findOne(placeId);
   Session.set("mapCenterLast", Session.get("mapCenter"));
   Session.set("mapCenter", place.location);
   panels.push("place");
@@ -271,7 +271,7 @@ Template.resultsList.rendered = function () {
 // instructions panel
 
 Template.instructions.anyPlaces = function () {
-  return App.collections.Places.find().count() > 0;
+  return collections.Places.find().count() > 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -288,14 +288,14 @@ Template.panelPlace.isOwner = function () {
 Template.panelPlace.events({
   'click .removePlace': function () {
     var id = this._id;
-    var placeTitle = App.collections.Places.findOne(id).title;
+    var placeTitle = collections.Places.findOne(id).title;
     // console.log("request to remove place", id, placeTitle);
     $.confirm({
       text: "Really delete place '" + placeTitle + "'?",
       title: "Confirmation required",
       confirm: function(button) {
         // console.log("confirmed!");
-        App.collections.Places.remove(id);
+        collections.Places.remove(id);
         client.placeSet();
       },
       confirmButton: "Yes",
@@ -369,7 +369,7 @@ Template.details.events({
 // Place sharedPanel widget
 
 Template.sharedPanel.outstandingInvitations = function () {
-  var place = App.collections.Places.findOne(this._id);
+  var place = collections.Places.findOne(this._id);
   return Meteor.users.find({_id: {$in: place.invited}});
 };
 
@@ -436,7 +436,7 @@ Template.placeResourcesPanel.placeResources = function () {
   //   console.log("place: ", place, " resources: ", place.resources);
   if (place.resources) {
     var rnames = _.map(place.resources, function (rid) {
-      return App.collections.Resources.findOne(rid);
+      return collections.Resources.findOne(rid);
     });
     return rnames.sort(_.dynamicSort("title"));
   }
@@ -458,7 +458,7 @@ Template.placeResourcesPanel.resourceTagsGet = function () {
     else {
       tags += ", ";
     }
-    tags += _.capitalize(App.collections.Tags.findOne(t).title);
+    tags += _.capitalize(collections.Tags.findOne(t).title);
   });
   return tags;
 };

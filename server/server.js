@@ -23,7 +23,7 @@ Meteor.publish("userDetails", function () {
 
 Meteor.publish("places", function (bounds) {
   if (bounds) {
-    var cursor = App.collections.Places.find({
+    var cursor = collections.Places.find({
       location: {$geoWithin : {$box: bounds}},
       $or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]
     });
@@ -33,33 +33,33 @@ Meteor.publish("places", function (bounds) {
 });
 
 Meteor.publish("tags", function () {
-  return App.collections.Tags.find();
+  return collections.Tags.find();
 });
 
 Meteor.publish("resources", function () {
-  return App.collections.Resources.find();
+  return collections.Resources.find();
 });
 
-App.collections.Places._ensureIndex({location : "2dsphere"});
+collections.Places._ensureIndex({location : "2dsphere"});
 console.log("app in", server.isDevEnv() ? "development" : "staging", "mode");
 
 //------------ db migration code -----------
 
 var dataMassage = function () {
-  _.each(App.collections.Places.find().fetch(), function (p) {
+  _.each(collections.Places.find().fetch(), function (p) {
     _.each(p.resources, function (rid) {
-      var r = App.collections.Resources.findOne(rid);
+      var r = collections.Resources.findOne(rid);
       if (!r.placeId) {
         console.log("set placeId", p._id, "in resource", rid);
-        var ret = App.collections.Resources.update(rid, {$set: {placeId: p._id}});
+        var ret = collections.Resources.update(rid, {$set: {placeId: p._id}});
       } else {
         console.log("placeId", p._id, "already in resource", rid);
       }
     });
   });
-  var ret = App.collections.Resources.update(
+  var ret = collections.Resources.update(
     {place: {$exists: true}}, {$unset: {place: 1}}, {multi: true});
-  var ret = App.collections.Resources.remove({placeId: {$exists: false}});
+  var ret = collections.Resources.remove({placeId: {$exists: false}});
 };
 // dataMassage();
 

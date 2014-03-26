@@ -31,7 +31,7 @@ client = {
     maxTags: 12,
     typeahead: {
       source: function(query) {
-        var foundTags = App.collections.Tags.
+        var foundTags = collections.Tags.
           find({title: new RegExp("^" + query.toLowerCase())}).fetch();
         var tags = _.map(foundTags, function (t) {
           return t.title;
@@ -43,7 +43,7 @@ client = {
     tagClass: function (item) {
       // console.log("tagClass", item);
       var v = item.trim().toLowerCase();
-      var o = App.collections.Tags.findOne({title: v});
+      var o = collections.Tags.findOne({title: v});
       return o ? 'label label-primary' : 'label label-warning';
     }
   },
@@ -52,7 +52,7 @@ client = {
     Session.set("placeEditLocation", undefined);
     Session.set("selectedResource", undefined);
     var place = _.isUndefined(id) ? 
-      undefined : App.collections.Places.findOne(id);
+      undefined : collections.Places.findOne(id);
     var lastPlace = Session.get("selectedPlace");
     Session.set("lastSelectedPlaceId", lastPlace ? lastPlace._id : undefined);
     Session.set("selectedPlace", place);
@@ -60,7 +60,7 @@ client = {
 
   selectedResourceGet: function () {
     var rid = Session.get("selectedResource");
-    return rid ? App.collections.Resources.findOne(rid) : undefined; 
+    return rid ? collections.Resources.findOne(rid) : undefined; 
   },
 
   selectedPlaceId: function () {

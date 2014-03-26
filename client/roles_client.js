@@ -1,8 +1,10 @@
+roles = {};
+
 ;(function () {
 
   "use strict";
 
-App.signout = function () {
+roles.signout = function () {
   console.log('logging out', Meteor.user().profile.name);
   Meteor.logout(function () {
     //     console.log('...done');

@@ -264,7 +264,7 @@ Template.leafletMap.rendered = function() {
     var b = Session.get("mapBounds");
     if (b) {
       // console.log("subscribing with bounds", b)
-      // console.log("all places", App.collections.Places.find().fetch());
+      // console.log("all places", collections.Places.find().fetch());
       Meteor.subscribe("places", b);
       Meteor.subscribe("tags");
       Meteor.subscribe("resources");
@@ -305,7 +305,7 @@ Template.leafletMap.rendered = function() {
 
   mapProvider.placeDragSet = function (action) {
     var updatePlaceCoords = function (id, c) {
-      App.collections.Places.update(
+      collections.Places.update(
         {_id: id},
         { $set: { 'location.coordinates': c}});
     };

@@ -59,7 +59,7 @@ Template.placeEditDialog.events({
             openInviteDialog();
           }
         }
-        Session.set("selectedPlace", App.collections.Places.findOne(pid));
+        Session.set("selectedPlace", collections.Places.findOne(pid));
       });
       bsModalOnHide("placeEdit");
     } else {
@@ -186,7 +186,7 @@ Template.resourceUpdateDialog.tags = function () {
     if (tagsStr) {
       tagsStr += ",";
     }
-    var name = App.collections.Tags.findOne(t).title;
+    var name = collections.Tags.findOne(t).title;
     //     console.log("tag", t, name);
     tagsStr += name;
   });
