@@ -67,22 +67,6 @@ client = {
     var selectedPlace = Session.get("selectedPlace");
     return selectedPlace ? selectedPlace._id : undefined;
   },
-
-  panelsStack: [],
-
-  panelPush: function (panel) {
-    // console.log("pushing panel", panel);
-    client.panelsStack.push(panel);
-    Session.set("panel", panel);
-  },
-
-  panelPop: function () {
-    var stack = client.panelsStack;
-    var prvPanel = stack.pop();
-    var currentPanel = stack[stack.length - 1];
-    // console.log("poped panel '" + prvPanel + "', current panel '" + currentPanel + "'");
-    Session.set("panel", currentPanel);
-  },
 };
 
 ;(function () {
@@ -100,7 +84,6 @@ client = {
   _.each(unsetList, function (name) {
     Session.set(name, undefined);
   });
-  client.panelPush("main");
   // If no place selected, select one.
   Meteor.startup(function () {
     Meteor.call("mtcIsDevEnv", function (error, result) {

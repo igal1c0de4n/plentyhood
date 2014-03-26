@@ -1,3 +1,5 @@
+app = {};
+
 ;(function () {
   "use strict";
 
@@ -10,11 +12,11 @@ Meteor.subscribe("userDetails");
 Template.panelMain.events({
   'click .resourcesSearch': function (){
     Session.set("searchType", "resources");
-    client.panelPush("search");
+    panels.push("search");
   },
   'click .servicesSearch': function (){
     Session.set("searchType", "services");
-    client.panelPush("search");
+    panels.push("search");
   },
 });
 
@@ -97,11 +99,7 @@ Template.main.mapHasCenter = function () {
 
 Template.main.isPanelActive = function (panel) {
   // console.log("isPanelActive", panel);
-  if (panel === "place") {
-    // console.log("isPanelActive.place");
-    return !!Session.get("selectedPlace") && !Session.get("editPlace");
-  }
-  if (panel === Session.get("panel") && !Session.get("selectedPlace")) {
+  if (panel === Session.get("panel")) {
     return true;
   }
 };
@@ -122,33 +120,40 @@ Template.main.canLoadMap = function () {
 // panel back button
 
 Template.panelBackButton.events({
-  'click .panelBack' : function(event, template) {
-    if (Session.get("selectedPlace")) {
-      // console.log("panelBack, deselecting place");
-      client.placeSet();
-    } else {
-      // console.log("panelBack, poping last panel");
-      client.panelPop();
-    }
-  },
+  'click .panelBack' : panels.backAction,
 });
 
 ///////////////////////////////////////////////////////////////////////////////
 // search panel
 
+var panelSearchAction = function () {
+  var tags = $("#tagsSearchInputField").tagsinput('items');
+  Session.set("searchTags", tags);
+  // console.log("search tags", tags);
+  panels.push("resultsList");
+};
+
 Template.panelSearch.events({
   'click .goSearch' : function(event, template) {
-    var tags = $("#tagsSearchInputField").tagsinput('items');
-    Session.set("searchTags", tags);
-    // console.log("search tags", tags);
-    client.panelPush("resultsList");
+    if (!panelSearchAction.enterKeyPressed) {
+      // console.log("goSearch real click");
+      panelSearchAction();
+    } else {
+      // console.log("goSearch click ignored");
+    }
   },
-  'keyup input' : function(event, template) {
-    if (event.which == client.keyCode.ESCAPE) {
-      // console.log("escape key");
-      client.panelPop();
+  'keydown .goSearch': function (e){
+    if (e.keyCode == client.keyCode.ENTER) {
+      // console.log("goSearch enter keydown");
+      panelSearchAction.enterKeyPressed = true;
+    }
+  },
+  'keyup .goSearch': function (e){
+    if (e.keyCode == client.keyCode.ENTER) {
+      // console.log("goSearch enter keyup");
       event.stopPropagation();
-      return false;
+      panelSearchAction.enterKeyPressed = false;
+      panelSearchAction();
     }
   },
 });
@@ -188,10 +193,6 @@ Template.resultsList.results = function () {
   return results;
 };
 
-Template.resultsList.destroyed = function () {
-  $(document).unbind("keyup");
-};
-
 Template.resultsList.tagTitle = function () {
   return App.collections.Tags.findOne(this).title;
 };
@@ -205,8 +206,10 @@ Template.resultsList.trSelected = function () {
 var setCenterPlace = function (placeId) {
   client.placeSet(placeId);
   var place = App.collections.Places.findOne(placeId);
+  Session.set("mapCenterLast", Session.get("mapCenter"));
   Session.set("mapCenter", place.location);
-}
+  panels.push("place");
+};
 
 var getCurRow = function () {
   var cr = $("table tr.selectedTableRow");
@@ -253,49 +256,6 @@ Template.resultsList.rendered = function () {
       return t.closest('.wrapper');
     }
   });
-  var needResponse = false;
-  $(document).on("keydown", function (e) {
-    needResponse = true;
-  });
-  $(document).on("keyup", function(e) {
-    if (!needResponse) {
-      return;
-    }
-    var r = getCurRow();
-    if (!r)
-      return;
-    function moveTo(jobj) {
-      // console.log("moveTo", r, jobj.length);
-      if (jobj.length) {
-        // console.log("moving", r, jobj);
-        selectResourceRow(jobj);
-      }
-    };
-    // console.log("resultsListRow.keyup", e.keyCode)
-    switch(e.keyCode) {
-      case client.keyCode.ARROW_UP: {
-        // console.log("arrow_up");
-        moveTo(r.prev());
-        break;
-      }
-      case client.keyCode.ARROW_DOWN: {
-        // console.log("arrow_down");
-        moveTo(r.next());
-        break;
-      }
-      case client.keyCode.ESCAPE: {
-        // console.log("escape");
-        client.panelPop();
-        break;
-      }
-      case client.keyCode.ENTER: {
-        var placeId = r[0].dataset.placeid;
-        // console.log("enter", placeId, e);
-        setCenterPlace(placeId);
-        break;
-      }
-    }
-  });
   var lastSelectedPid = Session.get("lastSelectedPlaceId");
   if (lastSelectedPid ) {
     var selector = $('tr[data-placeid="' + lastSelectedPid + '"]');
@@ -305,11 +265,6 @@ Template.resultsList.rendered = function () {
     // console.log("lastSelectedPlaceId unset");
     selectResourceRow($(".resultsListRow").first());
   }
-};
-
-Template.resultsList.destroyed = function () {
-  // console.log("resultsList destroyed");
-  $(document).off("keyup keydown");
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -376,19 +331,6 @@ Template.panelPlace.events({
     return false;
   },
 });
-
-Template.panelPlace.rendered = function () {
-  $(document).on("keyup", function(e) {
-    if (e.keyCode == client.keyCode.ESCAPE) {
-      // console.log("escape");
-      client.placeSet();
-    }
-  });
-};
-
-Template.panelPlace.destroyed = function () {
-  $(document).off("keyup");
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Place details 
@@ -539,5 +481,10 @@ Template.placeResourcesPanel.markSelected = function (rid) {
 Template.panelZoomedOut.locateAvailable = function () {
   return Session.get("locationAvailable");
 };
+
+// setup exports
+app.setCenterPlace = setCenterPlace;
+app.getCurRow = getCurRow;
+app.selectResourceRow = selectResourceRow;
 
 }());

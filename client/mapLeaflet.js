@@ -153,11 +153,13 @@ Template.leafletMap.rendered = function() {
     Session.set('mapCenter', newLocation);
     Session.set('locationAvailable', true);
     // console.log('locationfound:', newLocation.coordinates);
+    panels.push("main");
   });
   map.handle.on('locationerror', function(e) {
+    // console.log('locationerror', e.message, e.code);
     Session.set('mapCenter', map.ancientLevantGJ);
     Session.set("mapZoom", map.minZoom);
-    // console.log('locationerror', e.message, e.code);
+    panels.push("main");
   });
   // closure vars
   var markers = [];
@@ -220,7 +222,7 @@ Template.leafletMap.rendered = function() {
           m.lmark.on('click', function(e) {
             // console.log("selected place", this.placeId)
             client.placeSet(this.placeId);
-            // this.openPopup();
+            panel.push("place");
           });
           m.keep = true;
           markers.setItem(id, m);
