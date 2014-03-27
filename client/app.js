@@ -306,6 +306,10 @@ Template.resultsList.rendered = function () {
   }
 };
 
+Template.resultsList.placeName = function () {
+  return collections.Places.findOne(this.placeId).title;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // instructions panel
 
