@@ -3,9 +3,6 @@ app = {};
 ;(function () {
   "use strict";
 
-Meteor.subscribe("directory");
-Meteor.subscribe("userDetails");
-
 ///////////////////////////////////////////////////////////////////////////////
 // menu panel
 
@@ -22,12 +19,28 @@ Template.panelMain.events({
 
 Template.main.rendered = function () {
   $(".resourcesSearch").focus();
+};
+
+Template.main.created = function () {
+  var sessionVars = [
+    "searchTags",
+    "placesSearchResults",
+    "locationAvailable",
+    "panel",
+  ];
+  client.sessionUnsetList(sessionVars);
+  panels.clear();
   this.handleTagsUpdate = Deps.autorun(function () {
     // TBD: auto calculate from zoom level
     var places = [];
     var resources = [];
     var tags = Session.get("searchTags");
     var center = Session.get("mapCenter");
+    if (!subscriprionsReady(["places", "resources", "tags"])) {
+      // console.log("handleTagsUpdate: subscriptions not ready");
+      return;
+    }
+    // console.log("handleTagsUpdate ready");
     if (tags && tags.length) {
       // console.log("tags", tags);
       var tids = _.map(tags, function (t) {
@@ -47,6 +60,10 @@ Template.main.rendered = function () {
           // console.log("looking in place", place);
           _.map(place.resources, function (rid){
             var resource = collections.Resources.findOne(rid);
+            if (!resource) {
+              console.error("cannot find resource", rid, "under place", place._id);
+              return;
+            }
             var tagsAreMissing = _.find(tids, function(tid){
               var found = _.find(resource.tags, function(t){
                 return t === tid;
@@ -91,6 +108,27 @@ Template.main.rendered = function () {
     Session.set("placesSearchResults", places);
     Session.set("resourcesSearchResults", resources);
   });
+
+  this.handleSubscriptions = Deps.autorun(function () {
+    var b = Session.get("mapBounds");
+    if (b) {
+      // console.log("subscribing with bounds", b)
+      // console.log("all places", collections.Places.find().fetch());
+      // must subscribe places separately bc of parameter
+      subscriptionHandler["places"] = Meteor.subscribe("places", b);
+      subscriptionsAdd(["tags", "resources"]);
+    }
+  });
+};
+
+Template.main.destroyed = function () {
+  this.handleTagsUpdate.stop();
+  this.handleSubscriptions.stop();
+  var subscriptionHandlerList = ["places", "tags", "resources"];
+  _.each(subscriptionHandlerList, function (name){
+    subscriptionHandler[name].stop();
+    subscriptionHandler[name] = undefined;
+  })
 };
 
 Template.main.mapHasCenter = function () {
@@ -98,7 +136,7 @@ Template.main.mapHasCenter = function () {
 };
 
 Template.main.isPanelActive = function (panel) {
-  // console.log("isPanelActive", panel);
+  // console.log("isPanelActive", panel, Session.get("panel"));
   if (panel === Session.get("panel")) {
     return true;
   }
@@ -184,7 +222,8 @@ Template.resultsList.resourcesFound = function () {
 };
 
 Template.resultsList.showingAllPlaces = function () {
-  return !Session.get("searchTags").length;
+  var st = Session.get("searchTags");
+  return !st || !st.length;
 };
 
 Template.resultsList.results = function () {
@@ -482,6 +521,23 @@ Template.panelZoomedOut.locateAvailable = function () {
   return Session.get("locationAvailable");
 };
 
+var subscriptionHandler = [];
+
+var subscriprionsReady = function (list) {
+  var notReady = _.find(list, function (name){
+    var s = subscriptionHandler[name];
+    return !s || !s.ready();
+  });
+  return !notReady;
+}
+
+var subscriptionsAdd = function (list) {
+  _.each(list, function (name){
+    subscriptionHandler[name] = Meteor.subscribe(name);
+  });
+}
+
+subscriptionsAdd(["directory", "userDetails"]);
 // setup exports
 app.setCenterPlace = setCenterPlace;
 app.getCurRow = getCurRow;

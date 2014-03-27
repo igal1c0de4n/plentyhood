@@ -34,7 +34,6 @@ Template.leafletMap.destroyed = function() {
   map.handle = undefined;
   this.handlePlacesChanged.stop();
   this.handleZoomChanged.stop();
-  this.handleSubscriptions.stop();
   this.handleCenterChange.stop();
 };
 
@@ -89,6 +88,7 @@ Template.leafletMap.rendered = function() {
   // console.log("creating map handle and attempting auto locate");
   Session.set('mapCenter', undefined);
   Session.set('mapBounds', undefined);
+  panels.push("locate");
   map.handle = L.map('leaflet-map', initOptions).
     locate({maximumAge : 1000 * 60, setView: false}).
     whenReady(function () { 
@@ -153,12 +153,14 @@ Template.leafletMap.rendered = function() {
     Session.set('mapCenter', newLocation);
     Session.set('locationAvailable', true);
     // console.log('locationfound:', newLocation.coordinates);
+    panels.pop();
     panels.push("main");
   });
   map.handle.on('locationerror', function(e) {
     // console.log('locationerror', e.message, e.code);
     Session.set('mapCenter', map.ancientLevantGJ);
     Session.set("mapZoom", map.minZoom);
+    panels.pop();
     panels.push("main");
   });
   // closure vars
@@ -222,7 +224,7 @@ Template.leafletMap.rendered = function() {
           m.lmark.on('click', function(e) {
             // console.log("selected place", this.placeId)
             client.placeSet(this.placeId);
-            panel.push("place");
+            panels.push("place");
           });
           m.keep = true;
           markers.setItem(id, m);
@@ -257,17 +259,6 @@ Template.leafletMap.rendered = function() {
     }
     else {
       removeMarkers();
-    }
-  });
-
-  this.handleSubscriptions  = Deps.autorun(function () {
-    var b = Session.get("mapBounds");
-    if (b) {
-      // console.log("subscribing with bounds", b)
-      // console.log("all places", collections.Places.find().fetch());
-      Meteor.subscribe("places", b);
-      Meteor.subscribe("tags");
-      Meteor.subscribe("resources");
     }
   });
 

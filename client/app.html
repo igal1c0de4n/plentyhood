@@ -4,7 +4,9 @@
 {{> leafletMap}}
 {{/if}}
 {{#unless isDialogActive}}
-  {{#if mapHasCenter}}
+  {{#if isPanelActive "locate"}}
+  {{> panelLocate}}
+  {{else}}
     {{#if mapZoomedEnough}}
       {{#if isPanelActive "main"}}
       {{> panelMain}}
@@ -21,8 +23,6 @@
     {{else}}
       {{> panelZoomedOut}}
     {{/if}}
-  {{else}}
-    {{> panelWaitLocation}}
   {{/if}}
 {{/unless}}
 </template>
@@ -123,7 +123,7 @@
 </div>
 </template>
 
-<template name="panelWaitLocation">
+<template name="panelLocate">
 <div class="floatingPanel loadAnimation">
   <h4><em>Finding your location, stand by</em></h4>
   {{> loadAnimate}}

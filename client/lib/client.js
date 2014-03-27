@@ -67,6 +67,13 @@ client = {
     var selectedPlace = Session.get("selectedPlace");
     return selectedPlace ? selectedPlace._id : undefined;
   },
+
+  sessionUnsetList: function(list) {
+    _.each(list, function (name) {
+      // console.log("Session unset", name);
+      Session.set(name, undefined);
+    });
+  },
 };
 
 ;(function () {
@@ -75,15 +82,10 @@ client = {
   // console.log("client starting");
   // this is to prevent static resources from being fetched
   // before the static resources providing method is established
-  var unsetList = [
+  var sessionVars = [
     "staticContentReady",
-    "searchTags",
-    "placesSearchResults",
-    "locationAvailable",
   ];
-  _.each(unsetList, function (name) {
-    Session.set(name, undefined);
-  });
+  client.sessionUnsetList(sessionVars);
   // If no place selected, select one.
   Meteor.startup(function () {
     Meteor.call("mtcIsDevEnv", function (error, result) {

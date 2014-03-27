@@ -43,8 +43,6 @@ panels = {};
       type: "keyup", 
       handler: function(e) {
         var r = app.getCurRow();
-        if (!r)
-          return;
         function moveTo(jobj) {
           // console.log("moveTo", r, jobj.length);
           if (jobj.length) {
@@ -53,28 +51,29 @@ panels = {};
           }
         };
         // console.log("resultsListRow.keyup", e.keyCode)
-        switch(e.keyCode) {
-          case client.keyCode.ARROW_UP: {
-            // console.log("arrow_up");
-            moveTo(r.prev());
-            break;
+        if (r.length) {
+          switch(e.keyCode) {
+            case client.keyCode.ARROW_UP: {
+              // console.log("arrow_up");
+              moveTo(r.prev());
+              break;
+            }
+            case client.keyCode.ARROW_DOWN: {
+              // console.log("arrow_down");
+              moveTo(r.next());
+              break;
+            }
+            case client.keyCode.ENTER: {
+              var placeId = r[0].dataset.placeid;
+              // console.log("enter", placeId, e);
+              app.setCenterPlace(placeId);
+              break;
+            }
           }
-          case client.keyCode.ARROW_DOWN: {
-            // console.log("arrow_down");
-            moveTo(r.next());
-            break;
-          }
-          case client.keyCode.ESCAPE: {
-            // console.log("resultsList escape");
-            panels.pop();
-            break;
-          }
-          case client.keyCode.ENTER: {
-            var placeId = r[0].dataset.placeid;
-            // console.log("enter", placeId, e);
-            app.setCenterPlace(placeId);
-            break;
-          }
+        }
+        if (e.keyCode == client.keyCode.ESCAPE) {
+          // console.log("resultsList escape");
+          panels.pop();
         }
       }
     }],
@@ -83,10 +82,13 @@ panels = {};
     name: "place",
     events: [defaultKeyupHandler],
   },
+  {
+    name: "locate",
+  },
   ];
 
   (function setupPanels() {
-    // setup panels
+    // console.log("setup panels");
     var stack = [];
     var currentPanel = function () {
       return stack.length ? stack[stack.length - 1] : undefined;
@@ -113,10 +115,14 @@ panels = {};
     };
     panels.pop = function () {
       panelEventsActive(false);
+      // console.log("pop panel", currentPanel().name);
       var prv = stack.pop();
       panelEventsActive(true);
-      // console.log("pop panel", prv.name, "current", currentPanel().name);
-      Session.set("panel", currentPanel().name);
+      var cp = currentPanel();
+      Session.set("panel", cp ? cp.name : undefined);
     };
+    panels.clear = function () {
+      stack = [];
+    }
   })();
 }());
