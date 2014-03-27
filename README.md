@@ -1,22 +1,16 @@
 Plentyhood
 ==========
-Plentyhood is a web application which facilitates sharing and cooperation within a local community. It's about sharing resources such as tools, produce, gardens, services and more.
+Plentyhood is a web application which facilitates sharing, trade and general cooperation within a local community. 
+Resources and services can be shared or traded: tools, produce, gardens, related services and anything which comes to mind, really.
 
-The app wroks with the user's location to enable access to resources which are closer and thus more relevant. Search for resources is tag-based
+The app wroks with the user's location to enable access to resources which are closer and thus more relevant. The posting and search is tag-based.
 
 Feature roadmap
 ---------------
-- Fix broken search
-  - Resource to have geo-location
-  - Fix search to look in Resources, not in Places
-- Add 'search results' list
-  - Marked element in search results centers map on location and opens marker popup 
-- Explore putting both place panel and search panel on same div as navbar, 
-  set z-index of container to -1 so map overlays it
 - Deploy static content on nginx instead of s3
 - UI
-  - Mobile ui
-      - Allow adding a new place by press and hold on touch screens 
+  - Use flexbox
+    - Allow adding a new place by press and hold on touch screens 
         (no ctrl+click)
 
 - Add features:
@@ -32,8 +26,7 @@ Feature roadmap
   - Groups
     - Add 'friends group' to user
 - Services
-	- Add services offered by user, store under place as array of {user, service}
-		- Service details: hire, volunteer
+	- Add services offered by user, store under place (hire, volunteer)
 - Admin
   - Forms for removing tags, places and users
 
