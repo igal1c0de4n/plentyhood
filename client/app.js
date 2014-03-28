@@ -184,7 +184,6 @@ Template.panelSearch.events({
   'keyup .goSearch': function (e){
     if (e.keyCode == client.keyCode.ENTER) {
       // console.log("goSearch enter keyup");
-      event.stopPropagation();
       panelSearchAction.enterKeyPressed = false;
       panelSearchAction();
     }
