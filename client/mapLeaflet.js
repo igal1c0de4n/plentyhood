@@ -26,33 +26,106 @@ var map = {
 Template.leafletMap.created = function() {
   // console.log("template leafletMap created");
   map.renderCount = 0;
-};
-
-Template.leafletMap.destroyed = function() {
-  // console.log("leafletmap -> destroyed");
-  map.handle.remove();
-  map.handle = undefined;
-  this.handlePlacesChanged.stop();
-  this.handleZoomChanged.stop();
-  this.handleCenterChange.stop();
-};
-
-Template.leafletMap.rendered = function() {
-  var self = this;
-  var last = {};
-  last.center = {};
-  if (map.renderCount++ > 0) {
-    // workaround for meteor-leaflet issue
-    // console.log("leaflet rendered skip", map.renderCount);
-    return;
-  }
-  //   console.log("render iteration " + map.renderCount);
-  var latlng2GeoJson = function (latlng) {
-    return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
-  };
-  var areMapPlacesVisible = function (zoom) { 
-    return zoom >= map.minZoomForMarkers;
-  }
+  map.canRender = true;
+  map.markers = new HashTable();
+  map.markerStyle = undefined;
+  this.handleStaticContent = Deps.autorun(function () {
+    if (client.isStaticContentReady()) {
+      var path = client.getResourceUrl("img/leaflet/");
+      var markerIcon = L.icon({
+        iconUrl: path + "marker-icon.png",
+        shadowUrl: path + "marker-shadow.png",
+        iconAnchor: [12, 41], // half width, full length of marker-icon.png
+      });
+      map.markerStyle = {icon: markerIcon, riseOnHover: true,};
+    }
+  });
+  this.handlePlacesChanged = Deps.autorun(function () {
+    var removeMarkers = function () {
+      map.markers.each(function (k, m) {
+        map.markerLayer.removeLayer(m.lmark);
+      });
+      map.markers.clear();
+    };
+    var updateMarkers = function () {
+      // map recenter and tags trigger a new search
+      var places = Session.get("placesSearchResults");
+      // console.log("updateMarkers", places);
+      // before redawing markers, delete the current ones
+      // TBD optimization: update only the markers which change
+      //
+      // TDB: move selectedPlace to a new Deps.autorun as there's no
+      // need to refilter and search for places when selected place 
+      // changes. Just redraw two markers
+      var selected = client.selectedPlaceId();
+      map.markers.each(function (k, m) {
+        // default is not keep markers. Kept makers will be specifically marked
+        m.keep = false;
+      });
+      _.each(places, function (p) {
+        // check if place is alerady on map
+        var id = p._id;
+        var m = map.markers.getItem(id);
+        if (m) {
+          // place p is already marked on map, preserve existing marker
+          m.keep = true;
+        }
+        else {
+          // no marker for place yet
+          var m = {};
+          var latlng = L.GeoJSON.coordsToLatLng(p.location.coordinates);
+          m.lmark = L.marker(latlng, map.markerStyle).addTo(map.markerLayer);
+          m.lmark.placeId = id;
+          // console.log("setting popup", p.title);
+          m.lmark.bindPopup(
+            L.popup().setContent(p.title),
+            {offset: L.point(1,-19)});
+            m.lmark.on('click', function(e) {
+              // console.log("selected place", this.placeId)
+              client.placeSet(this.placeId);
+              panels.push("place");
+            });
+            m.keep = true;
+            map.markers.setItem(id, m);
+        }
+        var opacity = selected == id ?
+          map.selectedPlaceOpacity : map.unselectedPlaceOpacity;
+        if (selected == id) {
+          m.lmark.openPopup();
+        } else {
+          m.lmark.closePopup();
+        }
+        m.lmark.setOpacity(opacity);
+      });
+      // cleanup - remove markers for all places which 
+      // disappeared from the map
+      var removedMarkers = [];
+      map.markers.each(function (k, m) {
+        if (!m.keep) {
+          // add to list makers
+          // TBD: check if can removeItem here
+          removedMarkers.push(m);
+        }
+      });
+      _.each(removedMarkers, function (m) {
+        map.markerLayer.removeLayer(m.lmark);
+        map.markers.removeItem(m.lmark.placeId);
+      });
+    };
+    var zoomedEnough = Session.get("mapZoomedEnough");
+    // if (subscriptions.multiReady(["places", "resources", "tags"])) {
+    if (zoomedEnough) {
+      updateMarkers();
+    }
+    else {
+      removeMarkers();
+    }
+    // }
+  });
+  this.handleZoomChanged = Deps.autorun(function () {
+    Session.set("mapZoomedEnough",
+                Session.get("mapZoom") >= map.minZoomForMarkers);
+  });
   var updateMapBounds = function () {
     var b = map.handle.getBounds();
     // increase size of bounds by phi for more fluent user experience
@@ -78,6 +151,64 @@ Template.leafletMap.rendered = function() {
     //     console.log("bounds", bounds, b);
     Session.set("mapBounds", bounds);
   }
+  this.handleCenterChange = Deps.autorun(function () {
+    var wrapLongitude = function (d) {
+      // this is kind of a hack to keep the map and all markers between [-180,180]
+      if (d > 180) {
+        d -= 360;
+      }
+      if (d < -180) {
+        d += 360;
+      }
+      return d;
+    };
+    var mc = Session.get('mapCenter');
+    if (map.handle && mc) {
+      mc.coordinates[0] = wrapLongitude(mc.coordinates[0]);
+      // console.log("setting view center", mc.coordinates);
+      map.handle.setView(
+        L.GeoJSON.coordsToLatLng(
+          mc.coordinates), 
+          Session.get('mapZoom'),
+          {animate: true}
+      );
+      updateMapBounds();
+    } else {
+      // console.log("skipping setView");
+    }
+  });
+};
+
+Template.leafletMap.destroyed = function() {
+  map.canRender = false;
+  // console.log("template leafletMap destroyed");
+  if (map.handle) {
+    map.handle.remove();
+    map.handle = undefined;
+  }
+  this.handlePlacesChanged.stop();
+  this.handleZoomChanged.stop();
+  this.handleCenterChange.stop();
+  this.handleStaticContent .stop();
+};
+
+Template.leafletMap.rendered = function() {
+  if (map.renderCount++ > 0) {
+    // workaround for meteor-leaflet issue
+    // console.warn("leaflet rendered skip", map.renderCount);
+    return;
+  }
+  if (!map.canRender) {
+    // console.error("leaflet rendered called while template is destroyed! skipping");
+    return;
+  }
+  var last = {
+    center: {},
+  };
+  //   console.log("render iteration " + map.renderCount);
+  var latlng2GeoJson = function (latlng) {
+    return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
+  };
   var initOptions =  {
     maxZoom: map.maxZoom,
     minZoom: map.minZoom,
@@ -163,146 +294,17 @@ Template.leafletMap.rendered = function() {
     panels.pop();
     panels.push("main");
   });
-  // closure vars
-  var markers = [];
   // control all markers via a single layer
-  var markerLayer = L.layerGroup().addTo(map.handle);
-  var path = client.getResourceUrl("img/leaflet/");
-  var markerIcon = L.icon({
-    iconUrl: path + "marker-icon.png",
-    shadowUrl: path + "marker-shadow.png",
-    iconAnchor: [12, 41], // half width, full length of marker-icon.png
-  });
-  var markerStyle = {icon: markerIcon, riseOnHover: true,};
-
-  var markers = new HashTable();
-
-  this.handlePlacesChanged = Deps.autorun(function () {
-
-    var removeMarkers = function () {
-        markers.each(function (k, m) {
-          markerLayer.removeLayer(m.lmark);
-        });
-        markers.clear();
-    };
-
-    var updateMarkers = function () {
-      // map recenter and tags trigger a new search
-      var places = Session.get("placesSearchResults");
-      //     console.log("handlePlacesChanged", places);
-      // before redawing markers, delete the current ones
-      // TBD optimization: update only the markers which change
-      //
-      // TDB: move selectedPlace to a new Deps.autorun as there's no
-      // need to refilter and search for places when selected place 
-      // changes. Just redraw two markers
-      var selected = client.selectedPlaceId();
-
-      markers.each(function (k, m) {
-        // default is not keep markers. Kept makers will be specifically marked
-        m.keep = false;
-      });
-
-      _.each(places, function (p) {
-        // check if place is alerady on map
-        var id = p._id;
-        var m = markers.getItem(id);
-        if (m) {
-          // place p is already marked on map, preserve existing marker
-          m.keep = true;
-        }
-        else {
-          // no marker for place yet
-          var m = {};
-          var latlng = L.GeoJSON.coordsToLatLng(p.location.coordinates);
-          m.lmark = L.marker(latlng, markerStyle).addTo(markerLayer);
-          m.lmark.placeId = id;
-          // console.log("setting popup", p.title);
-          m.lmark.bindPopup(
-            L.popup().setContent(p.title),
-            {offset: L.point(1,-19)});
-          m.lmark.on('click', function(e) {
-            // console.log("selected place", this.placeId)
-            client.placeSet(this.placeId);
-            panels.push("place");
-          });
-          m.keep = true;
-          markers.setItem(id, m);
-        }
-        var opacity = selected == id ?
-          map.selectedPlaceOpacity : map.unselectedPlaceOpacity;
-        if (selected == id) {
-          m.lmark.openPopup();
-        } else {
-          m.lmark.closePopup();
-        }
-        m.lmark.setOpacity(opacity);
-      });
-
-      // cleanup - remove markers for all places which 
-      // disappeared from the map
-      var removedMarkers = [];
-      markers.each(function (k, m) {
-        if (!m.keep) {
-          // add to list makers
-          // TBD: check if can removeItem here
-          removedMarkers.push(m);
-        }
-      });
-      _.each(removedMarkers, function (m) {
-          markerLayer.removeLayer(m.lmark);
-          markers.removeItem(m.lmark.placeId);
-      });
-    };
-    if (Session.get("mapZoomedEnough")) {
-      updateMarkers();
-    }
-    else {
-      removeMarkers();
-    }
-  });
-
-  this.handleZoomChanged = Deps.autorun(function () {
-    Session.set("mapZoomedEnough",
-      areMapPlacesVisible(Session.get("mapZoom")));
-  });
-
-  this.handleCenterChange = Deps.autorun(function () {
-    var wrapLongitude = function (d) {
-      // this is kind of a hack to keep the map and all markers between [-180,180]
-      if (d > 180) {
-        d -= 360;
-      }
-      if (d < -180) {
-        d += 360;
-      }
-      return d;
-    };
-    var mc = Session.get('mapCenter');
-    if (map.handle && mc) {
-      mc.coordinates[0] = wrapLongitude(mc.coordinates[0]);
-      // console.log("setting view center", mc.coordinates);
-      map.handle.setView(
-        L.GeoJSON.coordsToLatLng(
-          mc.coordinates), 
-          Session.get('mapZoom'),
-          {animate: true}
-      );
-      updateMapBounds();
-    } else {
-      // console.log("skipping setView");
-    }
-  });
-
+  map.markerLayer = L.layerGroup().addTo(map.handle);
   mapProvider.placeDragSet = function (action) {
     var updatePlaceCoords = function (id, c) {
       collections.Places.update(
         {_id: id},
         { $set: { 'location.coordinates': c}});
     };
-    //     console.log("markers", markers);
+    //     console.log("markers", map.markers);
     var placeId = client.selectedPlaceId();
-    var lm = markers.getItem(placeId).lmark;
+    var lm = map.markers.getItem(placeId).lmark;
     if (action == "edit") {
       //       console.log("enable marker drag", lm);
       // store original coords in case user cancels

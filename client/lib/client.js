@@ -8,15 +8,16 @@ client = {
   },
 
   isStaticContentReady: function () {
-    return !_.isUndefined(Session.get("staticContentReady"));
+    return !_.isUndefined(Session.get("staticContentPath"));
   },
 
   getResourceUrl: function (path) {
-    if (_.isUndefined(client.staticContentPath)) {
+    if (!this.isStaticContentReady()) {
       throw new Error("access to static url while provider not set");
     }
-    // console.log("getResourceUrl", client.staticContentPath, path);
-    return client.staticContentPath + path;
+    var scp = Session.get("staticContentPath");
+    // console.log("getResourceUrl", scp, path);
+    return  scp + path;
   },
 
   displayName: function (user) {
@@ -76,22 +77,57 @@ client = {
   },
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// subscriptions
+
+subscriptions = {
+  subs: [],
+  multiAdd: function (list) {
+    _.each(list, function (name){
+      if (_.isString(name)) {
+        this.subs[name] = Meteor.subscribe(name);
+      } else {
+        // console.log("subscribing with arguments", name)
+        // assuming first arg is the name string
+        this.subs[name[0]] = Meteor.subscribe.apply(Meteor.subscribe, name);
+      }
+    }.bind(this));
+  },
+  multiRemove: function (list) {
+    _.each(list, function (name){
+      this.subs[name].stop();
+      this.subs[name] = undefined;
+    }.bind(this))
+  },
+  multiReady: function (list) {
+    var notReady = _.find(list, function (name){
+      var s = this.subs[name];
+      return !s || !s.ready();
+    }.bind(this));
+    return !notReady;
+  },
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// init
+
 ;(function () {
   "use strict";
 
   // console.log("client starting");
   // this is to prevent static resources from being fetched
   // before the static resources providing method is established
+  // must be run before Meteor.startup
   var sessionVars = [
-    "staticContentReady",
+    "staticContentPath",
   ];
   client.sessionUnsetList(sessionVars);
-  // If no place selected, select one.
   Meteor.startup(function () {
     Meteor.call("mtcIsDevEnv", function (error, result) {
       console.log("app in dev mode: ", result);
-      client.staticContentPath = result ? "" : "https://s3.amazonaws.com/plentyhood/";
-      Session.set("staticContentReady", result);
+      Session.set("staticContentPath", 
+                  result ? "" : "https://s3.amazonaws.com/plentyhood/");
     });
+    subscriptions.multiAdd(["directory", "userDetails"]);
   });
 }());

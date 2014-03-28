@@ -36,7 +36,7 @@ Template.main.created = function () {
     var resources = [];
     var tags = Session.get("searchTags");
     var center = Session.get("mapCenter");
-    if (!subscriprionsReady(["places", "resources", "tags"])) {
+    if (!center || !subscriptions.multiReady(["places", "resources", "tags"])) {
       // console.log("handleTagsUpdate: subscriptions not ready");
       return;
     }
@@ -115,8 +115,7 @@ Template.main.created = function () {
       // console.log("subscribing with bounds", b)
       // console.log("all places", collections.Places.find().fetch());
       // must subscribe places separately bc of parameter
-      subscriptionHandler["places"] = Meteor.subscribe("places", b);
-      subscriptionsAdd(["tags", "resources"]);
+      subscriptions.multiAdd(["tags", "resources", ["places", b]]);
     }
   });
 };
@@ -124,11 +123,7 @@ Template.main.created = function () {
 Template.main.destroyed = function () {
   this.handleTagsUpdate.stop();
   this.handleSubscriptions.stop();
-  var subscriptionHandlerList = ["places", "tags", "resources"];
-  _.each(subscriptionHandlerList, function (name){
-    subscriptionHandler[name].stop();
-    subscriptionHandler[name] = undefined;
-  })
+  subscriptions.multiRemove(["places", "tags", "resources"]);
 };
 
 Template.main.mapHasCenter = function () {
@@ -525,23 +520,9 @@ Template.panelZoomedOut.locateAvailable = function () {
   return Session.get("locationAvailable");
 };
 
-var subscriptionHandler = [];
+///////////////////////////////////////////////////////////////////////////////
+// init
 
-var subscriprionsReady = function (list) {
-  var notReady = _.find(list, function (name){
-    var s = subscriptionHandler[name];
-    return !s || !s.ready();
-  });
-  return !notReady;
-}
-
-var subscriptionsAdd = function (list) {
-  _.each(list, function (name){
-    subscriptionHandler[name] = Meteor.subscribe(name);
-  });
-}
-
-subscriptionsAdd(["directory", "userDetails"]);
 // setup exports
 app.setCenterPlace = setCenterPlace;
 app.getCurRow = getCurRow;
