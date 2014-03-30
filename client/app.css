@@ -1,53 +1,84 @@
-html, body, .fill {
+html, body {
   height: 100%;
   width: 100%;
-}
-
-.mainPanel {
-  pointer-events: none;
-}
-
-.floatingPanel {
-  position: fixed;
-  z-index: 1;
-  top: 60px;
-  left: 8px;
-  display: inline-block;
-  padding: 10px;
-  background-color: white;
-  /* opacity: 0.9; */
-  /* TBD: add css transitions 
-   * It only work if the element future size is known in advance, not in auto
-   * (there's a workaround)
-   */
-  /* 	transition:width 2s, height 2s, background-color 2s, transform 2s; */
-}
-
-.castShadow {
-  -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-}
-
-.menuButton {
-  pointer-events: auto;
-  display: block;
-  margin-bottom: 10px;
-  width: 100%;
-}
-
-.panelPlace {
-  padding: 15px;
-}
-
-#leaflet-map {
-  height: 100%;
-  width: 100%;
-  z-index: 0;
 }
 
 body {
   padding: 0;
   margin: 0;
+}
+
+/* page layout, frame */
+
+@media all and (max-width: 959px) {
+  .nbox {
+    flex-flow: column nowrap;
+  }
+  .nbox div.mainPanel {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    max-height: 45%;
+  }
+}
+@media all and (min-width: 960px) {
+  .nbox {
+    flex-flow: row nowrap;
+  }
+  .nbox div.mainPanel {
+    max-width: 50%;
+  }
+}
+
+.box {
+  width: 100%;
+  height: 100%;
+  flex-flow: column nowrap;
+}
+.box, .nbox {
+  display: flex;
+  justify-content: center;
+  align-content: stretch;
+  align-items: stretch;
+}
+.box nav.navbar {
+  order: 1;
+  flex: 0 1 auto;
+  align-self: auto;
+  min-width: 0;
+}
+.box div.nbox {
+  order: 2;
+  flex: 1 1 auto;
+  align-self: auto;
+  min-width: 0;
+}
+.nbox div.mainPanel {
+  order: 1;
+  flex: 0 1 auto;
+  align-self: auto;
+  min-width: 0;
+  z-index: 1;
+  padding: 10px;
+}
+.nbox #leaflet-map {
+  order: 2;
+  flex: 1 1 auto;
+  align-self: auto;
+  min-width: 0;
+}
+ 
+/* misc */
+
+.menuButton {
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.disable-select {
+  -webkit-user-select: none;  
+  -moz-user-select: none;    
+  -ms-user-select: none;      
+  user-select: none;
 }
 
 .indent {
@@ -107,10 +138,6 @@ input.chosen {
 
 .placeResourceRemove {
   margin-right: 5px;
-}
-
-.panelSearch  > .bootstrap-tagsinput {
-  width: 200px;
 }
 
 .marginTop {

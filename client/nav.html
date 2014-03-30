@@ -7,7 +7,6 @@
 <body>
   {{> dialogs}}
   {{renderPage}}
-  <div id="log"></div>
 </body>
 
 <template name="notfound">
@@ -47,8 +46,7 @@
 </template>
 
 <template name="header">
-<nav class="navbar navbar-inverse {{page2class "main" "navbar-fixed-top"}}" 
-  role="navigation" >
+<nav class="navbar navbar-inverse" role="navigation" >
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" 

@@ -1,12 +1,5 @@
-.navbar-inner {
-  max-height: 40px;
-}
-
-.navbar-w-map {
-  position: absolute;
-  width:100%;
+.navbar {
   margin-bottom: 0px;
-  z-index: 2;
 }
 
 #login-buttons a {

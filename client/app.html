@@ -1,34 +1,39 @@
 <template name="main">
-{{> header}}
-{{#if canLoadMap}}
-{{> leafletMap}}
-{{/if}}
-{{#unless isDialogActive}}
-  {{#if isPanelActive "locate"}}
-  {{> panelLocate}}
-  {{else}}
-    {{#if mapZoomedEnough}}
-      {{#if isPanelActive "main"}}
-      {{> panelMain}}
+<div class="box">
+  {{> header}}
+  <div class="nbox">
+    <div class="mainPanel disable-select">
+    {{#unless isDialogActive}}
+      {{#if isPanelActive "locate"}}
+      {{> panelLocate}}
+      {{else}}
+        {{#if mapZoomedEnough}}
+          {{#if isPanelActive "main"}}
+          {{> panelBegin}}
+          {{/if}}
+          {{#if isPanelActive "search"}}
+          {{> panelSearch}}
+          {{/if }}
+          {{#if isPanelActive "resultsList"}}
+          {{> resultsList}}
+          {{/if}}
+          {{#if isPanelActive "place"}}
+          {{> panelPlace}}
+          {{/if}}
+        {{else}}
+          {{> panelZoomedOut}}
+        {{/if}}
       {{/if}}
-      {{#if isPanelActive "search"}}
-      {{> panelSearch}}
-      {{/if }}
-      {{#if isPanelActive "resultsList"}}
-      {{> resultsList}}
-      {{/if}}
-      {{#if isPanelActive "place"}}
-      {{> panelPlace}}
-      {{/if}}
-    {{else}}
-      {{> panelZoomedOut}}
+    {{/unless}}
+    </div>
+    {{#if canLoadMap}}
+      {{> leafletMap}}
     {{/if}}
-  {{/if}}
-{{/unless}}
+  </div>
+</div>
 </template>
 
-<template name="panelMain">
-<div class="floatingPanel castShadow mainPanel">
+<template name="panelBegin">
     <button class="btn btn-success resourcesSearch menuButton">
       <span class="glyphicon glyphicon-white glyphicon-search"></span>
       Resources
@@ -39,7 +44,6 @@
     </button>
   <hr class="tight">
   {{> instructions}}
-</div>
 </template>
 
 <template name="panelBackButton">
@@ -49,7 +53,6 @@
 </template>
 
 <template name="panelSearch">
-<div class="floatingPanel castShadow panelSearch">
   {{> panelBackButton}}
   <input id="tagsSearchInputField" type="text" 
   placeholder="Enter tags" data-role="tagsinput"/>
@@ -57,11 +60,10 @@
     <span class="glyphicon glyphicon-white glyphicon-search"></span>
     Search
   </button> 
-</div>
 </template>
 
 <template name="resultsList">
-<div class="floatingPanel castShadow resultsListContainer">
+<div class="resultsListContainer">
   {{#if resourcesFound}}
   <h4>
     {{> panelBackButton}}

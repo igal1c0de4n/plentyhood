@@ -6,7 +6,7 @@ app = {};
 ///////////////////////////////////////////////////////////////////////////////
 // menu panel
 
-Template.panelMain.events({
+Template.panelBegin.events({
   'click .resourcesSearch': function (){
     Session.set("searchType", "resources");
     panels.push("search");
