@@ -38,7 +38,7 @@
     placeholder="Add interesting details">{{description}}</textarea>
   <h4 class="checkbox">
     <span class="glyphicon glyphicon-lock"></span>
-    <input type="checkbox" class="private" {{#if isPrivate}}checked{{/if}}>
+    <input type="checkbox" class="private" checked={{isPrivate}}>
     Private place &mdash; friends only
   </h4>
 </div>
@@ -97,7 +97,7 @@
     placeholder="Add interesting details">{{description}}</textarea>
   <div class="verticalMargin">
     <h4 class="checkbox">
-      <input type="checkbox" class="private" {{#if isPrivate}}checked{{/if}}>
+      <input type="checkbox" class="private" checked={{isPrivate}}>
       Private &mdash; friends only
       <span class="glyphicon glyphicon-lock"></span>
     </h4>
