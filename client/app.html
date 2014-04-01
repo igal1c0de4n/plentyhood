@@ -1,12 +1,13 @@
 <template name="main">
 <div class="box">
   {{> header}}
+  {{#unless isDialogActive}}
   <div class="nbox">
-    <div class="mainPanel disable-select">
-    {{#unless isDialogActive}}
-      {{#if isPanelActive "locate"}}
+    {{#unless isPanelActive undefined}}
+    {{#if isPanelActive "locate"}}
       {{> panelLocate}}
-      {{else}}
+    {{else}}
+      <div class="mainPanel disable-select">
         {{#if mapZoomedEnough}}
           {{#if isPanelActive "main"}}
           {{> panelBegin}}
@@ -23,13 +24,14 @@
         {{else}}
           {{> panelZoomedOut}}
         {{/if}}
-      {{/if}}
+      </div>
+    {{/if}}
     {{/unless}}
-    </div>
     {{#if canLoadMap}}
       {{> leafletMap}}
     {{/if}}
   </div>
+  {{/unless}}
 </div>
 </template>
 
@@ -107,27 +109,25 @@
 </template>
 
 <template name="panelZoomedOut">
-<div class="floatingPanel castShadow">
-  <div>
-    <em> 
-      <span class="glyphicon glyphicon-info-sign"></span>
-      Zoom in to search and see places 
-    </em>
-  </div>
-  {{#unless locateAvailable}}
-  <div>
-    <em> 
-      <span class="glyphicon glyphicon-question-sign"></span>
-      Auto location unavailable (check your browser settings)
-    </em>
-  </div>
-  {{/unless}}
+<div>
+  <em> 
+    <span class="glyphicon glyphicon-info-sign"></span>
+    Zoom in to search and see places 
+  </em>
 </div>
+{{#unless locateAvailable}}
+<div>
+  <em> 
+    <span class="glyphicon glyphicon-question-sign"></span>
+    Auto location unavailable (check your browser settings)
+  </em>
+</div>
+{{/unless}}
 </template>
 
 <template name="panelLocate">
-<div class="floatingPanel loadAnimation">
-  <h4><em>Finding your location, stand by</em></h4>
+<div class="locate">
+  <h4><em>Locating...</em></h4>
   {{> loadAnimate}}
 </div>
 </template>
@@ -154,8 +154,7 @@
 </template>
 
 <template name="panelPlace">
-<div class="floatingPanel castShadow panelPlace">
-  {{#with selectedPlaceGet}}
+{{#with selectedPlaceGet}}
   <div class="bottomBorder">
     {{> panelBackButton}}
     <span class="glyphicon glyphicon-bookmark"></span>
@@ -169,8 +168,7 @@
   <div class="marginTop">
     {{> placeResourcesPanel}}
   </div>
-  {{/with}}
-</div>
+{{/with}}
 </template>
 
   <!-- {{#unless public}} -->

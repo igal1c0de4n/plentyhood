@@ -52,6 +52,7 @@ body {
   align-self: auto;
   min-width: 0;
 }
+.nbox div.locate,
 .nbox div.mainPanel {
   order: 1;
   flex: 0 1 auto;
