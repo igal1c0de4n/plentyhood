@@ -95,6 +95,9 @@ subscriptions = {
   },
   multiRemove: function (list) {
     _.each(list, function (name){
+      if (!this.subs[name]) {
+        throw new Error("uninitialized subscription");
+      }
       this.subs[name].stop();
       this.subs[name] = undefined;
     }.bind(this))
