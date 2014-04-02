@@ -4,28 +4,24 @@
   {{#unless isDialogActive}}
   <div class="nbox">
     {{#unless isPanelActive undefined}}
-    {{#if isPanelActive "locate"}}
-      {{> panelLocate}}
-    {{else}}
       <div class="mainPanel disable-select">
-        {{#if mapZoomedEnough}}
-          {{#if isPanelActive "main"}}
-          {{> panelBegin}}
-          {{/if}}
-          {{#if isPanelActive "search"}}
-          {{> panelSearch}}
-          {{/if }}
-          {{#if isPanelActive "resultsList"}}
-          {{> resultsList}}
-          {{/if}}
-          {{#if isPanelActive "place"}}
-          {{> panelPlace}}
-          {{/if}}
-        {{else}}
-          {{> panelZoomedOut}}
+      {{#if mapZoomedEnough}}
+        {{#if isPanelActive "main"}}
+        {{> panelBegin}}
         {{/if}}
+        {{#if isPanelActive "search"}}
+        {{> panelSearch}}
+        {{/if }}
+        {{#if isPanelActive "resultsList"}}
+        {{> resultsList}}
+        {{/if}}
+        {{#if isPanelActive "place"}}
+        {{> panelPlace}}
+        {{/if}}
+      {{else}}
+        {{> panelZoomedOut}}
+      {{/if}}
       </div>
-    {{/if}}
     {{/unless}}
     {{#if canLoadMap}}
       {{> leafletMap}}
