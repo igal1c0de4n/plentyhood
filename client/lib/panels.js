@@ -10,13 +10,13 @@ panels = {};
       if (lastCenter) {
         // recenter map before other panels are loaded
         // console.log("panning map back to last center");
-        Session.set("mapCenter", lastCenter);
+        mapProvider.centerSet(lastCenter, false);
         Session.set("mapCenterLast", undefined);
       }
       // console.log("panelBack, deselecting place");
       client.placeSet();
     } 
-    // console.log("panelBack, poping last panel");
+    // console.log("panelBack removing top panel");
     panels.pop();
   };
 
@@ -41,7 +41,7 @@ panels = {};
     name: "resultsList",
     events: [{
       type: "keyup", 
-      handler: function(e) {
+      handler: function(e) { // app.resultListKeyupHandler
         var r = app.getCurRow();
         function moveTo(jobj) {
           // console.log("moveTo", r, jobj.length);
@@ -65,7 +65,7 @@ panels = {};
             }
             case client.keyCode.ENTER: {
               var placeId = r[0].dataset.placeid;
-              // console.log("enter", placeId, e);
+              // console.log("enter", placeId);
               app.setCenterPlace(placeId);
               break;
             }

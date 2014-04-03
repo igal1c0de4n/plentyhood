@@ -240,7 +240,7 @@ var setCenterPlace = function (placeId) {
   client.placeSet(placeId);
   var place = collections.Places.findOne(placeId);
   Session.set("mapCenterLast", Session.get("mapCenter"));
-  Session.set("mapCenter", place.location);
+  mapProvider.centerSet(place.location, true);
   panels.push("place");
 };
 
@@ -345,7 +345,7 @@ Template.panelPlace.events({
     var sp = Session.get("selectedPlace");
     location.coordinates = sp.location.coordinates;
     // console.log("clicked title of", sp.title);
-    Session.set('mapCenter', location);
+    mapProvider.centerSet(location, true);
     return false;
   },
   'click .editLocation': function () {

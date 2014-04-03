@@ -21,6 +21,18 @@ var map = {
     // Jerusalem, "cradle of man kind" :)
     coordinates: [35.21873474121094, 31.78669746847703], 
   },
+  isCloseEnough: function (c1, c2) {
+    var isInRange = function (n1, n2, delta) {
+      return (n1 - delta) <= n2 && n2 <= (n1 + delta);
+    }
+    // Determined by experimenting with leaflet map. 
+    // Not very scientific, I know
+    var d = 0.001; 
+    return isInRange(c1[0], c2[0], d) && isInRange(c1[1], c2[1], d);
+  },
+  latlng2GeoJson: function (latlng) {
+    return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
+  },
 };
 
 Template.leafletMap.created = function() {
@@ -151,32 +163,34 @@ Template.leafletMap.created = function() {
     //     console.log("bounds", bounds, b);
     Session.set("mapBounds", bounds);
   }
-  this.handleCenterChange = Deps.autorun(function () {
+  mapProvider.centerSet = function (center, animate) {
+    if (!map.handle) {
+      console.error("map not initialized");
+      return;
+    }
+    var mc = Session.get('mapCenter');
+    if (mc && map.isCloseEnough(mc.coordinates, center.coordinates)) {
+      Session.set('mapNextCenter', undefined);
+      // console.log('centerSet: requested center already set');
+      return;
+    } 
+    // console.log('centerSet', center.coordinates);
+    if (Session.get('mapNextCenter')) {
+      console.error("centerSet: recenter already in progress");
+      return;
+    }
+    Session.set('mapNextCenter', center);
     var wrapLongitude = function (d) {
-      // this is kind of a hack to keep the map and all markers between [-180,180]
-      if (d > 180) {
-        d -= 360;
-      }
-      if (d < -180) {
-        d += 360;
-      }
+      // this is kind of a hack to keep the map and all markers 
+      // between [-180,180] so that GeoLocation db APIs work
+      if (d > 180) { d -= 360; } if (d < -180) { d += 360; }
       return d;
     };
-    var mc = Session.get('mapCenter');
-    if (map.handle && mc) {
-      mc.coordinates[0] = wrapLongitude(mc.coordinates[0]);
-      // console.log("setting view center", mc.coordinates);
-      map.handle.setView(
-        L.GeoJSON.coordsToLatLng(
-          mc.coordinates), 
-          Session.get('mapZoom'),
-          {animate: true}
-      );
-      updateMapBounds();
-    } else {
-      // console.log("skipping setView");
-    }
-  });
+    center.coordinates[0] = wrapLongitude(center.coordinates[0]);
+    var llCoord = L.GeoJSON.coordsToLatLng(center.coordinates);
+    map.handle.setView(llCoord, Session.get('mapZoom'), {animate: animate});
+    updateMapBounds();
+  };
 };
 
 Template.leafletMap.destroyed = function() {
@@ -188,7 +202,6 @@ Template.leafletMap.destroyed = function() {
   }
   this.handlePlacesChanged.stop();
   this.handleZoomChanged.stop();
-  this.handleCenterChange.stop();
   this.handleStaticContent .stop();
 };
 
@@ -206,9 +219,6 @@ Template.leafletMap.rendered = function() {
     center: {},
   };
   //   console.log("render iteration " + map.renderCount);
-  var latlng2GeoJson = function (latlng) {
-    return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
-  };
   var initOptions =  {
     maxZoom: map.maxZoom,
     minZoom: map.minZoom,
@@ -218,6 +228,7 @@ Template.leafletMap.rendered = function() {
   };
   // console.log("creating map handle and attempting auto locate");
   Session.set('mapCenter', undefined);
+  Session.set('mapNextCenter', undefined);
   Session.set('mapBounds', undefined);
   panels.push("locate");
   map.handle = L.map('leaflet-map', initOptions).
@@ -235,10 +246,24 @@ Template.leafletMap.rendered = function() {
   }).addTo(map.handle);
   map.handle.on('moveend', function(e) {
     var zoom = map.handle.getZoom();
-    var mcc = latlng2GeoJson(map.handle.getCenter());
-    // console.log('map moveend', mcc.coordinates, zoom);
+    var center = {
+      last: Session.get("mapCenter"),
+      current: map.latlng2GeoJson(map.handle.getCenter()),
+      next: Session.get('mapNextCenter'),
+    };
+    var coordsGet = function (c) {
+      return c ? c.coordinates : undefined;
+    }
+    // console.log('map moveend', zoom, coordsGet(center.last), 
+    //             coordsGet(center.current), coordsGet(center.next));
     Session.set("mapZoom", zoom);
-    Session.set('mapCenter', mcc);
+    Session.set('mapCenter', center.current);
+    if (center.next && 
+        map.isCloseEnough(center.next.coordinates, 
+                          center.current.coordinates)) {
+      Session.set('mapNextCenter', undefined);
+      // console.log('map next center move is complete');
+    }
   });
   map.handle.on('click', function(e) {
     //     console.log('clicked at', e.latlng);
@@ -248,12 +273,12 @@ Template.leafletMap.rendered = function() {
         alert("must be logged in to create place");
         return;
       }
-      schedCreateDialog(latlng2GeoJson(e.latlng));
+      schedCreateDialog(map.latlng2GeoJson(e.latlng));
     }
   });  
   var userLocationMarker;
   map.handle.on('locationfound', function(e) {
-    var newLocation = latlng2GeoJson(e.latlng);
+    var newLocation = map.latlng2GeoJson(e.latlng);
     if (!_.isEqual(last.userLocation, newLocation)) {
       if (userLocationMarker) {
         // remove previous user location
@@ -281,7 +306,7 @@ Template.leafletMap.rendered = function() {
     }
     // pan the map to user location
     Session.set("mapZoom", map.defaultZoom);
-    Session.set('mapCenter', newLocation);
+    mapProvider.centerSet(newLocation);
     Session.set('locationAvailable', true);
     // console.log('locationfound:', newLocation.coordinates);
     panels.pop();
@@ -289,7 +314,7 @@ Template.leafletMap.rendered = function() {
   });
   map.handle.on('locationerror', function(e) {
     // console.log('locationerror', e.message, e.code);
-    Session.set('mapCenter', map.ancientLevantGJ);
+    mapProvider.centerSet(map.ancientLevantGJ);
     Session.set("mapZoom", map.minZoom);
     panels.pop();
     panels.push("main");
