@@ -10,22 +10,24 @@ body {
 
 /* page layout, frame */
 
-@media all and (max-width: 959px) {
+@media all and (max-width: 960px) {
   .nbox {
     flex-flow: column nowrap;
   }
   .nbox div.mainPanel {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    max-height: 45%;
   }
 }
-@media all and (min-width: 960px) {
+@media all and (min-width: 961px) {
   .nbox {
     flex-flow: row nowrap;
   }
   .nbox div.mainPanel {
-    max-width: 50%;
+    width: 50%;
+  }
+  .nbox #leaflet-map {
+    width: 50%;
   }
 }
 
@@ -37,35 +39,28 @@ body {
 .box, .nbox {
   display: flex;
   justify-content: center;
-  align-content: stretch;
-  align-items: stretch;
 }
 .box nav.navbar {
-  order: 1;
-  flex: 0 1 auto;
+  flex-grow: 0;
   align-self: auto;
   min-width: 0;
 }
 .box div.nbox {
-  order: 2;
-  flex: 1 1 auto;
+  flex-grow: 1;
   align-self: auto;
   min-width: 0;
 }
 .nbox div.locate,
 .nbox div.mainPanel {
-  order: 1;
-  flex: 0 1 auto;
+  flex-grow: 0;
+  /* flex-basis: 200px; */
   align-self: auto;
-  min-width: 0;
   z-index: 1;
   padding: 10px;
 }
 .nbox #leaflet-map {
-  order: 2;
-  flex: 1 1 auto;
+  flex-grow: 1;
   align-self: auto;
-  min-width: 0;
 }
  
 /* misc */
