@@ -1,3 +1,5 @@
+@import 'flex';
+
 html, body {
   height: 100%;
   width: 100%;
@@ -38,7 +40,7 @@ body {
   flex-flow: column nowrap;
 }
 .box, .nbox {
-  display: flex;
+  @include flexbox();
   justify-content: center;
 }
 .box nav.navbar {
