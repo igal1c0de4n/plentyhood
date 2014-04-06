@@ -1,0 +1,196 @@
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+/* page layout, frame */
+@media all and (max-width: 960px) {
+  .nbox {
+    flex-flow: column nowrap;
+  }
+
+  .nbox div.mainPanel {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  }
+}
+@media all and (min-width: 961px) {
+  .nbox {
+    flex-flow: row nowrap;
+  }
+
+  .nbox div.mainPanel {
+    width: 50%;
+  }
+
+  .nbox #leaflet-map {
+    width: 50%;
+  }
+}
+.box {
+  width: 100%;
+  height: 100%;
+  flex-flow: column nowrap;
+}
+
+.box, .nbox {
+  display: flex;
+  justify-content: center;
+}
+
+.box nav.navbar {
+  flex-grow: 0;
+  align-self: auto;
+  min-width: 0;
+}
+
+.box div.nbox {
+  flex-grow: 1;
+  align-self: auto;
+  min-width: 0;
+}
+
+.nbox div.locate,
+.nbox div.mainPanel {
+  flex-grow: 0;
+  /* flex-basis: 200px; */
+  align-self: auto;
+  z-index: 1;
+  padding: 10px;
+}
+
+.nbox #leaflet-map {
+  flex-grow: 1;
+  align-self: auto;
+}
+
+/* misc */
+.menuButton {
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.disable-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.indent {
+  margin-left: 10px;
+}
+
+.glyphicon {
+  margin-right: 6px;
+}
+
+.header {
+  padding: 10px 0;
+  padding-bottom: 0px;
+}
+
+.invite-row .invite {
+  margin: 10px 10px 10px 0;
+}
+
+.sharedPanel {
+  margin-bottom: 0px;
+}
+
+.sharedPanel .usersList {
+  margin-bottom: 5px;
+}
+
+input.chosen {
+  font-weight: bold;
+}
+
+.attribution {
+  position: absolute;
+  bottom: 0;
+  background-color: white;
+  padding: 3px;
+  padding-bottom: 0;
+}
+
+.pull-right {
+  margin-right: 20px;
+}
+
+.verticalMargin {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.tagsLabel {
+  padding-right: 5px;
+}
+
+.bootstrap-tagsinput {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.placeResourceRemove {
+  margin-right: 5px;
+}
+
+.marginTop {
+  margin-top: 5px !important;
+}
+
+.bottomBorder {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+
+h4.inline {
+  display: inline !important;
+}
+
+#resourceSelect {
+  margin: 7px 0;
+}
+
+button.close {
+  margin-left: 10px;
+  padding: 5px;
+}
+
+a.btn-link {
+  padding: 6px 0;
+}
+
+hr.tight {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+table.resultsListTable {
+  display: inline-block;
+  margin-bottom: 0;
+  cursor: pointer;
+  cursor: hand;
+}
+
+.selectedTableRow {
+  background-color: #cfc;
+  /* opacity: .5; */
+}
+
+.resultsListContainer {
+  overflow: auto;
+  height: auto;
+  max-height: 75%;
+}
+
+button.panelBack {
+  margin-right: 4px;
+}

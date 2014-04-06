@@ -1,0 +1,12 @@
+.carousel-caption {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.carousel {
+  margin: 10px auto;
+  max-width: 1200px;
+}
+
+.wait.jumbotron {
+  margin-top: 30px;
+}

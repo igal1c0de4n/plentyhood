@@ -1,0 +1,73 @@
+.navbar {
+  margin-bottom: 0px;
+}
+
+#login-buttons a {
+  padding: 15px 15px 15px;
+  color: #999999;
+  line-height: 0;
+  text-decoration: none;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  float: none;
+  display: block;
+  line-height: 20px;
+}
+
+.signin {
+  width: 100%;
+  text-align: center;
+}
+
+.signin .login-form {
+  width: 200px;
+  margin: 0 auto;
+  position: relative;
+  text-align: left;
+}
+
+.signin .login-close-text {
+  display: none;
+}
+
+.signin .additional-link-container {
+  display: none;
+}
+
+.signin .example-users {
+  width: 350px;
+  margin: 0 auto;
+  position: relative;
+  text-align: left;
+  top: 15em;
+  left: 3em;
+}
+
+#err .close {
+  float: none;
+  margin-left: 1em;
+}
+
+.note {
+  margin: 1em 0em;
+  padding: 1em;
+  border: 1px solid #ccc;
+}
+
+.security-note {
+  margin-top: 10em;
+}
+
+a.userNavMenu {
+  background-color: transparent !important;
+  padding-top: 4px !important;
+  padding-bottom: 0px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-right: 10px;
+}
+
+img.avatar {
+  margin: 8px;
+  max-height: 30px;
+  border-radius: 100px;
+}
