@@ -17,6 +17,7 @@ body {
   .nbox div.mainPanel {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    height: 300px;
   }
 }
 @media all and (min-width: 961px) {
