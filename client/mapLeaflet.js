@@ -12,8 +12,8 @@ var map = {
   renderCount: undefined, // for troubleshooting extra renders
   defaultZoom: 12,
   minZoomForMarkers: 12,
-  maxZoom: 16, // server does not serve higher zoom level
   minZoom: 3,
+  maxZoom: 16, // server does not serve higher zoom level
   selectedPlaceOpacity: 1,
   unselectedPlaceOpacity: 0.5,
   ancientLevantGJ: {
@@ -32,6 +32,12 @@ var map = {
   },
   latlng2GeoJson: function (latlng) {
     return {type: "Point", coordinates: [latlng.lng, latlng.lat]};
+  },
+  zoomSet: function (zoom) {
+    map.handle.setZoom(zoom);
+    var ze = zoom >= map.minZoomForMarkers;
+    // console.log("setting mapZoomedEnough", ze, zoom);
+    Session.set("mapZoomedEnough", ze);
   },
 };
 
@@ -124,19 +130,15 @@ Template.leafletMap.created = function() {
         map.markers.removeItem(m.lmark.placeId);
       });
     };
-    var zoomedEnough = Session.get("mapZoomedEnough");
+    var ze = Session.get("mapZoomedEnough");
     // if (subscriptions.multiReady(["places", "resources", "tags"])) {
-    if (zoomedEnough) {
+    if (ze) {
       updateMarkers();
     }
     else {
       removeMarkers();
     }
     // }
-  });
-  this.handleZoomChanged = Deps.autorun(function () {
-    Session.set("mapZoomedEnough",
-                Session.get("mapZoom") >= map.minZoomForMarkers);
   });
   var updateMapBounds = function () {
     var b = map.handle.getBounds();
@@ -188,7 +190,7 @@ Template.leafletMap.created = function() {
     };
     center.coordinates[0] = wrapLongitude(center.coordinates[0]);
     var llCoord = L.GeoJSON.coordsToLatLng(center.coordinates);
-    map.handle.setView(llCoord, Session.get('mapZoom'), {animate: animate});
+    map.handle.setView(llCoord, undefined, {animate: animate});
     updateMapBounds();
   };
 };
@@ -201,7 +203,6 @@ Template.leafletMap.destroyed = function() {
     map.handle = undefined;
   }
   this.handlePlacesChanged.stop();
-  this.handleZoomChanged.stop();
   this.handleStaticContent .stop();
 };
 
@@ -254,9 +255,11 @@ Template.leafletMap.rendered = function() {
     var coordsGet = function (c) {
       return c ? c.coordinates : undefined;
     }
-    // console.log('map moveend', zoom, coordsGet(center.last), 
-    //             coordsGet(center.current), coordsGet(center.next));
-    Session.set("mapZoom", zoom);
+    // console.log('map moveend', zoom, 
+    //             coordsGet(center.last), 
+    //             coordsGet(center.current), 
+    //             coordsGet(center.next));
+    map.zoomSet(zoom);
     Session.set('mapCenter', center.current);
     if (center.next && 
         map.isCloseEnough(center.next.coordinates, 
@@ -305,7 +308,7 @@ Template.leafletMap.rendered = function() {
       last.userLocation = newLocation;
     }
     // pan the map to user location
-    Session.set("mapZoom", map.defaultZoom);
+    map.zoomSet(map.defaultZoom);
     mapProvider.centerSet(newLocation);
     Session.set('locationAvailable', true);
     // console.log('locationfound:', newLocation.coordinates);
@@ -315,7 +318,7 @@ Template.leafletMap.rendered = function() {
   map.handle.on('locationerror', function(e) {
     // console.log('locationerror', e.message, e.code);
     mapProvider.centerSet(map.ancientLevantGJ);
-    Session.set("mapZoom", map.minZoom);
+    map.zoomSet(map.minZoom);
     panels.pop();
     panels.push("main");
   });

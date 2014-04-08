@@ -8,38 +8,10 @@ body {
   margin: 0;
 }
 
-/* page layout, frame */
-@media all and (max-width: 960px) {
-  .nbox {
-    flex-flow: column nowrap;
-  }
-
-  .nbox div.mainPanel {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    height: 300px;
-  }
-}
-@media all and (min-width: 961px) {
-  .nbox {
-    flex-flow: row nowrap;
-  }
-
-  .nbox div.mainPanel {
-    width: 50%;
-  }
-
-  .nbox #leaflet-map {
-    width: 50%;
-  }
-}
 .box {
   width: 100%;
   height: 100%;
   flex-flow: column nowrap;
-}
-
-.box, .nbox {
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;
@@ -58,20 +30,40 @@ body {
   flex-grow: 1;
   align-self: auto;
   min-width: 0;
+  position: relative;
+}
+
+.nbox div.mainPanel {
+  z-index: 1;
+  padding: 10px;
+  position: absolute;
+  background-color: white;
+  margin: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .nbox div.locate,
-.nbox div.mainPanel {
-  flex-grow: 0;
-  /* flex-basis: 200px; */
-  align-self: auto;
-  z-index: 1;
-  padding: 10px;
+#leaflet-map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
 }
 
-.nbox #leaflet-map {
-  flex-grow: 1;
-  align-self: auto;
+.locate {
+  z-index: 1;
+  background-color: white;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.locate > div {
+  flex: 0 1 auto;
 }
 
 /* misc */

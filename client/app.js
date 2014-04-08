@@ -141,8 +141,10 @@ Template.main.isDialogActive = function () {
   return !!Session.get("activeDialog");
 };
 
-Template.main.mapZoomedEnough = function () {
-  return Session.get("mapZoomedEnough");
+Template.main.zoomedEnough = function () {
+  var ze = Session.get("mapZoomedEnough");
+  // console.log("zoomedEnough", ze);
+  return ze;
 };
 
 Template.main.canLoadMap = function () {

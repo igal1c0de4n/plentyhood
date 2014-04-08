@@ -10,60 +10,56 @@ body {
   margin: 0;
 }
 
-/* page layout, frame */
-
 @media all and (max-width: 960px) {
-  .nbox {
-    flex-flow: column nowrap;
-  }
-  .nbox div.mainPanel {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    height: 300px;
-  }
 }
 @media all and (min-width: 961px) {
-  .nbox {
-    flex-flow: row nowrap;
-  }
-  .nbox div.mainPanel {
-    width: 50%;
-  }
-  .nbox #leaflet-map {
-    width: 50%;
-  }
 }
-
 .box {
   width: 100%;
   height: 100%;
   flex-flow: column nowrap;
-}
-.box, .nbox {
   @include flexbox();
   justify-content: center;
 }
+
 .box nav.navbar {
   flex-grow: 0;
   align-self: auto;
   min-width: 0;
 }
+
 .box div.nbox {
   flex-grow: 1;
   align-self: auto;
   min-width: 0;
+  position: relative;
 }
-.nbox div.locate,
+
 .nbox div.mainPanel {
-  flex-grow: 0;
-  /* flex-basis: 200px; */
-  align-self: auto;
   z-index: 1;
   padding: 10px;
+  position: absolute;
+  background-color: white;
+  margin: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
-.nbox #leaflet-map {
-  flex-grow: 1;
-  align-self: auto;
+
+.nbox div.locate,
+#leaflet-map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.locate {
+  z-index: 1;
+  background-color: white;
+  @include flexbox();
+  justify-content: center;
+  align-items: center;
+}
+.locate > div {
+  flex: 0 1 auto;
 }
  
 /* misc */

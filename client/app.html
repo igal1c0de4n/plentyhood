@@ -1,33 +1,37 @@
 <template name="main">
 <div class="box">
   {{> header}}
-  {{#unless isDialogActive}}
   <div class="nbox">
-    {{#unless isPanelActive undefined}}
-      <div class="mainPanel disable-select">
-      {{#if mapZoomedEnough}}
-        {{#if isPanelActive "main"}}
-        {{> panelBegin}}
-        {{/if}}
-        {{#if isPanelActive "search"}}
-        {{> panelSearch}}
-        {{/if }}
-        {{#if isPanelActive "resultsList"}}
-        {{> resultsList}}
-        {{/if}}
-        {{#if isPanelActive "place"}}
-        {{> panelPlace}}
-        {{/if}}
+    {{#unless isDialogActive}}
+      {{#if isPanelActive "locate"}}
+        {{> panelLocate}}
       {{else}}
-        {{> panelZoomedOut}}
+        {{#unless isPanelActive undefined}}
+          <div class="mainPanel disable-select">
+          {{#if zoomedEnough}}
+            {{#if isPanelActive "main"}}
+            {{> panelBegin}}
+            {{/if}}
+            {{#if isPanelActive "search"}}
+            {{> panelSearch}}
+            {{/if }}
+            {{#if isPanelActive "resultsList"}}
+            {{> resultsList}}
+            {{/if}}
+            {{#if isPanelActive "place"}}
+            {{> panelPlace}}
+            {{/if}}
+          {{else}}
+            {{> panelZoomedOut}}
+          {{/if}}
+          </div>
+        {{/unless}}
       {{/if}}
-      </div>
     {{/unless}}
     {{#if canLoadMap}}
       {{> leafletMap}}
     {{/if}}
   </div>
-  {{/unless}}
 </div>
 </template>
 
@@ -123,8 +127,10 @@
 
 <template name="panelLocate">
 <div class="locate">
-  <h4><em>Locating...</em></h4>
-  {{> loadAnimate}}
+  <div>
+    {{> loadAnimate}}
+    <h4><em>Getting Location</em></h4>
+  </div>
 </div>
 </template>
 
