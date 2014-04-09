@@ -1,7 +1,7 @@
 ;(function () {
   "use strict";
 
-Template.landing.ready = function () {
+Template.land.ready = function () {
   return client.isStaticContentReady();
 };
 

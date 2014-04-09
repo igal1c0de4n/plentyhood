@@ -2,12 +2,8 @@
 
   "use strict";
 
-////////////////////////////////////////////////////////////////////
-// Routing
-
-// override with meteor-router navigate method
 Meteor.navigateTo = function (path) {
-  Meteor.Router.to(path);
+  Router.go(path);
 };
 
 function emailVerified (user) {
@@ -16,62 +12,32 @@ function emailVerified (user) {
   });
 }
 
-Meteor.Router.add({
-  '/': function () {
-//     console.log('router root');
-    if (Meteor.loggingIn()) {
-//       console.log('home: loading');
-      return 'loading';
-    }
-    var user = Meteor.user();
-    if (user) {
-//       console.log("user", user);
-//        if (!emailVerified(user)) {
-//          console.log('home: awaiting-verification');
-//          return 'awaiting-verification';
-//        }
-    }
-    return 'landing';
-  },
-
-  '/about': 'about',
-  '/landing': 'landing',
-  '/main': 'main',
-  '/admin': function () {
-    if (Roles.userIsInRole(Meteor.user(), 'admin')) {
-      return 'admin';
-    }
-    return 'notfound';
-  },
-  '/signout': roles.signout,
-  '*': 'notfound',
-});
-
-Meteor.Router.filters({
-  checkLoggedIn: function (page) {
-    var user;
-    if (Meteor.loggingIn()) {
-      console.log('filter: loading');
-      return 'loading';
-    } else {
-      user = Meteor.user();
-      if (!user) {
-        console.log('filter: not signed in');
-        return 'notfound';
+Router.map(function() {
+  this.route('land', {path: '/'})
+  this.route('land', {path: '/home'})
+  this.route('main');
+  this.route('about');
+  this.route('admin', {
+    onBeforeAction: function (pause) {
+      if (!Roles.userIsInRole(Meteor.user(), 'admin')) {
+        this.render('notfound');
+        pause();
       }
-// Disable email verification for now
-//       if (!emailVerified(user)) {
-//         console.log('filter: awaiting-verification');
-//         return 'awaiting-verification';
-//       } 
-      return page;
-    }
-  }
+    },
+  });
+  this.route('land', {
+    path: '/signout',
+    onBeforeAction: function (pause) {
+      if (!Meteor.user()) {
+        // render the login template but keep the url in the browser the same
+        this.render('land');
+        // stop the rest of the before hooks and the action function 
+        pause();
+      }
+    },
+    action: function () {
+      roles.signout();
+    },
+  });
 });
-
-// make sure user has logged in for all appropriate routes
-Meteor.Router.filter('checkLoggedIn', {
-  except:['about', 'main', 'loading', 'not-found', 'landing']
-});
-
 }());

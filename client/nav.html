@@ -11,8 +11,10 @@
 
 <template name="notfound">
 {{> header}}
-<h2>Oops, page not found</h2>
-<p>The page you were looking for has gone missing!</p>
+<div class="notfound">
+  <h2>Oops, Page Not Found!</h2>
+  <p>It seems that the page you were looking for has gone missing</p>
+</div>
 </template>
 
 <template name="signin">
@@ -20,7 +22,7 @@
 <div class="signin">
   <div class="login-form">
     <h1>Sign In</h1>
-    {{loginButtons}}
+    {{> loginButtons}}
   </div>
   <div class="example-users">
     <p>Normal User: normal@example.com | apple1</p>
@@ -88,7 +90,7 @@
         </ul>
         </li>
         {{else}}
-        <li>{{loginButtons align="right"}}</li>
+        <li>{{> loginButtons align="right"}}</li>
         {{/if}}
         <!-- eventually replace w/own login controls as in: -->
         <!-- https://www.eventedmind.com/tracks/feed-archive/meteor-customizing-login -->

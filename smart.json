@@ -1,9 +1,7 @@
 {
   "packages": {
-    "router": {
-      "version": "0.5.4.1"
-    },
     "bootstrap-3": {},
-    "roles": {}
+    "roles": {},
+    "iron-router": {}
   }
 }

@@ -103,9 +103,7 @@
 </template>
 
 <template name="leafletMap">
-{{#constant}}
 <div id="leaflet-map"></div>
-{{/constant}}
 </template>
 
 <template name="panelZoomedOut">
@@ -156,6 +154,7 @@
 </template>
 
 <template name="panelPlace">
+{{#if selectedPlaceGet}}
 {{#with selectedPlaceGet}}
   <div class="bottomBorder">
     {{> panelBackButton}}
@@ -171,6 +170,7 @@
     {{> placeResourcesPanel}}
   </div>
 {{/with}}
+{{/if}}
 </template>
 
   <!-- {{#unless public}} -->

@@ -2,7 +2,7 @@
 // header
 
 Template.header.page2class = function (page, cssClass) {
-  if (Meteor.Router.page() == page) {
+  if (Router.current() == page) {
     //     console.log("active page", page);
     return cssClass;
   }
