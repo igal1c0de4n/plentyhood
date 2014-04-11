@@ -1,38 +1,51 @@
-<template name="main">
+<template name="siteLayout">
 <div class="box">
   {{> header}}
   <div class="nbox">
-    {{#unless isDialogActive}}
-      {{#if isPanelActive "locate"}}
-        {{> panelLocate}}
-      {{else}}
-        {{#unless isPanelActive undefined}}
-          <div class="mainPanel disable-select">
-          {{#if zoomedEnough}}
-            {{#if isPanelActive "main"}}
-            {{> panelBegin}}
-            {{/if}}
-            {{#if isPanelActive "search"}}
-            {{> panelSearch}}
-            {{/if }}
-            {{#if isPanelActive "resultsList"}}
-            {{> resultsList}}
-            {{/if}}
-            {{#if isPanelActive "place"}}
-            {{> panelPlace}}
-            {{/if}}
-          {{else}}
-            {{> panelZoomedOut}}
-          {{/if}}
-          </div>
-        {{/unless}}
-      {{/if}}
-    {{/unless}}
-    {{#if canLoadMap}}
-      {{> leafletMap}}
-    {{/if}}
+    {{> yield}}
   </div>
 </div>
+</template>
+
+<template name="loading">
+<div class="centerBox">
+  <div>
+    {{> loadAnimate}}
+    <h4><em>Loading</em></h4>
+  </div>
+</div>
+</template>
+
+<template name="main">
+{{#unless isDialogActive}}
+  {{#if isPanelActive "locate"}}
+    {{> panelLocate}}
+  {{else}}
+    {{#unless isPanelActive undefined}}
+      <div class="mainPanel disable-select">
+      {{#if zoomedEnough}}
+        {{#if isPanelActive "main"}}
+        {{> panelBegin}}
+        {{/if}}
+        {{#if isPanelActive "search"}}
+        {{> panelSearch}}
+        {{/if }}
+        {{#if isPanelActive "resultsList"}}
+        {{> resultsList}}
+        {{/if}}
+        {{#if isPanelActive "place"}}
+        {{> panelPlace}}
+        {{/if}}
+      {{else}}
+        {{> panelZoomedOut}}
+      {{/if}}
+      </div>
+    {{/unless}}
+  {{/if}}
+{{/unless}}
+{{#if canLoadMap}}
+  {{> leafletMap}}
+{{/if}}
 </template>
 
 <template name="panelBegin">
@@ -124,7 +137,7 @@
 </template>
 
 <template name="panelLocate">
-<div class="locate">
+<div class="centerBox">
   <div>
     {{> loadAnimate}}
     <h4><em>Getting Location</em></h4>

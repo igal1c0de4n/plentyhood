@@ -4,21 +4,14 @@
   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 </head>
 
-<body>
-  {{> dialogs}}
-  {{renderPage}}
-</body>
-
-<template name="notfound">
-{{> header}}
-<div class="notfound">
+<template name="notFound">
+<div class="notFound">
   <h2>Oops, Page Not Found!</h2>
   <p>It seems that the page you were looking for has gone missing</p>
 </div>
 </template>
 
 <template name="signin">
-{{> header}}
 <div class="signin">
   <div class="login-form">
     <h1>Sign In</h1>
@@ -30,21 +23,6 @@
     <p>Admin User: admin@example.com | apple1</p>
   </div>
 </div>
-</template>
-
-<template name="loading">
-{{> header}}
-<h3>Loading...</h3>
-</template>
-
-<template name="awaiting-verification">
-{{> header}}
-<h1>Awaiting email verification...</h1>
-</template>
-
-<template name="invalid-access">
-{{> header}}
-<h3>403 Forbidden - Invalid Access</h3>
 </template>
 
 <template name="header">
@@ -118,7 +96,6 @@
 </template>
 
 <template name="about">
-{{> header}}
 <div class="container">
   <h2>About Plentyhood</h2>
   <p>tbd</p>
@@ -151,7 +128,6 @@
 </template>
 
 <template name="manage">
-{{> header}}
 <div class="manage-users row">
   <div class="offset4 span8">
     <p class="note">

@@ -12,15 +12,23 @@ function emailVerified (user) {
   });
 }
 
+Router.configure({
+  layoutTemplate: 'siteLayout',
+  notFoundTemplate: 'notFound',
+  loadingTemplate: 'loading',
+});
+
 Router.map(function() {
-  this.route('land', {path: '/'})
-  this.route('land', {path: '/home'})
+  this.route('land', {
+    path: '/',
+    layoutTemplate: 'land',
+  });
   this.route('main');
   this.route('about');
   this.route('admin', {
     onBeforeAction: function (pause) {
       if (!Roles.userIsInRole(Meteor.user(), 'admin')) {
-        this.render('notfound');
+        this.render('notFound');
         pause();
       }
     },

@@ -43,14 +43,14 @@ body {
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
-.nbox div.locate,
+.nbox div.centerBox,
 #leaflet-map {
   width: 100%;
   height: 100%;
   position: absolute;
 }
 
-.locate {
+.centerBox {
   z-index: 1;
   background-color: white;
   display: -webkit-box;
@@ -62,7 +62,7 @@ body {
   align-items: center;
 }
 
-.locate > div {
+.centerBox > div {
   flex: 0 1 auto;
 }
 
