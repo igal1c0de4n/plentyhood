@@ -9,15 +9,12 @@ Feature roadmap
 ---------------
 - Deploy static content on nginx instead of s3
 - UI
-  - Use flexbox
-    - Allow adding a new place by press and hold on touch screens 
-        (no ctrl+click)
-
+  - Allow adding a new place by press and hold on touch screens (no ctrl+click)
 - Add features:
 	- Resources
       - Options: sell, rent, donate
       - Quantity
-      - Calendar per resource (?)
+      - Calendar for resource (advanced)
   - Location
     - Support adding a place at specific address (via nominatim). 
       Example here: http://derickrethans.nl/leaflet-and-nominatim.html
@@ -25,10 +22,16 @@ Feature roadmap
     - Add 'needs' concept (implement with tags engine)
   - Groups
     - Add 'friends group' to user
+  - tags
+    - allow search for existing tags, only
+    - spell check tags on resource creation 
 - Services
 	- Add services offered by user, store under place (hire, volunteer)
 - Admin
   - Forms for removing tags, places and users
+- Deploy
+  - Docker
+  - nginx
 
 License
 -------
