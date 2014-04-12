@@ -5,14 +5,17 @@ html, body {
   width: 100%;
 }
 
-body {
-  padding: 0;
-  margin: 0;
-}
+$widthSmallDevice: 480px;
 
-@media all and (max-width: 960px) {
+@media all and (max-width: $widthSmallDevice) {
+  .nbox div.mainPanel {
+    width: 100%;
+  }
 }
-@media all and (min-width: 961px) {
+@media all and (min-width: $widthSmallDevice) {
+  .nbox div.mainPanel {
+    margin: 10px;
+  }
 }
 .box {
   width: 100%;
@@ -40,7 +43,6 @@ body {
   padding: 10px;
   position: absolute;
   background-color: white;
-  margin: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
