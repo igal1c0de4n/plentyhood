@@ -108,7 +108,6 @@ Template.main.created = function () {
     Session.set("placesSearchResults", places);
     Session.set("resourcesSearchResults", resources);
   });
-
   this.handleSubscriptions = Deps.autorun(function () {
     var b = Session.get("mapBounds");
     if (b) {
@@ -118,6 +117,8 @@ Template.main.created = function () {
       subscriptions.multiAdd(["tags", "resources", ["places", b]]);
     }
   });
+  // trigger handleTagsUpdate run
+  Session.set("searchTags", "");
 };
 
 Template.main.destroyed = function () {

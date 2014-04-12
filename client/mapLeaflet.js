@@ -47,6 +47,9 @@ Template.leafletMap.created = function() {
   map.canRender = true;
   map.markers = new HashTable();
   map.markerStyle = undefined;
+  Session.set('mapCenter', undefined);
+  Session.set('mapNextCenter', undefined);
+  Session.set('mapBounds', undefined);
   this.handleStaticContent = Deps.autorun(function () {
     if (client.isStaticContentReady()) {
       var path = client.getResourceUrl("img/leaflet/");
@@ -66,6 +69,10 @@ Template.leafletMap.created = function() {
       map.markers.clear();
     };
     var updateMarkers = function () {
+      if (!Session.get('mapCenter')) {
+        // map not yet ready
+        return;
+      }
       // map recenter and tags trigger a new search
       var places = Session.get("placesSearchResults");
       // console.log("updateMarkers", places);
@@ -228,9 +235,6 @@ Template.leafletMap.rendered = function() {
     keyboard: false,
   };
   // console.log("creating map handle and attempting auto locate");
-  Session.set('mapCenter', undefined);
-  Session.set('mapNextCenter', undefined);
-  Session.set('mapBounds', undefined);
   panels.push("locate");
   map.handle = L.map('leaflet-map', initOptions).
     locate({maximumAge : 1000 * 60, setView: false}).
