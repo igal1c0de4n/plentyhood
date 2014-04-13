@@ -21,20 +21,23 @@
   {{#if isPanelActive "locate"}}
     {{> panelLocate}}
   {{else}}
-    {{#unless isPanelActive undefined}}
+    {{#unless isPanelActive}}
       <div class="mainPanel disable-select">
       {{#if zoomedEnough}}
         {{#if isPanelActive "main"}}
-        {{> panelBegin}}
-        {{/if}}
-        {{#if isPanelActive "search"}}
-        {{> panelSearch}}
-        {{/if }}
-        {{#if isPanelActive "resultsList"}}
-        {{> resultsList}}
-        {{/if}}
-        {{#if isPanelActive "place"}}
-        {{> panelPlace}}
+          {{> panelBegin}}
+        {{else}}
+          {{#if isPanelActive "search"}}
+            {{> panelSearch}}
+          {{else}}
+            {{#if isPanelActive "resultsList"}}
+              {{> resultsList}}
+            {{else}}
+              {{#if isPanelActive "place"}}
+                {{> panelPlace}}
+              {{/if}}
+            {{/if}}
+          {{/if }}
         {{/if}}
       {{else}}
         {{> panelZoomedOut}}

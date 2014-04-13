@@ -132,10 +132,9 @@ Template.main.mapHasCenter = function () {
 };
 
 Template.main.isPanelActive = function (panel) {
-  // console.log("isPanelActive", panel, Session.get("panel"));
-  if (panel === Session.get("panel")) {
-    return true;
-  }
+  var cp = Session.get("panel");
+  // console.log("isPanelActive current", cp, "checked against", panel);
+  return panel == cp;
 };
 
 Template.main.isDialogActive = function () {
