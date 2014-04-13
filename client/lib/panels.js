@@ -107,22 +107,28 @@ panels = {};
       var cxt = _.find(panelContexts, function (c) {
         return c.name == name;
       });
-      // console.log("pushing panel", cxt.name);
+      var cp = currentPanel();
+      if (cp && cp.name == 'place') {
+        console.log("place panel replace stacking skipped");
+        return;
+      }
       panelEventsActive(false);
       stack.push(cxt);
       panelEventsActive(true);
       Session.set("panel", cxt.name);
+      // console.log("push", name, stack);
     };
     panels.pop = function () {
       panelEventsActive(false);
-      // console.log("pop panel", currentPanel().name);
+      // console.log("pop panel", currentPanel().name, stack);
       var prv = stack.pop();
       panelEventsActive(true);
       var cp = currentPanel();
       Session.set("panel", cp ? cp.name : undefined);
     };
     panels.clear = function () {
-      stack = [];
+      // in case there are external references
+      stack.length = 0;
     }
   })();
 }());
