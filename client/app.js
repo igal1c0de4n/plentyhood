@@ -117,7 +117,7 @@ Template.main.created = function () {
       subscriptions.multiAdd(["tags", "resources", ["places", b]]);
     }
   });
-  // trigger handleTagsUpdate run
+  // trigger handleTagsUpdate run to show all places
   Session.set("searchTags", "");
 };
 
@@ -166,6 +166,13 @@ var panelSearchAction = function () {
   Session.set("searchTags", tags);
   // console.log("search tags", tags);
   panels.push("resultsList");
+};
+
+Template.panelSearch.prvTags = function () {
+  var tags = Session.get("searchTags");
+  var tagsList = tags ? tags.join(",") : undefined;
+  // console.log("tagsList", tagsList);
+  return tagsList;
 };
 
 Template.panelSearch.events({
