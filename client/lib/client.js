@@ -83,13 +83,14 @@ client = {
 subscriptions = {
   subs: [],
   multiAdd: function (list) {
-    _.each(list, function (name){
-      if (_.isString(name)) {
-        this.subs[name] = Meteor.subscribe(name);
-      } else {
-        // console.log("subscribing with arguments", name)
+    _.each(list, function (arg){
+      if (_.isArray(arg)) {
+        // console.log("subscribing with arguments", arg)
         // assuming first arg is the name string
-        this.subs[name[0]] = Meteor.subscribe.apply(Meteor.subscribe, name);
+        var name = arg[0]
+        this.subs[name] = Meteor.subscribe.apply(Meteor.subscribe, arg);
+      } else {
+        this.subs[arg] = Meteor.subscribe(arg);
       }
     }.bind(this));
   },
