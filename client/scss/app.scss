@@ -184,6 +184,8 @@ table.resultsListTable {
   overflow: auto;
   height: auto;
   max-height: 75%;
+  // disable scrollbars
+  overflow:hidden
 }
 
 button.panelBack {
