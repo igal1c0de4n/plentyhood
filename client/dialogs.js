@@ -17,7 +17,10 @@ var bsModalOnShow = function (name) {
 }
 
 var bsModalOnHide = function (name) {
+  // console.log("bsModalOnHide");
   $('#eModalDialog').modal('hide');
+  $('body').removeClass('modal-open');
+  $('.modal-backdrop').remove();
 }
 
 Template.placeEditDialog.rendered = function () {

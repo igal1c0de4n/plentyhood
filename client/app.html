@@ -17,6 +17,7 @@
 </template>
 
 <template name="main">
+{{> dialogs}}
 {{#unless isDialogActive}}
   {{#if isPanelActive "locate"}}
     {{> panelLocate}}

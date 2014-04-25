@@ -17,7 +17,7 @@ Template.panelBegin.events({
   },
 });
 
-Template.main.rendered = function () {
+Template.panelBegin.rendered = function () {
   $(".resourcesSearch").focus();
 };
 
@@ -310,7 +310,8 @@ Template.resultsList.rendered = function () {
 };
 
 Template.resultsList.placeName = function () {
-  return collections.Places.findOne(this.placeId).title;
+  var place = collections.Places.findOne(this.placeId)
+  return place ? place.title : "load failed!";
 };
 
 ///////////////////////////////////////////////////////////////////////////////
