@@ -39,6 +39,31 @@ var map = {
     // console.log("setting mapZoomedEnough", ze, zoom);
     Session.set("mapZoomedEnough", ze);
   },
+  updateMapBounds: function () {
+    var b = map.handle.getBounds();
+    // increase size of bounds by phi for more fluent user experience
+    var kmPerDegree = 111.2;
+    var marginKm = 1;
+    var phi = marginKm / kmPerDegree;
+    var bounds = [
+      [b.getWest() - phi, b.getSouth() - phi],
+      [b.getEast() + phi, b.getNorth() + phi],
+    ];
+    if (Session.get("drawBounds")) {
+      // debug 
+      if (last.rect) {
+        map.handle.removeLayer(last.rect);
+        delete last.rect;
+      }
+      var rb = L.latLngBounds(
+        L.latLng(bounds[0][1], bounds[0][0]),
+        L.latLng(bounds[1][1], bounds[1][0])
+      );
+      last.rect = L.rectangle(rb, {color: "#ff7800", weight: 2}).addTo(map.handle);
+    }
+    // console.log("bounds", bounds, b);
+    Session.set("mapBounds", bounds);
+  },
 };
 
 Template.leafletMap.created = function() {
@@ -147,31 +172,7 @@ Template.leafletMap.created = function() {
     }
     // }
   });
-  var updateMapBounds = function () {
-    var b = map.handle.getBounds();
-    // increase size of bounds by phi for more fluent user experience
-    var kmPerDegree = 111.2;
-    var marginKm = 1;
-    var phi = marginKm / kmPerDegree;
-    var bounds = [
-      [b.getWest() - phi, b.getSouth() - phi],
-      [b.getEast() + phi, b.getNorth() + phi],
-    ];
-    if (Session.get("drawBounds")) {
-      // debug 
-      if (last.rect) {
-        map.handle.removeLayer(last.rect);
-        delete last.rect;
-      }
-      var rb = L.latLngBounds(
-        L.latLng(bounds[0][1], bounds[0][0]),
-        L.latLng(bounds[1][1], bounds[1][0])
-      );
-      last.rect = L.rectangle(rb, {color: "#ff7800", weight: 2}).addTo(map.handle);
-    }
-    //     console.log("bounds", bounds, b);
-    Session.set("mapBounds", bounds);
-  }
+
   mapProvider.centerSet = function (center, animate) {
     if (!map.handle) {
       console.error("map not initialized");
@@ -182,10 +183,10 @@ Template.leafletMap.created = function() {
       Session.set('mapNextCenter', undefined);
       // console.log('centerSet: requested center already set');
       return;
-    } 
+    }
     // console.log('centerSet', center.coordinates);
     if (Session.get('mapNextCenter')) {
-      console.error("centerSet: recenter already in progress");
+      console.info("centerSet: recenter already in progress");
       return;
     }
     Session.set('mapNextCenter', center);
@@ -198,7 +199,7 @@ Template.leafletMap.created = function() {
     center.coordinates[0] = wrapLongitude(center.coordinates[0]);
     var llCoord = L.GeoJSON.coordsToLatLng(center.coordinates);
     map.handle.setView(llCoord, undefined, {animate: animate});
-    updateMapBounds();
+    map.updateMapBounds();
   };
 };
 
@@ -269,8 +270,9 @@ Template.leafletMap.rendered = function() {
         map.isCloseEnough(center.next.coordinates, 
                           center.current.coordinates)) {
       Session.set('mapNextCenter', undefined);
-      // console.log('map next center move is complete');
+      console.log('map next center move is complete');
     }
+    map.updateMapBounds();
   });
   map.handle.on('click', function(e) {
     //     console.log('clicked at', e.latlng);
