@@ -241,7 +241,7 @@ Template.resultsList.tagTitle = function () {
 
 Template.resultsList.trSelected = function () {
   if (Session.get("lastSelectedPlaceId") == this.place) {
-    return "selectedTableRow";
+    return "selectedRLEntry";
   }
 };
 
@@ -254,7 +254,7 @@ var setCenterPlace = function (placeId) {
 };
 
 var getCurRow = function () {
-  var cr = $("table tr.selectedTableRow");
+  var cr = $("div.selectedRLEntry");
   if (cr) {
     // prevent selector from getting cluttered
     cr.selector = "";
@@ -268,44 +268,37 @@ var selectResourceRow = function (target) {
   var cr = getCurRow();
   if (cr != jtarget) {
     if (cr) {
-      cr.removeClass("selectedTableRow");
+      cr.removeClass("selectedRLEntry");
     }
     cr = jtarget;
-    cr.addClass("selectedTableRow");
+    cr.addClass("selectedRLEntry");
   }
 };
 
-var resultsListRowAction = function (event) {
-  // console.log("resultsListRow click", e.currentTarget.dataset.placeid);
+var rListEntryAction = function (event) {
+  // console.log("rListEntry click", e.currentTarget.dataset.placeid);
   selectResourceRow(event.currentTarget);
   setCenterPlace(event.currentTarget.dataset.placeid);
 };
 
 Template.resultsList.events({
-  'tap .resultsListRow': function (event, template) {
-    resultsListRowAction(event);
+  'tap .rListEntry': function (event, template) {
+    rListEntryAction(event);
   },
-  'click .resultsListRow': function (event, template) {
-    resultsListRowAction(event);
+  'click .rListEntry': function (event, template) {
+    rListEntryAction(event);
   },
 });
 
 Template.resultsList.rendered = function () {
-  // console.log("resultsList rendered");
-  var table = $('.resultsListTable');
-  table.floatThead({
-    scrollContainer: function(t){
-      return t.closest('.wrapper');
-    }
-  });
   var lastSelectedPid = Session.get("lastSelectedPlaceId");
   if (lastSelectedPid ) {
-    var selector = $('tr[data-placeid="' + lastSelectedPid + '"]');
+    var selector = $('div[data-placeid="' + lastSelectedPid + '"]');
     // console.log("lastSelectedPlaceId", lastSelectedPid, selector);
     selectResourceRow(selector.first());
   } else {
     // console.log("lastSelectedPlaceId unset");
-    selectResourceRow($(".resultsListRow").first());
+    selectResourceRow($(".rListEntry").first());
   }
 };
 

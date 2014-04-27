@@ -168,24 +168,22 @@ hr.tight {
   margin-bottom: 10px;
 }
 
-table.resultsListTable {
-  display: inline-block;
-  margin-bottom: 0;
-  cursor: pointer;
-  cursor: hand;
-}
-
-.selectedTableRow {
+.selectedRLEntry {
   background-color: #cfc;
   /* opacity: .5; */
 }
 
-.resultsListContainer {
+.rListContainer {
   overflow: auto;
   height: auto;
   max-height: 75%;
   // disable scrollbars
   overflow:hidden
+}
+
+.rListEntry {
+  padding: 5px;
+  cursor: pointer;
 }
 
 button.panelBack {

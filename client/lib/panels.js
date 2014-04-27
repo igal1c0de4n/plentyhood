@@ -50,17 +50,19 @@ panels = {};
             app.selectResourceRow(jobj);
           }
         };
-        // console.log("resultsListRow.keyup", e.keyCode)
+        // console.log("rListEntry.keyup", e.keyCode)
         if (r.length) {
           switch(e.keyCode) {
             case client.keyCode.ARROW_UP: {
-              // console.log("arrow_up");
-              moveTo(r.prev());
+              // console.log("arrow_up", r.prev());
+              var dest = r.prev();
+              dest.hasClass("rListEntry") && moveTo(dest);
               break;
             }
             case client.keyCode.ARROW_DOWN: {
-              // console.log("arrow_down");
-              moveTo(r.next());
+              // console.log("arrow_down", r.prev());
+              var dest = r.next();
+              dest.hasClass("rListEntry") && moveTo(dest);
               break;
             }
             case client.keyCode.ENTER: {

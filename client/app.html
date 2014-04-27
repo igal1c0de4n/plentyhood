@@ -82,36 +82,24 @@
 </template>
 
 <template name="resultsList">
-<div class="resultsListContainer">
+<div class="rListContainer">
   {{#if resourcesFound}}
   <h4>
     {{> panelBackButton}}
     Search Results
   </h4>
-  <table class="table table-hover resultsListTable">
-    <thead>
-      <tr>
-        <th>Place</th>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Tags</th>
-      </tr>
-    </thead>
-    <tbody>
     {{#each results}}
-    <tr class="resultsListRow {{trSelected}}" data-placeid="{{this.placeId}}">
-      <td>{{placeName}}</td>
-      <td>{{this.title}}</td>
-      <td>{{this.description}}</td>
-      <td>
+    <div class="rListEntry {{trSelected}}" data-placeid="{{this.placeId}}">
+      <span class="rListEntryPlaceName">{{placeName}}</span>
+      <span>{{this.title}}</span>
+      <span>{{this.description}}</span>
+      <span>
         {{#each this.tags}}
         <span class="tag label label-primary">{{tagTitle}}</span>
         {{/each}}
-      </td>
-    </tr>
+      </span>
+    </div>
     {{/each}}
-    </tbody>
-  </table>
   {{else}}
   <h4>
     {{> panelBackButton}}
