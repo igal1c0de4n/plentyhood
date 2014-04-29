@@ -5,15 +5,16 @@ panels = {};
 
   panels.backAction = function () {
     if (Session.get("panel") === "place") {
-      // place panel must have been open
-      var lastCenter = Session.get("mapCenterLast");
-      if (lastCenter) {
-        // recenter map before other panels are loaded
-        // console.log("panning map back to last center");
-        mapProvider.centerSet(lastCenter, false);
-        Session.set("mapCenterLast", undefined);
+      if (Session.get("autoBackToSearchCenter")) {
+        var lastCenter = Session.get("mapCenterLast");
+        if (lastCenter) {
+          // recenter map before other panels are loaded
+          // console.log("panning map back to last center");
+          mapProvider.centerSet(lastCenter, false);
+          Session.set("mapCenterLast", undefined);
+        }
       }
-      // console.log("panelBack, deselecting place");
+      // console.log("panel back from place");
       client.placeSet();
     } 
     // console.log("panelBack removing top panel");
