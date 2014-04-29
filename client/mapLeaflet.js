@@ -250,6 +250,9 @@ Template.leafletMap.rendered = function() {
   L.control.scale({
     updateWhenIdle: true, metric: false,
   }).addTo(map.handle);
+  map.handle.on('dragend', function(e) {
+    Session.set("searchTrigger", true);
+  });
   map.handle.on('moveend', function(e) {
     var zoom = map.handle.getZoom();
     var center = {
@@ -270,7 +273,7 @@ Template.leafletMap.rendered = function() {
         map.isCloseEnough(center.next.coordinates, 
                           center.current.coordinates)) {
       Session.set('mapNextCenter', undefined);
-      console.log('map next center move is complete');
+      // console.log('map next center move is complete');
     }
     map.updateMapBounds();
   });

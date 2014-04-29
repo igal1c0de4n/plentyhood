@@ -36,11 +36,16 @@ Template.main.created = function () {
     var resources = [];
     var tags = Session.get("searchTags");
     var center = Session.get("mapCenter");
+    // only search when search is explicitly triggered
+    if (Session.get("searchTrigger") == false) {
+      return;
+    } 
+    Session.set("searchTrigger", false);
     if (!center || !subscriptions.multiReady(["places", "resources", "tags"])) {
       // console.log("handleTagsUpdate: subscriptions not ready");
       return;
     }
-    // console.log("handleTagsUpdate ready");
+    // console.log("handleTagsUpdate run");
     if (tags && tags.length) {
       // console.log("tags", tags);
       var tids = _.map(tags, function (t) {
@@ -164,6 +169,7 @@ Template.panelBackButton.events({
 var panelSearchAction = function () {
   var tags = $("#tagsSearchInputField").tagsinput('items');
   Session.set("searchTags", tags);
+  Session.set("searchTrigger", true);
   // console.log("search tags", tags);
   panels.push("resultsList");
 };
