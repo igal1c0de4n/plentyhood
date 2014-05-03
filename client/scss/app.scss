@@ -4,188 +4,161 @@ html, body {
   height: 100%;
   width: 100%;
 }
-
-$widthSmallDevice: 480px;
-
-@media all and (max-width: $widthSmallDevice) {
-  .nbox div.mainPanel {
-    width: 100%;
-  }
-}
-@media all and (min-width: $widthSmallDevice) {
-  .nbox div.mainPanel {
-    margin: 10px;
-  }
-}
-.box {
-  width: 100%;
-  height: 100%;
-  flex-flow: column nowrap;
+#placesMapBox {
+  // flex container
   @include flexbox();
-  justify-content: center;
-}
+  align-items: stretch;
 
-.box nav.navbar {
-  flex-grow: 0;
-  align-self: auto;
-  min-width: 0;
-}
-
-.box div.nbox {
+  // flex item
   flex-grow: 1;
-  align-self: auto;
-  min-width: 0;
+}
+$widthSmallDisp: 640px;
+$widthLargeDisp: 1280px;
+@media all and (max-width: $widthSmallDisp) {
+  #placesMapBox {
+    flex-direction: column;
+  }
+}
+@media all and (min-width: $widthSmallDisp) and (max-width: $widthLargeDisp) {
+  #mainPanel {
+    width: $widthSmallDisp/2;
+  }
+}
+@media all and (min-width: $widthLargeDisp) {
+  #mainPanel {
+    width: $widthSmallDisp;
+  }
+}
+.rootbox {
+  height: 100%;
+  @include flexbox();
+  flex-direction: column;
+}
+.rootbox div.nbox {
+  // flex item
+  flex-grow: 1;
   position: relative;
 }
-
-.nbox div.mainPanel {
-  z-index: 1;
+#mainPanel {
   padding: 10px;
-  position: absolute;
   background-color: white;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
 }
-
-.nbox div.centerBox,
 #leaflet-map {
-  width: 100%;
-  height: 100%;
-  position: absolute;
+  flex-grow: 1;
+  background: black;
 }
 .centerBox {
-  z-index: 1;
-  background-color: white;
   @include flexbox();
   justify-content: center;
   align-items: center;
 }
-.centerBox > div {
-  flex: 0 1 auto;
-}
- 
-/* misc */
-
-.menuButton {
-  margin-bottom: 10px;
-  width: 100%;
-}
-
 .disable-select {
   -webkit-user-select: none;  
   -moz-user-select: none;    
   -ms-user-select: none;      
   user-select: none;
 }
-
 .indent {
   margin-left: 10px;
 }
-
 .glyphicon {
   margin-right: 6px;
 }
-
 .header {
   padding: 10px 0;
   padding-bottom: 0px;
 }
-
 .invite-row .invite {
   margin: 10px 10px 10px 0;
 }
-
 .sharedPanel {
   margin-bottom: 0px;
 }
-
 .sharedPanel .usersList {
   margin-bottom: 5px;
 }
-
 input.chosen {
   font-weight: bold;
 }
-
-.attribution {
-  position: absolute;
-  bottom: 0;
-  background-color: white;
-  padding: 3px;
-  padding-bottom: 0;
-}
-
-.pull-right {
+#navcol {
   margin-right: 20px;
 }
-
 .verticalMargin {
   margin-top: 10px;
   margin-bottom: 10px;
 }
-
 .tagsLabel {
   padding-right: 5px;
 }
-
 .bootstrap-tagsinput {
   margin-bottom: 0;
 }
-
 .placeResourceRemove {
   margin-right: 5px;
 }
-
 .marginTop {
   margin-top: 5px !important;
 }
-
 .bottomBorder {
   border-bottom: 1px solid #e5e5e5;
   padding-bottom: 5px;
   margin-bottom: 5px;
 }
-
 h4.inline {
   display: inline !important;
 }
-
 #resourceSelect {
   margin: 7px 0;
 }
-
 button.close {
   margin-left: 10px;
   padding: 5px;
 }
-
 a.btn-link {
   padding: 6px 0;
 }
-
 hr.tight {
   margin-top: 10px;
   margin-bottom: 10px;
 }
-
 .selectedRLEntry {
-  background-color: #cfc;
-  /* opacity: .5; */
+  background-color: #dfb;
 }
-
 .rListContainer {
-  overflow: auto;
   height: auto;
   max-height: 75%;
   // disable scrollbars
   overflow:hidden
 }
-
 .rListEntry {
   padding: 5px;
   cursor: pointer;
 }
-
 button.panelBack {
   margin-right: 4px;
+}
+#panelSearch {
+  @include flexbox();
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+.bootstrap-tagsinput {
+  width: 100%;
+  margin: 5px 0px;
+}
+.horizbox {
+  @include flexbox();
+  align-items: stretch;
+}
+.panelBegin {
+  flex-wrap: wrap;
+}
+.panelBegin button {
+  margin: 3px;
+  flex-grow: 1;
 }

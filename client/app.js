@@ -4,7 +4,7 @@ app = {};
   "use strict";
 
 ///////////////////////////////////////////////////////////////////////////////
-// menu panel
+// panelBgin
 
 Template.panelBegin.events({
   'click .resourcesSearch': function (){
@@ -15,13 +15,23 @@ Template.panelBegin.events({
     Session.set("searchType", "services");
     panels.push("search");
   },
+  'click .locateTrig': function (){
+    Session.set("userLocateTrigger", true);
+  },
 });
 
 Template.panelBegin.rendered = function () {
   $(".resourcesSearch").focus();
 };
 
-Template.main.created = function () {
+Template.panelBegin.locateAvailable = function() {
+  return Session.get("locationAvailable");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// panelBgin
+
+Template.placesMap.created = function () {
   var sessionVars = [
     "searchTags",
     "placesSearchResults",
@@ -126,33 +136,34 @@ Template.main.created = function () {
   Session.set("searchTags", "");
 };
 
-Template.main.destroyed = function () {
+Template.placesMap.destroyed = function () {
   this.handleTagsUpdate.stop();
   this.handleSubscriptions.stop();
   subscriptions.multiRemove(["places", "tags", "resources"]);
 };
 
-Template.main.mapHasCenter = function () {
+Template.placesMap.mapHasCenter = function () {
   return !!Session.get("mapCenter");
 };
 
-Template.main.isPanelActive = function (panel) {
+Template.placesMap.isPanelActive = function (panel) {
   var cp = Session.get("panel");
   // console.log("isPanelActive current", cp, "checked against", panel);
   return panel == cp;
 };
 
-Template.main.isDialogActive = function () {
+Template.placesMap.isDialogActive = function () {
   return !!Session.get("activeDialog");
 };
 
-Template.main.zoomedEnough = function () {
+Template.placesMap.mapZoomedOut = function () {
   var ze = Session.get("mapZoomedEnough");
-  // console.log("zoomedEnough", ze);
-  return ze;
+  var ult = Session.get("userLocateTrigger");
+  // console.log("zoomedEnough", ze, ult);
+  return !ze && !ult;
 };
 
-Template.main.canLoadMap = function () {
+Template.placesMap.canLoadMap = function () {
   return client.isStaticContentReady();
 };
 
@@ -245,7 +256,7 @@ Template.resultsList.tagTitle = function () {
   return collections.Tags.findOne(this).title;
 };
 
-Template.resultsList.trSelected = function () {
+Template.resultsList.rSelected = function () {
   if (Session.get("lastSelectedPlaceId") == this.place) {
     return "selectedRLEntry";
   }

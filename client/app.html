@@ -1,9 +1,7 @@
 <template name="siteLayout">
-<div class="box">
+<div class="rootbox">
   {{> header}}
-  <div class="nbox">
-    {{> yield}}
-  </div>
+  {{> yield}}
 </div>
 </template>
 
@@ -16,53 +14,58 @@
 </div>
 </template>
 
-<template name="main">
+<template name="placesMap">
+<div id="placesMapBox">
 {{> dialogs}}
 {{#unless isDialogActive}}
-  {{#if isPanelActive "locate"}}
-    {{> panelLocate}}
-  {{else}}
     {{#unless isPanelActive}}
-      <div class="mainPanel disable-select">
-      {{#if zoomedEnough}}
-        {{#if isPanelActive "main"}}
-          {{> panelBegin}}
-        {{else}}
-          {{#if isPanelActive "search"}}
-            {{> panelSearch}}
-          {{else}}
-            {{#if isPanelActive "resultsList"}}
-              {{> resultsList}}
-            {{else}}
-              {{#if isPanelActive "place"}}
-                {{> panelPlace}}
-              {{/if}}
-            {{/if}}
-          {{/if }}
-        {{/if}}
-      {{else}}
-        {{> panelZoomedOut}}
+    <div id="mainPanel" class="disable-select">
+      {{#if isPanelActive "locate"}}
+      {{> panelLocate}}
       {{/if}}
-      </div>
+      {{#if isPanelActive "main"}}
+      {{> panelBegin}}
+      {{/if}}
+      {{#if isPanelActive "search"}}
+      {{> panelSearch}}
+      {{/if}}
+      {{#if isPanelActive "resultsList"}}
+      {{> resultsList}}
+      {{/if}}
+      {{#if isPanelActive "place"}}
+      {{> panelPlace}}
+      {{/if}}
+      {{#if mapZoomedOut}}
+      {{> panelZoomedOut}}
+      {{/if}}
+    </div>
     {{/unless}}
-  {{/if}}
 {{/unless}}
 {{#if canLoadMap}}
-  {{> leafletMap}}
+{{> leafletMap}}
 {{/if}}
+</div>
 </template>
 
 <template name="panelBegin">
-    <button class="btn btn-success resourcesSearch menuButton">
-      <span class="glyphicon glyphicon-white glyphicon-search"></span>
-      Resources
-    </button>
-    <button class="btn btn-success servicesSearch menuButton">
-      <span class="glyphicon glyphicon-white glyphicon-search"></span>
-      Services
-    </button>
-  <hr class="tight">
-  {{> instructions}}
+<div class="horizbox panelBegin">
+  <button class="btn btn-success resourcesSearch">
+    <span class="glyphicon glyphicon-white glyphicon-search"></span>
+    Resources
+  </button>
+  <button class="btn btn-success servicesSearch">
+    <span class="glyphicon glyphicon-white glyphicon-search"></span>
+    Services
+  </button>
+  {{#if locateAvailable}}
+  <button class="btn btn-primary locateTrig">
+    <span class="glyphicon glyphicon-screenshot white glyphicon-search"></span>
+    My Location
+  </button>
+  {{/if}}
+</div>
+<hr class="tight">
+{{> instructions}}
 </template>
 
 <template name="panelBackButton">
@@ -72,34 +75,38 @@
 </template>
 
 <template name="panelSearch">
-  {{> panelBackButton}}
+<div id="panelSearch">
+  <div>
+    {{> panelBackButton}}
+    <h4 class="inline">Enter Search Tags</h4>
+  </div>
+  <div>
   <input id="tagsSearchInputField" type="text" value="{{prvTags}}"
   placeholder="Enter tags" data-role="tagsinput"/>
+  </div>
   <button class="btn btn-success goSearch">
     <span class="glyphicon glyphicon-white glyphicon-search"></span>
     Search
   </button> 
+</div>
 </template>
 
 <template name="resultsList">
 <div class="rListContainer">
   {{#if resourcesFound}}
-  <h4>
-    {{> panelBackButton}}
-    Search Results
-  </h4>
-    {{#each results}}
-    <div class="rListEntry {{trSelected}}" data-placeid="{{this.placeId}}">
-      <span class="rListEntryPlaceName">{{placeName}}</span>
-      <span>{{this.title}}</span>
-      <span>{{this.description}}</span>
-      <span>
-        {{#each this.tags}}
-        <span class="tag label label-primary">{{tagTitle}}</span>
-        {{/each}}
-      </span>
-    </div>
-    {{/each}}
+  <h4>{{> panelBackButton}} Search Results</h4>
+  {{#each results}}
+  <div class="rListEntry {{rSelected}} bottomBorder" data-placeid="{{this.placeId}}">
+    <span class="rListEntryPlaceName">{{placeName}}</span>
+    <span>{{this.title}}</span>
+    <span>{{this.description}}</span>
+    <span>
+      {{#each this.tags}}
+      <span class="tag label label-primary">{{tagTitle}}</span>
+      {{/each}}
+    </span>
+  </div>
+  {{/each}}
   {{else}}
   <h4>
     {{> panelBackButton}}
@@ -141,48 +148,50 @@
 
 <template name="instructions">
 <div>
-  {{#if anyPlaces}}
-  <span class="glyphicon glyphicon-th-list"></span>
-  Select a place to see details
-  {{else}}
-  <span class="glyphicon glyphicon-info-sign"></span>
-  No places nearby... yet
-  {{/if}}
-</div>
-<div>
-  {{#if currentUser}}
-  <span class="glyphicon glyphicon-screenshot"></span>
-  Ctrl + click the map to post a new place
-  {{else}}
-  <span class="glyphicon glyphicon-user"></span>
-  Sign in to post a new place
-  {{/if}}
+  <div>
+    {{#if anyPlaces}}
+    <span class="glyphicon glyphicon-th-list"></span>
+    Select a place to see details
+    {{else}}
+    <span class="glyphicon glyphicon-info-sign"></span>
+    No places nearby... yet
+    {{/if}}
+  </div>
+  <div>
+    {{#if currentUser}}
+    <span class="glyphicon glyphicon-screenshot"></span>
+    Ctrl + click the map to post a new place
+    {{else}}
+    <span class="glyphicon glyphicon-user"></span>
+    Sign in to post a new place
+    {{/if}}
+  </div>
 </div>
 </template>
 
 <template name="panelPlace">
 {{#if selectedPlaceGet}}
 {{#with selectedPlaceGet}}
-  <div class="bottomBorder">
-    {{> panelBackButton}}
+<div class="bottomBorder horizbox">
+  {{> panelBackButton}}
+  <div>
     <span class="glyphicon glyphicon-bookmark"></span>
     <h4 class="inline"><a href="#" class="btn btn-link title">{{title}}</a></h4>
     {{#if isOwner}}
-    <input type="button" class="btn btn-xs editPlace" value="Edit">
-    <input type="button" class="btn btn-xs removePlace" value="Delete">
+    <div>
+      <input type="button" class="btn btn-xs editPlace" value="Edit">
+      <input type="button" class="btn btn-xs removePlace" value="Delete">
+    </div>
     {{/if}}
   </div>
-  {{> details}}
-  <div class="marginTop">
-    {{> placeResourcesPanel}}
-  </div>
+</div>
+{{> details}}
+<div class="marginTop">
+  {{> placeResourcesPanel}}
+</div>
 {{/with}}
 {{/if}}
 </template>
-
-  <!-- {{#unless public}} -->
-  <!-- {{> sharedPanel}} -->
-  <!-- {{/unless}} -->
 
 <template name="details">
 <div class="bottomBorder">

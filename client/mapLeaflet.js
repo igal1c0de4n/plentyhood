@@ -173,9 +173,28 @@ Template.leafletMap.created = function() {
     // }
   });
 
+  this.handleUserLocate = Deps.autorun(function () {
+    if (!Session.get("userLocateTrigger")) {
+      return;
+    }
+    if (map.handle) {
+      Meteor.setTimeout(function (){
+        if (Session.get("userLocateTrigger")) {
+          // console.log("search is still in progress, displaying locate panel");
+          panels.push("locate");
+        }
+      }, 500);
+      // console.log("running auto locate");
+      map.handle.locate({maximumAge : 1000 * 60, setView: false});
+    } else {
+      // console.warn("map not ready!");
+      Session.set("userLocateTrigger", false);
+    }
+  });
+
   mapProvider.centerSet = function (center, animate) {
     if (!map.handle) {
-      console.error("map not initialized");
+      // console.error("map not initialized");
       return;
     }
     var mc = Session.get('mapCenter');
@@ -186,7 +205,7 @@ Template.leafletMap.created = function() {
     }
     // console.log('centerSet', center.coordinates);
     if (Session.get('mapNextCenter')) {
-      console.info("centerSet: recenter already in progress");
+      // console.info("centerSet: recenter already in progress");
       return;
     }
     Session.set('mapNextCenter', center);
@@ -211,7 +230,8 @@ Template.leafletMap.destroyed = function() {
     map.handle = undefined;
   }
   this.handlePlacesChanged.stop();
-  this.handleStaticContent .stop();
+  this.handleStaticContent.stop();
+  this.handleUserLocate.stop();
 };
 
 Template.leafletMap.rendered = function() {
@@ -235,11 +255,8 @@ Template.leafletMap.rendered = function() {
     markerZoomAnimation: true,
     keyboard: false,
   };
-  // console.log("creating map handle and attempting auto locate");
-  panels.push("locate");
-  map.handle = L.map('leaflet-map', initOptions).
-    locate({maximumAge : 1000 * 60, setView: false}).
-    whenReady(function () { 
+  // console.log("creating map handle");
+  map.handle = L.map('leaflet-map', initOptions).whenReady(function () { 
     //console.log("leaflet ready")
   });
   L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -289,6 +306,19 @@ Template.leafletMap.rendered = function() {
     }
   });  
   var userLocationMarker;
+  var locateEnd = function (result, center, zoom) {
+    Session.set("userLocateTrigger", false);
+    map.zoomSet(zoom);
+    mapProvider.centerSet(center);
+    Session.set('locationAvailable', result);
+    // console.log(
+    //   'location', result ? 'found' : 'unavailable', 
+    //   'center', center, 'zoom', zoom);
+    if (Session.get("panel") == "locate") {
+      panels.pop();
+    }
+    panels.push("main");
+  }
   map.handle.on('locationfound', function(e) {
     var newLocation = map.latlng2GeoJson(e.latlng);
     if (!_.isEqual(last.userLocation, newLocation)) {
@@ -317,20 +347,13 @@ Template.leafletMap.rendered = function() {
       last.userLocation = newLocation;
     }
     // pan the map to user location
-    map.zoomSet(map.defaultZoom);
-    mapProvider.centerSet(newLocation);
-    Session.set('locationAvailable', true);
-    // console.log('locationfound:', newLocation.coordinates);
-    panels.pop();
-    panels.push("main");
+    locateEnd(true, newLocation, map.defaultZoom);
   });
   map.handle.on('locationerror', function(e) {
-    // console.log('locationerror', e.message, e.code);
-    mapProvider.centerSet(map.ancientLevantGJ);
-    map.zoomSet(map.minZoom);
-    panels.pop();
-    panels.push("main");
+    locateEnd(false, map.ancientLevantGJ, map.minZoom);
   });
+  // console.log("trigger first auto-locate");
+  Session.set("userLocateTrigger", true);
   // control all markers via a single layer
   map.markerLayer = L.layerGroup().addTo(map.handle);
   mapProvider.placeDragSet = function (action) {

@@ -23,7 +23,7 @@ Router.map(function() {
     path: '/',
     layoutTemplate: 'land',
   });
-  this.route('main');
+  this.route('placesMap');
   this.route('about');
   this.route('admin', {
     onBeforeAction: function (pause) {

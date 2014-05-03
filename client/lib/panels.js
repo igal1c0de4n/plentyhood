@@ -132,6 +132,6 @@ panels = {};
     panels.clear = function () {
       // in case there are external references
       stack.length = 0;
-    }
+    };
   })();
 }());

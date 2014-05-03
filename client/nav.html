@@ -39,9 +39,9 @@
       <a class="navbar-brand" href="/">Plentyhood</a>
     </div>
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse pull-right" id="navcol">
+    <div class="collapse navbar-collapse" id="navcol">
       <ul class="nav navbar-nav">
-        <li  class="{{page2class "main" "active"}}"><a href="/main">Places</a></li>
+        <li  class="{{page2class "placesMap" "active"}}"><a href="/placesMap">Places</a></li>
         <li  class="{{page2class "about" "active"}}"><a href="/about">About</a></li>
         {{#if isInRole 'admin'}}
         <li class="{{page2class "admin" "active"}}"><a href="/admin">Admin</a></li>
@@ -96,10 +96,8 @@
 </template>
 
 <template name="about">
-<div class="container">
-  <h2>About Plentyhood</h2>
-  <p>tbd</p>
-  <h3>Want to try it out?</h3>
+<div class="nbox indent">
+  <h3>How to try it out?</h3>
   <p>
   Create an account, login with Facebook or use one of the demo users 
   (psw <em>sharewme</em>):</p>
@@ -110,9 +108,8 @@
   <p><small>
     <strong>Note:</strong>
     <em>
-      current app vertion is approaching alpha. 
-      Security is not yet strictly enforced.<br/>
-      Expect bugs and missing features, thanks for the understanding!
+      Plentyhood is under dev<br/>
+      Expect bugs and missing features, thanks for taking the time to evaluate it!
     </em>
   </small></p>
 </div>
