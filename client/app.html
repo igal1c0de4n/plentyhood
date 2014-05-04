@@ -1,5 +1,5 @@
 <template name="siteLayout">
-<div class="rootbox">
+<div id="rootbox">
   {{> header}}
   {{> yield}}
 </div>
@@ -48,24 +48,26 @@
 </template>
 
 <template name="panelBegin">
-<div class="horizbox panelBegin">
-  <button class="btn btn-success resourcesSearch">
-    <span class="glyphicon glyphicon-white glyphicon-search"></span>
-    Resources
-  </button>
-  <button class="btn btn-success servicesSearch">
-    <span class="glyphicon glyphicon-white glyphicon-search"></span>
-    Services
-  </button>
-  {{#if locateAvailable}}
-  <button class="btn btn-primary locateTrig">
-    <span class="glyphicon glyphicon-screenshot white glyphicon-search"></span>
-    My Location
-  </button>
-  {{/if}}
+<div>
+  <div class="horizbox panelBegin">
+    <button class="btn btn-success resourcesSearch">
+      <span class="glyphicon glyphicon-white glyphicon-search"></span>
+      Resources
+    </button>
+    <button class="btn btn-success servicesSearch">
+      <span class="glyphicon glyphicon-white glyphicon-search"></span>
+      Services
+    </button>
+    {{#if locateAvailable}}
+    <button class="btn btn-primary locateTrig">
+      <span class="glyphicon glyphicon-screenshot white glyphicon-search"></span>
+      My Location
+    </button>
+    {{/if}}
+  </div>
+  <hr class="tight">
+  {{> instructions}}
 </div>
-<hr class="tight">
-{{> instructions}}
 </template>
 
 <template name="panelBackButton">
@@ -83,11 +85,11 @@
   <div>
   <input id="tagsSearchInputField" type="text" value="{{prvTags}}"
   placeholder="Enter tags" data-role="tagsinput"/>
-  </div>
   <button class="btn btn-success goSearch">
     <span class="glyphicon glyphicon-white glyphicon-search"></span>
     Search
   </button> 
+  </div>
 </div>
 </template>
 
@@ -171,25 +173,27 @@
 
 <template name="panelPlace">
 {{#if selectedPlaceGet}}
-{{#with selectedPlaceGet}}
-<div class="bottomBorder horizbox">
-  {{> panelBackButton}}
-  <div>
-    <span class="glyphicon glyphicon-bookmark"></span>
-    <h4 class="inline"><a href="#" class="btn btn-link title">{{title}}</a></h4>
-    {{#if isOwner}}
+<div id="panelPlace">
+  {{#with selectedPlaceGet}}
+  <div class="bottomBorder horizbox">
+    {{> panelBackButton}}
     <div>
-      <input type="button" class="btn btn-xs editPlace" value="Edit">
-      <input type="button" class="btn btn-xs removePlace" value="Delete">
+      <span class="glyphicon glyphicon-bookmark"></span>
+      <h4 class="inline"><a href="#" class="btn btn-link title">{{title}}</a></h4>
+      {{#if isOwner}}
+      <div>
+        <input type="button" class="btn btn-xs editPlace" value="Edit">
+        <input type="button" class="btn btn-xs removePlace" value="Delete">
+      </div>
+      {{/if}}
     </div>
-    {{/if}}
   </div>
+  {{> details}}
+  <div class="marginTop">
+    {{> placeResourcesPanel}}
+  </div>
+  {{/with}}
 </div>
-{{> details}}
-<div class="marginTop">
-  {{> placeResourcesPanel}}
-</div>
-{{/with}}
 {{/if}}
 </template>
 

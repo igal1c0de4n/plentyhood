@@ -25,10 +25,10 @@ html, body {
 }
 @media all and (min-width: 1280px) {
   #mainPanel {
-    width: 640px;
+    width: 426.66667px;
   }
 }
-.rootbox {
+#rootbox {
   height: 100%;
   display: -webkit-box;
   display: -moz-box;
@@ -38,7 +38,7 @@ html, body {
   flex-direction: column;
 }
 
-.rootbox div.nbox {
+#rootbox div.nbox {
   flex-grow: 1;
   position: relative;
 }
@@ -48,13 +48,37 @@ html, body {
   background-color: white;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  position: relative;
-  overflow: hidden;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  align-content: stretch;
+}
+
+#panelSearch {
+  flex-grow: 1;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#panelPlace {
+  flex-grow: 1;
 }
 
 #leaflet-map {
   flex-grow: 1;
   background: black;
+}
+
+#navcol {
+  margin-right: 20px;
 }
 
 .centerBox {
@@ -65,6 +89,7 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-grow: 1;
 }
 
 .disable-select {
@@ -101,10 +126,6 @@ html, body {
 
 input.chosen {
   font-weight: bold;
-}
-
-#navcol {
-  margin-right: 20px;
 }
 
 .verticalMargin {
@@ -173,17 +194,6 @@ hr.tight {
 
 button.panelBack {
   margin-right: 4px;
-}
-
-#panelSearch {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
 }
 
 .bootstrap-tagsinput {

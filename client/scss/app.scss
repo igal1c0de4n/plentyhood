@@ -18,6 +18,10 @@ $widthLargeDisp: 1280px;
   #placesMapBox {
     flex-direction: column;
   }
+  #mainPanel {
+    // TBD: assign fixed height?
+    // height: $widthSmallDisp/2;
+  }
 }
 @media all and (min-width: $widthSmallDisp) and (max-width: $widthLargeDisp) {
   #mainPanel {
@@ -26,15 +30,15 @@ $widthLargeDisp: 1280px;
 }
 @media all and (min-width: $widthLargeDisp) {
   #mainPanel {
-    width: $widthSmallDisp;
+    width: $widthLargeDisp/3;
   }
 }
-.rootbox {
+#rootbox {
   height: 100%;
   @include flexbox();
   flex-direction: column;
 }
-.rootbox div.nbox {
+#rootbox div.nbox {
   // flex item
   flex-grow: 1;
   position: relative;
@@ -44,17 +48,31 @@ $widthLargeDisp: 1280px;
   background-color: white;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  position: relative;
-  overflow: hidden;
+  @include flexbox();
+  justify-content: center;
+  align-content: stretch;
+}
+#panelSearch {
+  flex-grow: 1;
+  @include flexbox();
+  flex-direction: column;
+  align-items: stretch;
+}
+#panelPlace {
+  flex-grow: 1;
 }
 #leaflet-map {
   flex-grow: 1;
   background: black;
 }
+#navcol {
+  margin-right: 20px;
+}
 .centerBox {
   @include flexbox();
   justify-content: center;
   align-items: center;
+  flex-grow: 1;
 }
 .disable-select {
   -webkit-user-select: none;  
@@ -83,9 +101,6 @@ $widthLargeDisp: 1280px;
 }
 input.chosen {
   font-weight: bold;
-}
-#navcol {
-  margin-right: 20px;
 }
 .verticalMargin {
   margin-top: 10px;
@@ -140,12 +155,6 @@ hr.tight {
 }
 button.panelBack {
   margin-right: 4px;
-}
-#panelSearch {
-  @include flexbox();
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
 }
 .bootstrap-tagsinput {
   width: 100%;
