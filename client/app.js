@@ -9,11 +9,11 @@ app = {};
 Template.panelBegin.events({
   'click .resourcesSearch': function (){
     Session.set("searchType", "resources");
-    panels.push("search");
+    panels.push("pSearch");
   },
   'click .servicesSearch': function (){
     Session.set("searchType", "services");
-    panels.push("search");
+    panels.push("pSearch");
   },
   'click .locateTrig': function (){
     Session.set("userLocateTrigger", true);
@@ -46,7 +46,7 @@ Template.placesMap.created = function () {
     var resources = [];
     var tags = Session.get("searchTags");
     var center = Session.get("mapCenter");
-    // only search when search is explicitly triggered
+    // only search when explicitly triggered
     if (Session.get("searchTrigger") == false) {
       return;
     } 
@@ -182,7 +182,7 @@ var panelSearchAction = function () {
   Session.set("searchTags", tags);
   Session.set("searchTrigger", true);
   // console.log("search tags", tags);
-  panels.push("resultsList");
+  panels.push("pResultsList");
 };
 
 Template.panelSearch.prvTags = function () {

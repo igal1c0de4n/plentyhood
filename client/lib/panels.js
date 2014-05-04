@@ -32,14 +32,14 @@ panels = {};
   };
 
   var panelContexts = [{
-    name: "main"
+    name: "pBegin"
   },
   { 
-    name: "search",
+    name: "pSearch",
     events: [defaultKeyupHandler],
   },
   { 
-    name: "resultsList",
+    name: "pResultsList",
     events: [{
       type: "keyup", 
       handler: function(e) { // app.resultListKeyupHandler
@@ -86,7 +86,7 @@ panels = {};
     events: [defaultKeyupHandler],
   },
   {
-    name: "locate",
+    name: "pLocate",
   },
   ];
 

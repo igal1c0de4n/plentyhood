@@ -181,7 +181,7 @@ Template.leafletMap.created = function() {
       Meteor.setTimeout(function (){
         if (Session.get("userLocateTrigger")) {
           // console.log("search is still in progress, displaying locate panel");
-          panels.push("locate");
+          panels.push("pLocate");
         }
       }, 500);
       // console.log("running auto locate");
@@ -314,10 +314,10 @@ Template.leafletMap.rendered = function() {
     // console.log(
     //   'location', result ? 'found' : 'unavailable', 
     //   'center', center, 'zoom', zoom);
-    if (Session.get("panel") == "locate") {
+    if (Session.get("panel") == "pLocate") {
       panels.pop();
     }
-    panels.push("main");
+    panels.push("pBegin");
   }
   map.handle.on('locationfound', function(e) {
     var newLocation = map.latlng2GeoJson(e.latlng);

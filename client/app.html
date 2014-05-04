@@ -20,16 +20,16 @@
 {{#unless isDialogActive}}
     {{#unless isPanelActive}}
     <div id="mainPanel" class="disable-select">
-      {{#if isPanelActive "locate"}}
+      {{#if isPanelActive "pLocate"}}
       {{> panelLocate}}
       {{/if}}
-      {{#if isPanelActive "main"}}
+      {{#if isPanelActive "pBegin"}}
       {{> panelBegin}}
       {{/if}}
-      {{#if isPanelActive "search"}}
+      {{#if isPanelActive "pSearch"}}
       {{> panelSearch}}
       {{/if}}
-      {{#if isPanelActive "resultsList"}}
+      {{#if isPanelActive "pResultsList"}}
       {{> resultsList}}
       {{/if}}
       {{#if isPanelActive "place"}}
