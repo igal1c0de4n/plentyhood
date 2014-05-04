@@ -46,15 +46,19 @@ Template.placesMap.created = function () {
     var resources = [];
     var tags = Session.get("searchTags");
     var center = Session.get("mapCenter");
-    // only search when explicitly triggered
-    if (Session.get("searchTrigger") == false) {
-      return;
+    if (Session.get("mapSubscriptionsReady")) {
+      // cause recompute
+      Session.set("mapSubscriptionsReady", false);
     } 
-    Session.set("searchTrigger", false);
     if (!center || !subscriptions.multiReady(["places", "resources", "tags"])) {
       // console.log("handleTagsUpdate: subscriptions not ready");
       return;
     }
+    if (!Session.get("searchTrigger")) {
+      // console.log("search not triggered so skipped");
+      return;
+    } 
+    Session.set("searchTrigger", false);
     // console.log("handleTagsUpdate run");
     if (tags && tags.length) {
       // console.log("tags", tags);
@@ -129,7 +133,10 @@ Template.placesMap.created = function () {
       // console.log("subscribing with bounds", b)
       // console.log("all places", collections.Places.find().fetch());
       // must subscribe places separately bc of parameter
-      subscriptions.multiAdd(["tags", "resources", ["places", b]]);
+      subscriptions.multiAdd(["tags", "resources", ["places", b]], function (){
+        // console.log("subscription ready");
+        Session.set("mapSubscriptionsReady", true);
+      });
     }
   });
   // trigger handleTagsUpdate run to show all places

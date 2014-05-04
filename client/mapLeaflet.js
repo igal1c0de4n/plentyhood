@@ -346,8 +346,9 @@ Template.leafletMap.rendered = function() {
       // console.log("updated current loc marker to", e.latlng.toString());
       last.userLocation = newLocation;
     }
-    // pan the map to user location
+    // console.log("pan the map to user location");
     locateEnd(true, newLocation, map.defaultZoom);
+    Session.set("searchTrigger", true);
   });
   map.handle.on('locationerror', function(e) {
     locateEnd(false, map.ancientLevantGJ, map.minZoom);
