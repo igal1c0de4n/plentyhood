@@ -10,13 +10,13 @@ html, body {
   align-items: stretch;
 
   // flex item
-  flex-grow: 1;
+  @include flex-grow(1);
 }
 $widthSmallDisp: 640px;
 $widthLargeDisp: 1280px;
 @media all and (max-width: $widthSmallDisp) {
   #placesMapBox {
-    flex-direction: column;
+    @include flex-direction(column);
   }
   #mainPanel {
     // TBD: assign fixed height?
@@ -36,33 +36,31 @@ $widthLargeDisp: 1280px;
 #rootbox {
   height: 100%;
   @include flexbox();
-  flex-direction: column;
+  @include flex-direction(column);
 }
 #rootbox div.nbox {
   // flex item
-  flex-grow: 1;
+  @include flex-grow(1);
   position: relative;
 }
 #mainPanel {
   padding: 10px;
   background-color: white;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   @include flexbox();
   justify-content: center;
   align-content: stretch;
 }
 #panelSearch {
-  flex-grow: 1;
+  @include flex-grow(1);
   @include flexbox();
-  flex-direction: column;
+  @include flex-direction(column);
   align-items: stretch;
 }
 #panelPlace {
-  flex-grow: 1;
+  @include flex-grow(1);
 }
 #leaflet-map {
-  flex-grow: 1;
+  @include flex-grow(1);
   background: black;
 }
 #navcol {
@@ -72,7 +70,7 @@ $widthLargeDisp: 1280px;
   @include flexbox();
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
+  @include flex-grow(1);
 }
 .disable-select {
   -webkit-user-select: none;  
@@ -165,9 +163,9 @@ button.panelBack {
   align-items: stretch;
 }
 .panelBegin {
-  flex-wrap: wrap;
+  @include flex-wrap(wrap);
 }
 .panelBegin button {
   margin: 3px;
-  flex-grow: 1;
+  @include flex-grow(1);
 }
