@@ -18,8 +18,8 @@
 <div id="placesMapBox">
 {{> dialogs}}
 {{#unless isDialogActive}}
-    {{#unless isPanelActive}}
     <div id="mainPanel" class="disable-select">
+    {{#unless isPanelActive}}
       {{#if isPanelActive "pLocate"}}
       {{> panelLocate}}
       {{/if}}
@@ -38,8 +38,8 @@
       {{#if mapZoomedOut}}
       {{> panelZoomedOut}}
       {{/if}}
-    </div>
     {{/unless}}
+    </div>
 {{/unless}}
 {{#if canLoadMap}}
 {{> leafletMap}}
