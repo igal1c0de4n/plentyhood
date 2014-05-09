@@ -18,12 +18,12 @@ if (!console || !console.log) {
 // Startup
 
 Meteor.startup(function () {
-  // Create Test Users
+  // Create Demo Users
   if (Meteor.users.find().fetch().length === 0) {
     console.log('Creating users: ');
     var users = [
-      {name:"User",email:"user@ph.earth",roles:[]},
-      {name:"Admin",email:"admin@ph.earth",roles:['admin']}
+      {name:"user", email:"user@ph.earth", roles: []},
+      {name:"admin", email:"admin@ph.earth", roles: ['admin']}
     ];
     _.each(users, function (userData) {
       var id,
