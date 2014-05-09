@@ -25,26 +25,17 @@ Router.map(function() {
   });
   this.route('placesMap');
   this.route('about');
+  this.route('signin');
   this.route('admin', {
     onBeforeAction: function (pause) {
       if (!Roles.userIsInRole(Meteor.user(), 'admin')) {
+        console.log("user is not an admin");
         this.render('notFound');
-        pause();
+        // TBD: uncomment this
+        // pause();
+      } else {
+        console.log("admin confirmed");
       }
-    },
-  });
-  this.route('land', {
-    path: '/signout',
-    onBeforeAction: function (pause) {
-      if (!Meteor.user()) {
-        // render the login template but keep the url in the browser the same
-        this.render('land');
-        // stop the rest of the before hooks and the action function 
-        pause();
-      }
-    },
-    action: function () {
-      roles.signout();
     },
   });
 });

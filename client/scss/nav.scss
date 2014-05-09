@@ -1,76 +1,149 @@
-.navbar {
-  margin-bottom: 0px;
-}
+@import 'flex';
 
-#login-buttons a {
-  padding: 15px 15px 15px;
-  color: #999999;
-  line-height: 0;
-  text-decoration: none;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  float: none;
+@mixin box-sizing($value: border-box) {
+  -webkit-box-sizing: $value;
+  -moz-box-sizing: $value;
+  box-sizing: $value;
+}
+// css reset start
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  @include box-sizing;
+}
+*:after, *:before {
+  @include box-sizing;
+}
+article,aside,details,figcaption,figure,footer,header,hgroup,nav,section {
   display: block;
-  line-height: 20px;
 }
-
-.signin {
-  width:100%;
-  text-align:center;
-}
-.signin .login-form {
-  width:200px;
-  margin: 0 auto;
-  position:relative;
-  text-align:left;
-}
-.signin .login-form {
-}
-.signin .login-close-text {
-  display:none;
-}
-.signin #login-buttons {
-}
-.signin .additional-link-container {
-  display:none;
-}
-.signin .example-users {
-  width:350px;
-  margin: 0 auto;
-  position:relative;
-  text-align:left;
-  top:15em;
-  left:3em;
-}
-
-#err .close {
-  float:none;
-  margin-left:1em;
-}
-
-.note {
-  margin:1em 0em;
-  padding:1em;
-  border:1px solid #ccc;
-}
-
-.security-note {
-  margin-top:10em;
-}
-
-a.userNavMenu {
-  background-color: transparent !important;
-  padding-top: 4px !important;
-  padding-bottom: 0px !important;
-  padding-left: 0px !important;
-  padding-right: 0px !important;
-  margin-right: 10px;
-}
+// css reset end
 
 img.avatar {
-  margin: 8px;
+  margin-right: 8px;
   max-height: 30px;
   border-radius: 100px;
 }
-.notFound {
+.textPage {
   margin: 10px;
+}
+
+// begin new header
+$navColorTop: rgba(0,10,20,1);
+$navColorBottom: rgba(0,100,50,1);
+$menuColorHighlight: rgba(0,140,30,0.3);
+$navColorBg: linear-gradient(to bottom,$navColorTop,$navColorBottom);
+$navColorBgRev: linear-gradient(to top,$navColorTop,$navColorBottom);
+
+header {
+  background: $navColorBg;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+  display: block;
+}
+
+header a:hover {
+  color: white;
+  text-decoration: none;
+}
+header > nav > ul {
+  @include flexbox();
+  @include flex-wrap(wrap);
+  @include justify-content(flex-start);
+  @include align-items(center);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+header > nav > ul > li {
+  @include flex(0,1,auto);
+  margin: 0;
+  padding: 0;
+  position: relative;
+  transition: all linear 0.1s;	
+}
+
+header > nav > ul > li.nav-separator {
+  @include flex(1,1,auto);
+}
+
+header > nav > ul > li:hover {
+  background: $menuColorHighlight;
+}
+header > nav > ul > li.active:hover {
+  background: none;
+}
+header > nav > ul > li.active > a:hover {
+  cursor: default;
+}
+header > nav > ul > li.nav-separator:hover {
+  background: none;
+}
+
+header > nav > ul > li a + div {
+  background: $navColorBgRev;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 5px 10px rgba(0,0,0,.5);
+  font-size: 1.5rem;
+  position: absolute;
+  width: 100%;
+  display: none;
+}
+
+header > nav > ul > li:hover a + div {
+  display: block;
+  z-index: 1000;
+}
+
+header > nav > ul > li a + div > ul {
+  list-style-type: none;
+}
+
+header > nav > ul > li a + div > ul > li {
+  margin: 0;
+  padding: 0;
+}
+
+header > nav > ul > li a + div > ul > li > a {
+  color: rgba(255,255,255,.7);
+  display: block;	
+  padding: 10px;
+  text-decoration: none;
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+header > nav > ul > li a + div > ul > li:hover > a {
+  background-color: rgba(0,0,0,.15);	
+}
+
+header > nav > ul > li > a {
+  @include flexbox();
+  @include align-items(center);
+  color: #fff;
+  font-size: 1.55rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  max-width: 130px;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  text-shadow: 0 1px 1px rgba(0,0,0,.1);
+  transition: all linear 0.1s;
+}
+
+header > nav > ul > li > a.userNav {
+  padding: 0px !important;
+  margin: 10px 15px;
+}
+
+header > nav > ul > li > a > div > span {
+  color: rgba(255,255,255,.75);
+  display: block;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: .7rem;	
+  font-style: italic;
+  line-height: 1rem;
+  max-width: 260px;
 }

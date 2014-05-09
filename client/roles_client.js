@@ -4,13 +4,6 @@ roles = {};
 
   "use strict";
 
-roles.signout = function () {
-  console.log('logging out', Meteor.user().profile.name);
-  Meteor.logout(function () {
-    //     console.log('...done');
-    Meteor.navigateTo('/');
-  });
-};
 
 ////////////////////////////////////////////////////////////////////
 // Patches
@@ -45,87 +38,21 @@ Deps.autorun(function () {
 });
 
 ////////////////////////////////////////////////////////////////////
-// Templates
+// header
 
-Template.signin.rendered = function () {
-  // auto-trigger accounts-ui login form dropdown
-  Accounts._loginButtonsSession.set('dropdownVisible', true);
-};
-
-Template.header.events({
-  // template data, if any, is available in 'this'
-  'click .btn-navbar' : openCloseNav
-});
-
-Template.header.helpers({
-  rolesDispName: function () {
-    return rolesDispName();
-  }
-});
-
-Template.noteOfTheDay.helpers({
-  note: function () {
-    return "Greetings " + rolesDispName() + "!";
-  }
-});
-
-////////////////////////////////////////////////////////////////////
-// displayUsers
-
-Template.displayUsers.helpers({
-  users: function () {
-    return Meteor.users.find();
-  },
-  email: function () {
-    return this.emails[0].address;
-  },
-  roles: function () {
-    if (!this.roles) return '<none>';
-    return this.roles.join(',');
-  }
-});
-
-////////////////////////////////////////////////////////////////////
-// Misc helper functions
-
-function rolesDispName (user) {
+Template.header.rolesDispName = function (user) {
   var name;
-
   if (!user) {
     user = Meteor.user();
   }
-
   if (!user) return "<missing user>";
-
   if (user.profile) {
     name = user.profile.name;
   }
-
-  if ('string' === typeof name) {
-    name = name.trim();
-  } else {
-    name = null;
-  }
-
+  name = 'string' === typeof name ? name.trim() : null;
   if (!name && user.emails && user.emails.length > 0) {
     name = user.emails[0].address;
   }
-
   return name || "<missing name>";
-}
-
-// insta-open/close nav rather than animate collapse.
-// this improves UX on mobile devices
-function openCloseNav (e) {
-  // Select .nav-collapse within same .navbar as current button
-  var nav = $(e.target).closest('.navbar').find('.nav-collapse');
-
-  if (nav.height() != 0) {
-    // If it has a height, hide it
-    nav.height(0);
-  } else {
-    // If it's collapsed, show it
-    nav.height('auto');
-  }
 }
 }());

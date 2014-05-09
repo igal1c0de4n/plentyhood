@@ -2,7 +2,8 @@
 // header
 
 Template.header.page2class = function (page, cssClass) {
-  if (Router.current() == page) {
+  var rc = Router.current();
+  if (rc && rc.path == ("/" + page)) {
     //     console.log("active page", page);
     return cssClass;
   }
@@ -55,5 +56,10 @@ Template.header.events({
   },
   'click #fullscreen-off': function () {
     exitFullScreen();
+  },
+  'click #signout': function () {
+    Meteor.logout(function () {
+      console.log("signed out");
+    });
   },
 });

@@ -1,110 +1,75 @@
-<head>
-  <title>Plentyhood</title>
-  <meta name="viewport" 
-  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-</head>
-
 <template name="notFound">
-<div class="notFound">
+<div class="textPage">
   <h2>Oops, Page Not Found!</h2>
   <p>It seems that the page you were looking for has gone missing</p>
 </div>
 </template>
 
 <template name="signin">
-<div class="signin">
-  <div class="login-form">
-    <h1>Sign In</h1>
-    {{> loginButtons}}
-  </div>
-  <div class="example-users">
-    <p>Normal User: normal@example.com | apple1</p>
-    <p>Manage Users: manage@example.com | apple1</p>
-    <p>Admin User: admin@example.com | apple1</p>
-  </div>
-</div>
-</template>
-
-<template name="header">
-<nav class="navbar navbar-inverse" role="navigation" >
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" 
-        data-target="#navcol">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/">Plentyhood</a>
-    </div>
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="navcol">
-      <ul class="nav navbar-nav">
-        <li  class="{{page2class "placesMap" "active"}}"><a href="/placesMap">Places</a></li>
-        <li  class="{{page2class "about" "active"}}"><a href="/about">About</a></li>
-        {{#if isInRole 'admin'}}
-        <li class="{{page2class "admin" "active"}}"><a href="/admin">Admin</a></li>
-        {{/if}}
-        {{#if isInRole 'admin,manage-users'}}
-        <li class="{{page2class "manage" "active"}}"><a href="/manage">Users</a></li>
-        {{/if}}
-        <li><a href="#" id="fullscreen-on" class="btn btn-link">Fullscreen</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        {{#if currentUser}}
-        <li class="dropdown">
-        <a href="#" class="dropdown-toggle userNavMenu" data-toggle="dropdown">
-          {{#if getFbUser}}
-          <img src="//graph.facebook.com/{{getFbUser}}/picture" 
-          Title="{{rolesDispName}}"
-          class="avatar"/>
-          {{/if}}
-          {{rolesDispName}}
-          <b class="caret"></b>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="signout" href="/signout">Sign out</a></li>
-        </ul>
-        </li>
-        {{else}}
-        <li>{{> loginButtons align="right"}}</li>
-        {{/if}}
-        <!-- eventually replace w/own login controls as in: -->
-        <!-- https://www.eventedmind.com/tracks/feed-archive/meteor-customizing-login -->
-        <!--   <li><a href="#">Link</a></li> -->
-        <!--   <li class="dropdown"> -->
-        <!--     <a href="#" class="dropdown-toggle" data-toggle="dropdown"> -->
-        <!--       Dropdown <b class="caret"></b> -->
-        <!--     </a> -->
-        <!--     <ul class="dropdown-menu"> -->
-        <!--       <li><a href="#">Action</a></li> -->
-        <!--       <li><a href="#">Another action</a></li> -->
-        <!--       <li><a href="#">Something else here</a></li> -->
-        <!--       <li class="divider"></li> -->
-        <!--       <li><a href="#">Separated link</a></li> -->
-        <!--     </ul> -->
-        <!--   </li> -->
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
-</nav>
-</template>
-
-<template name="noteOfTheDay">
-<p>Note of the day: {{note}}</p>
-</template>
-
-<template name="about">
-<div class="nbox indent">
-  <h3>How to try it out?</h3>
-  <p>
-  Create an account, login with Facebook or use one of the demo users 
-  (psw <em>sharewme</em>):</p>
+<div class="textPage">
+  <p>Create an account, login with Facebook or use one of the demo users 
+  [psw <em>sharewme</em>]):</p>
   <ul>
     <li>user@ph.earth</li>
     <li>admin@ph.earth</li>
   </ul>
+  {{> loginButtons}}
+</div>
+</template>
+
+<template name="header">
+<header role="banner">
+  <nav role="navigation">
+    <ul>
+      <li class="{{page2class "" "active"}}">
+      <a href="/"><div>Plentyhood<span></span></div></a>
+      </li>
+      <li class="{{page2class "about" "active"}}">
+      <a href="/about"><div>About</div></a>
+      </li>
+      <li class="{{page2class "placesMap" "active"}}">
+      <a href="/placesMap"><div>Places</div></a>
+      </li>
+      <li>
+      <a href="#" id="fullscreen-on"><div>Fullscreen</div></a>
+      </li>
+      {{#if isInRole 'admin'}}
+      <li class="{{page2class "admin" "active"}}">
+      <a href="/admin"><div>Admin</div></a>
+      </li>
+      <li class="{{page2class "manage" "active"}}">
+      <a href="/manage"><div>Users</div></a>
+      </li>
+      {{/if}}
+      <li class="nav-separator"></li>
+      <!-- <a href="#"><div>User Name</div></a> -->
+      {{#if currentUser}}
+      <li>
+      <a href="#" class="userNav">
+        {{#if getFbUser}}
+        <img src="//graph.facebook.com/{{getFbUser}}/picture" class="avatar"/>
+        {{/if}}
+        <div>{{rolesDispName}}</div>
+      </a>
+      <div>
+        <ul>
+          <li><a href="#">Settings</a></li>
+          <li><a href="#" id="signout">Sign out</a></li>
+        </ul>
+      </div>
+      </li>
+      {{else}}
+      <li class="{{page2class "signin" "active"}}">
+      <a href="/signin"><div>Sign In</div></a>
+      </li>
+      {{/if}}
+    </ul>
+  </nav>
+</header>
+</template>
+
+<template name="about">
+<div class="nbox textPage">
   <p><small>
     <strong>Note:</strong>
     <em>
@@ -115,25 +80,3 @@
 </div>
 </template>
 
-<template name="displayUsers">
-<h3>Current Users</h3>
-<ul>
-  {{#each users}}
-  <li>{{email}} - Roles: {{roles}}</li>
-  {{/each}}
-</ul>
-</template>
-
-<template name="manage">
-<div class="manage-users row">
-  <div class="offset4 span8">
-    <p class="note">
-    Only Admins and those with the 'manage-users' role 
-    will see this page in their nav menu.
-    </p>
-    <h2>Manage Users</h2>
-    <br />
-    {{> displayUsers}}
-  </div>
-</div>
-</template>
