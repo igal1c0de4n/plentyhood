@@ -94,6 +94,13 @@ header > nav > ul > li.active:hover {
   background: none;
 }
 
+header > nav > ul > li > a:active,
+header > nav > ul > li > a:focus {
+  outline-style: none;
+  text-decoration: none;
+  color: white;
+}
+
 header > nav > ul > li.active > a:hover {
   cursor: default;
 }

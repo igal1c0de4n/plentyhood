@@ -35,14 +35,12 @@ $navColorBottom: rgba(0,100,50,1);
 $menuColorHighlight: rgba(0,140,30,0.3);
 $navColorBg: linear-gradient(to bottom,$navColorTop,$navColorBottom);
 $navColorBgRev: linear-gradient(to top,$navColorTop,$navColorBottom);
-
 header {
   background: $navColorBg;
   border-bottom: 1px solid rgba(0,0,0,.1);
   box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
   display: block;
 }
-
 header a:hover {
   color: white;
   text-decoration: none;
@@ -56,7 +54,6 @@ header > nav > ul {
   margin: 0;
   padding: 0;
 }
-
 header > nav > ul > li {
   @include flex(0,1,auto);
   margin: 0;
@@ -64,16 +61,20 @@ header > nav > ul > li {
   position: relative;
   transition: all linear 0.1s;	
 }
-
 header > nav > ul > li.nav-separator {
   @include flex(1,1,auto);
 }
-
 header > nav > ul > li:hover {
   background: $menuColorHighlight;
 }
 header > nav > ul > li.active:hover {
   background: none;
+}
+header > nav > ul > li > a:active,
+header > nav > ul > li > a:focus {
+  outline-style: none; 
+  text-decoration: none;
+  color: white;
 }
 header > nav > ul > li.active > a:hover {
   cursor: default;
@@ -81,7 +82,6 @@ header > nav > ul > li.active > a:hover {
 header > nav > ul > li.nav-separator:hover {
   background: none;
 }
-
 header > nav > ul > li a + div {
   background: $navColorBgRev;
   border-radius: 0 0 5px 5px;
@@ -91,21 +91,17 @@ header > nav > ul > li a + div {
   width: 100%;
   display: none;
 }
-
 header > nav > ul > li:hover a + div {
   display: block;
   z-index: 1000;
 }
-
 header > nav > ul > li a + div > ul {
   list-style-type: none;
 }
-
 header > nav > ul > li a + div > ul > li {
   margin: 0;
   padding: 0;
 }
-
 header > nav > ul > li a + div > ul > li > a {
   color: rgba(255,255,255,.7);
   display: block;	
@@ -114,11 +110,9 @@ header > nav > ul > li a + div > ul > li > a {
   text-transform: capitalize;
   font-weight: 500;
 }
-
 header > nav > ul > li a + div > ul > li:hover > a {
   background-color: rgba(0,0,0,.15);	
 }
-
 header > nav > ul > li > a {
   @include flexbox();
   @include align-items(center);
@@ -132,12 +126,10 @@ header > nav > ul > li > a {
   text-shadow: 0 1px 1px rgba(0,0,0,.1);
   transition: all linear 0.1s;
 }
-
 header > nav > ul > li > a.userNav {
   padding: 0px !important;
   margin: 10px 15px;
 }
-
 header > nav > ul > li > a > div > span {
   color: rgba(255,255,255,.75);
   display: block;
