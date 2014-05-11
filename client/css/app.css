@@ -69,7 +69,13 @@ html, body {
   display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  justify-content: center;
+  -webkit-box-direction: normal;
+  -webkit-box-orient: vertical;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  justify-content: flex-start;
   align-content: stretch;
 }
 

@@ -47,7 +47,8 @@ $widthLargeDisp: 1280px;
   padding: 10px;
   background-color: white;
   @include flexbox();
-  justify-content: center;
+  @include flex-direction(column);
+  justify-content: flex-start;
   align-content: stretch;
 }
 #panelSearch {
