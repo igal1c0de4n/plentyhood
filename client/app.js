@@ -372,7 +372,7 @@ Template.panelPlace.events({
     var sp = Session.get("selectedPlace");
     location.coordinates = sp.location.coordinates;
     // console.log("clicked title of", sp.title);
-    mapProvider.centerSet(location, true);
+    mapProvider.centerSet(true, location);
     return false;
   },
   'click .editLocation': function () {

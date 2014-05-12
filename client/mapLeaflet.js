@@ -8,6 +8,7 @@ mapProvider = {};
 ///////////////////////////////////////////////////////////////////////////////
 
 var map = {
+  debug: {},
   handle: undefined,
   renderCount: undefined, // for troubleshooting extra renders
   defaultZoom: 12,
@@ -51,18 +52,152 @@ var map = {
     ];
     if (Session.get("drawBounds")) {
       // debug 
-      if (last.rect) {
-        map.handle.removeLayer(last.rect);
-        delete last.rect;
+      if (map.debug.rect) {
+        map.handle.removeLayer(map.debug.rect);
+        delete map.debug.rect;
       }
       var rb = L.latLngBounds(
         L.latLng(bounds[0][1], bounds[0][0]),
         L.latLng(bounds[1][1], bounds[1][0])
       );
-      last.rect = L.rectangle(rb, {color: "#ff7800", weight: 2}).addTo(map.handle);
+      map.debug.rect = L.rectangle(rb, {color: "#ff7800", weight: 2}).addTo(map.handle);
     }
     // console.log("bounds", bounds, b);
     Session.set("mapBounds", bounds);
+  },
+  moveEnd: function(e) {
+    var zoom = map.handle.getZoom();
+    var center = {
+      // last: Session.get("mapCenter"),
+      current: map.latlng2GeoJson(map.handle.getCenter()),
+      next: Session.get('mapNextCenter'),
+    };
+    var coordsGet = function (c) {
+      return c ? c.coordinates : undefined;
+    }
+    // console.log('map moveend', zoom, 
+    //             coordsGet(center.last), 
+    //             coordsGet(center.current), 
+    //             coordsGet(center.next));
+    map.zoomSet(zoom);
+    Session.set('mapCenter', center.current);
+    var closeEnough = center.next ? 
+      map.isCloseEnough(center.next.coordinates, center.current.coordinates) : false;
+    if (closeEnough) {
+      Session.set('mapNextCenter', undefined);
+      // console.log('map next center move is complete');
+      if (Session.get('animateCurrentLocation')) {
+        // console.log("animating auto locate");
+      }
+      if (map.userLocation) {
+        map.markUserLocation();
+      }
+    }
+    map.updateMapBounds();
+  },
+  markUserLocation: function () {
+    // remove previous user location, if exists
+    if (map.userLocationMarker) {
+      map.handle.removeLayer(map.userLocationMarker);
+    }
+    var currRadius = 300;
+    // mark user on the map with circle
+    var userLocMarkerOpts = {
+      color: 'yellow' /* for blue: '#15f'*/, 
+      opacity: 0.9,
+      fillOpacity: 0.6,
+      radius: currRadius, 
+      stroke: true,
+      clickable: true,
+    };
+    // console.log("animating user location", this.userLocation.coordinates);
+    var latlng = L.GeoJSON.coordsToLatLng(this.userLocation.coordinates);
+    map.userLocationMarker = new L.CircleMarker(latlng, userLocMarkerOpts);
+    L.featureGroup([map.userLocationMarker]).
+      bindPopup('Your detected location').
+      on('click', function() { 
+      // console.log('location marker clicked'); 
+    });
+    map.userLocationMarker.addTo(map.handle);
+    var intervalFuncId = Meteor.setInterval(function (){
+      // console.log("animate location marker", currRadius);
+      if (currRadius <= 10) {
+        Meteor.clearInterval(intervalFuncId);
+        return;
+      }
+      currRadius = Math.floor(currRadius * 0.9);
+      map.userLocationMarker.setRadius(currRadius);
+    }, 25);
+  },
+  locationFound: function(e) {
+    // console.log("location found");
+    var newLocation = map.latlng2GeoJson(e.latlng);
+    if (_.isEqual(map.userLocation, newLocation)) {
+      // console.log("user location already set at detected location");
+    } else {
+      // console.log("shifting map center to current location");
+      // console.log("updated current loc marker to", e.latlng.toString());
+      map.userLocation = newLocation;
+    }
+    map.locateEnd(true, newLocation, map.defaultZoom);
+    Session.set("searchTrigger", true);
+  },
+  locateEnd: function (locateSuccess, loc, zoom) {
+    Session.set("userLocateTrigger", false);
+    // map.zoomSet(zoom);
+    var mc = Session.get('mapCenter');
+    var closeEnough = mc ? 
+      map.isCloseEnough(mc.coordinates, loc.coordinates) : false;
+    if (closeEnough) {
+      map.markUserLocation();
+    } else {
+      // console.log("pan the map to user location");
+      mapProvider.centerSet(true, loc, zoom);
+      Session.set('locationAvailable', locateSuccess);
+    }
+    // console.log(
+    //   'location', locateSuccess ? 'found' : 'unavailable', 
+    //   loc, 'zoom', zoom);
+    if (Session.get("panel") == "pLocate") {
+      panels.pop();
+    }
+    if (Session.get("panel") != "pBegin") {
+      panels.push("pBegin");
+    }
+  },
+  placeDragSet: function (action) {
+    var updatePlaceCoords = function (id, c) {
+      collections.Places.update(
+        {_id: id},
+        { $set: { 'location.coordinates': c}});
+    };
+    //     console.log("markers", map.markers);
+    var placeId = client.selectedPlaceId();
+    var lm = map.markers.getItem(placeId).lmark;
+    if (action == "edit") {
+      //       console.log("enable marker drag", lm);
+      // store original coords in case user cancels
+      map.coordsBeforeDrag = lm.toGeoJSON().geometry.coordinates;
+      lm.on('dragend', function (e) {
+        var coords = this.toGeoJSON().geometry.coordinates;
+        //         console.log("marker", this, "moved to", coords);
+        updatePlaceCoords(this.placeId, coords);
+      });
+      lm.dragging.enable();
+    } else {
+      lm.dragging.disable();
+      lm.off('dragend', undefined);
+      if (action == "cancel") {
+        var sameLocation = 
+          _.isEqual(lm.toGeoJSON().geometry.coordinates, map.coordsBeforeDrag);
+        if (!sameLocation) {
+          // console.log("restoring previous coordinates", map.coordsBeforeDrag);
+          updatePlaceCoords(placeId, map.coordsBeforeDrag);
+          lm.setLatLng(L.GeoJSON.coordsToLatLng(map.coordsBeforeDrag));
+        }
+        delete map.coordsBeforeDrag;
+      }
+    }
   },
 };
 
@@ -192,7 +327,7 @@ Template.leafletMap.created = function() {
     }
   });
 
-  mapProvider.centerSet = function (center, animate) {
+  mapProvider.centerSet = function (animate, center, zoom) {
     if (!map.handle) {
       // console.error("map not initialized");
       return;
@@ -200,12 +335,12 @@ Template.leafletMap.created = function() {
     var mc = Session.get('mapCenter');
     if (mc && map.isCloseEnough(mc.coordinates, center.coordinates)) {
       Session.set('mapNextCenter', undefined);
-      // console.log('centerSet: requested center already set');
+      // console.log('center set: requested center already set');
       return;
     }
-    // console.log('centerSet', center.coordinates);
+    // console.log('center set', center.coordinates);
     if (Session.get('mapNextCenter')) {
-      // console.info("centerSet: recenter already in progress");
+      // console.info("center set: recenter already in progress");
       return;
     }
     Session.set('mapNextCenter', center);
@@ -217,7 +352,7 @@ Template.leafletMap.created = function() {
     };
     center.coordinates[0] = wrapLongitude(center.coordinates[0]);
     var llCoord = L.GeoJSON.coordsToLatLng(center.coordinates);
-    map.handle.setView(llCoord, undefined, {animate: animate});
+    map.handle.setView(llCoord, zoom, {animate: animate});
     map.updateMapBounds();
   };
 };
@@ -244,9 +379,6 @@ Template.leafletMap.rendered = function() {
     // console.error("leaflet rendered called while template is destroyed! skipping");
     return;
   }
-  var last = {
-    center: {},
-  };
   //   console.log("render iteration " + map.renderCount);
   var initOptions =  {
     maxZoom: map.maxZoom,
@@ -270,30 +402,7 @@ Template.leafletMap.rendered = function() {
   map.handle.on('dragend', function(e) {
     Session.set("searchTrigger", true);
   });
-  map.handle.on('moveend', function(e) {
-    var zoom = map.handle.getZoom();
-    var center = {
-      last: Session.get("mapCenter"),
-      current: map.latlng2GeoJson(map.handle.getCenter()),
-      next: Session.get('mapNextCenter'),
-    };
-    var coordsGet = function (c) {
-      return c ? c.coordinates : undefined;
-    }
-    // console.log('map moveend', zoom, 
-    //             coordsGet(center.last), 
-    //             coordsGet(center.current), 
-    //             coordsGet(center.next));
-    map.zoomSet(zoom);
-    Session.set('mapCenter', center.current);
-    if (center.next && 
-        map.isCloseEnough(center.next.coordinates, 
-                          center.current.coordinates)) {
-      Session.set('mapNextCenter', undefined);
-      // console.log('map next center move is complete');
-    }
-    map.updateMapBounds();
-  });
+  map.handle.on('moveend', map.moveEnd);
   map.handle.on('click', function(e) {
     //     console.log('clicked at', e.latlng);
     // ctrl is meta key to add a new place
@@ -305,92 +414,14 @@ Template.leafletMap.rendered = function() {
       schedCreateDialog(map.latlng2GeoJson(e.latlng));
     }
   });  
-  var userLocationMarker;
-  var locateEnd = function (result, center, zoom) {
-    Session.set("userLocateTrigger", false);
-    map.zoomSet(zoom);
-    mapProvider.centerSet(center);
-    Session.set('locationAvailable', result);
-    // console.log(
-    //   'location', result ? 'found' : 'unavailable', 
-    //   'center', center, 'zoom', zoom);
-    if (Session.get("panel") == "pLocate") {
-      panels.pop();
-    }
-    panels.push("pBegin");
-  }
-  map.handle.on('locationfound', function(e) {
-    var newLocation = map.latlng2GeoJson(e.latlng);
-    if (!_.isEqual(last.userLocation, newLocation)) {
-      if (userLocationMarker) {
-        // remove previous user location
-        map.handle.removeLayer(userLocationMarker);
-      }
-      // mark user on the map with circle
-      var userLocMarkerOpts = {
-        color: 'yellow' /* for blue: '#15f'*/, 
-        opacity: 0.9,
-        fillOpacity: 0.6,
-        radius: 10, 
-        stroke: true,
-        clickable: true,
-      };
-      userLocationMarker = 
-        new L.CircleMarker(e.latlng, userLocMarkerOpts);
-      L.featureGroup([userLocationMarker]).
-        bindPopup('Your detected location').
-        on('click', function() { 
-        // console.log('location marker clicked'); 
-      });
-      userLocationMarker.addTo(map.handle);
-      // console.log("updated current loc marker to", e.latlng.toString());
-      last.userLocation = newLocation;
-    }
-    // console.log("pan the map to user location");
-    locateEnd(true, newLocation, map.defaultZoom);
-    Session.set("searchTrigger", true);
-  });
+  map.handle.on('locationfound', map.locationFound);
   map.handle.on('locationerror', function(e) {
-    locateEnd(false, map.ancientLevantGJ, map.minZoom);
+    map.locateEnd(false, map.ancientLevantGJ, map.minZoom);
   });
   // console.log("trigger first auto-locate");
   Session.set("userLocateTrigger", true);
   // control all markers via a single layer
   map.markerLayer = L.layerGroup().addTo(map.handle);
-  mapProvider.placeDragSet = function (action) {
-    var updatePlaceCoords = function (id, c) {
-      collections.Places.update(
-        {_id: id},
-        { $set: { 'location.coordinates': c}});
-    };
-    //     console.log("markers", map.markers);
-    var placeId = client.selectedPlaceId();
-    var lm = map.markers.getItem(placeId).lmark;
-    if (action == "edit") {
-      //       console.log("enable marker drag", lm);
-      // store original coords in case user cancels
-      last.coordsBeforeDrag = lm.toGeoJSON().geometry.coordinates;
-      lm.on('dragend', function (e) {
-        var coords = this.toGeoJSON().geometry.coordinates;
-        //         console.log("marker", this, "moved to", coords);
-        updatePlaceCoords(this.placeId, coords);
-      });
-      lm.dragging.enable();
-    } else {
-      lm.dragging.disable();
-      lm.off('dragend', undefined);
-      if (action == "cancel") {
-        var sameLocation = _.isEqual(
-          lm.toGeoJSON().geometry.coordinates, last.coordsBeforeDrag);
-        if (!sameLocation) {
-          // console.log("restoring previous coordinates", last.coordsBeforeDrag);
-          updatePlaceCoords(placeId, last.coordsBeforeDrag);
-          lm.setLatLng(L.GeoJSON.coordsToLatLng(last.coordsBeforeDrag));
-        }
-        delete last.coordsBeforeDrag;
-      }
-    }
-  };
 };
 
 var schedCreateDialog = function (geoJsonLoc) {

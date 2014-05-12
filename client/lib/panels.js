@@ -10,7 +10,7 @@ panels = {};
         if (lastCenter) {
           // recenter map before other panels are loaded
           // console.log("panning map back to last center");
-          mapProvider.centerSet(lastCenter, false);
+          mapProvider.centerSet(false, lastCenter);
           Session.set("mapCenterLast", undefined);
         }
       }
