@@ -182,3 +182,7 @@ header > nav > ul > li > a > div > span {
   line-height: 1rem;
   max-width: 260px;
 }
+
+.centeredText {
+  padding: 20px;
+}
