@@ -1,11 +1,6 @@
 mapProvider = {};
 (function() {
   "use strict";
-
-  ///////////////////////////////////////////////////////////////////////////////
-  // Leaflet Map
-  ///////////////////////////////////////////////////////////////////////////////
-
   var map = {
     debug: {},
     handle: undefined,
@@ -87,8 +82,7 @@ mapProvider = {};
       map.zoomSet(zoom);
       Session.set('mapCenter', center.current);
       var closeEnough = center.next ?
-        map.isCloseEnough(center.next.coordinates,
-          center.current.coordinates) : false;
+        map.isCloseEnough(center.next.coordinates, center.current.coordinates) : false;
       if (closeEnough) {
         Session.set('mapNextCenter', undefined);
         // console.log('map next center move is complete');
@@ -106,16 +100,20 @@ mapProvider = {};
       if (map.userLocationMarker) {
         map.handle.removeLayer(map.userLocationMarker);
       }
-      var currRadius = 300;
       // mark user on the map with circle
       var userLocMarkerOpts = {
         color: 'yellow' /* for blue: '#15f'*/ ,
         opacity: 0.9,
         fillOpacity: 0.6,
-        radius: currRadius,
         stroke: true,
         clickable: true,
+        radius: 10,
+        radiusMaxFactor: 6,
+        animateFactor: 0.1,
+        animateStepMs: 15,
       };
+      var currRadius = userLocMarkerOpts.radius;
+      var direction = 'grow';
       // console.log("animating user location", this.userLocation.coordinates);
       var latlng = L.GeoJSON.coordsToLatLng(this.userLocation.coordinates);
       map.userLocationMarker = new L.CircleMarker(latlng, userLocMarkerOpts);
@@ -125,15 +123,26 @@ mapProvider = {};
           // console.log('location marker clicked'); 
         });
       map.userLocationMarker.addTo(map.handle);
+      var maxRadius = userLocMarkerOpts.radiusMaxFactor *
+        userLocMarkerOpts.radius;
       var intervalFuncId = Meteor.setInterval(function() {
         // console.log("animate location marker", currRadius);
-        if (currRadius <= 10) {
-          Meteor.clearInterval(intervalFuncId);
-          return;
+        if (currRadius > maxRadius) {
+          direction = 'shrink';
         }
-        currRadius = Math.floor(currRadius * 0.9);
+        if (direction === 'grow') {
+          currRadius = Math.floor(
+            currRadius * (1 + userLocMarkerOpts.animateFactor));
+        } else {
+          currRadius = Math.floor(
+            currRadius * (1 - userLocMarkerOpts.animateFactor));
+          if (currRadius <= userLocMarkerOpts.radius) {
+            Meteor.clearInterval(intervalFuncId);
+            return;
+          }
+        }
         map.userLocationMarker.setRadius(currRadius);
-      }, 25);
+      }, userLocMarkerOpts.animateStepMs);
     },
     locationFound: function(e) {
       // console.log("location found");
@@ -455,4 +464,5 @@ mapProvider = {};
     Session.set("createError", null);
     Session.set("activeDialog", "placeEdit");
   };
+
 }());
