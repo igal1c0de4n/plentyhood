@@ -2,7 +2,7 @@
 server = {
   isDevEnv: function(){
     // console.log("ROOT_URL", process.env.ROOT_URL, "NODE_ENV", process.env.NODE_ENV);
-    return process.env.ROOT_URL === "http://localhost:3000/" && 
+    return process.env.ROOT_URL === "http://localhost:3000/" &&
       // allow command line override with --env=production
       process.env.NODE_ENV === 'development';
   }
@@ -17,7 +17,7 @@ Meteor.publish("directory", function () {
 
 Meteor.publish("userDetails", function () {
   return Meteor.users.find(
-    {_id: this.userId}, 
+    {_id: this.userId},
     {fields: {profile: 1, emails: 1, services: 1}});
 });
 

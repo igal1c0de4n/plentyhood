@@ -1,9 +1,9 @@
 panels = {};
 
-;(function () {
+(function() {
   "use strict";
 
-  panels.backAction = function () {
+  panels.backAction = function() {
     if (Session.get("panel") === "place") {
       if (Session.get("autoBackToSearchCenter")) {
         var lastCenter = Session.get("mapCenterLast");
@@ -16,7 +16,7 @@ panels = {};
       }
       // console.log("panel back from place");
       client.placeSet();
-    } 
+    }
     // console.log("panelBack removing top panel");
     panels.pop();
   };
@@ -33,17 +33,16 @@ panels = {};
 
   var panelContexts = [{
     name: "pBegin"
-  },
-  { 
+  }, {
     name: "pSearch",
     events: [defaultKeyupHandler],
-  },
-  { 
+  }, {
     name: "pResultsList",
     events: [{
-      type: "keyup", 
+      type: "keyup",
       handler: function(e) { // app.resultListKeyupHandler
         var r = app.getCurRow();
+
         function moveTo(jobj) {
           // console.log("moveTo", r, jobj.length);
           if (jobj.length) {
@@ -53,25 +52,28 @@ panels = {};
         };
         // console.log("rListEntry.keyup", e.keyCode)
         if (r.length) {
-          switch(e.keyCode) {
-            case client.keyCode.ARROW_UP: {
-              // console.log("arrow_up", r.prev());
-              var dest = r.prev();
-              dest.hasClass("rListEntry") && moveTo(dest);
-              break;
-            }
-            case client.keyCode.ARROW_DOWN: {
-              // console.log("arrow_down", r.prev());
-              var dest = r.next();
-              dest.hasClass("rListEntry") && moveTo(dest);
-              break;
-            }
-            case client.keyCode.ENTER: {
-              var placeId = r[0].dataset.placeid;
-              // console.log("enter", placeId);
-              app.setCenterPlace(placeId);
-              break;
-            }
+          switch (e.keyCode) {
+            case client.keyCode.ARROW_UP:
+              {
+                // console.log("arrow_up", r.prev());
+                var dest = r.prev();
+                dest.hasClass("rListEntry") && moveTo(dest);
+                break;
+              }
+            case client.keyCode.ARROW_DOWN:
+              {
+                // console.log("arrow_down", r.prev());
+                var dest = r.next();
+                dest.hasClass("rListEntry") && moveTo(dest);
+                break;
+              }
+            case client.keyCode.ENTER:
+              {
+                var placeId = r[0].dataset.placeid;
+                // console.log("enter", placeId);
+                app.setCenterPlace(placeId);
+                break;
+              }
           }
         }
         if (e.keyCode == client.keyCode.ESCAPE) {
@@ -80,34 +82,31 @@ panels = {};
         }
       }
     }],
-  },
-  {
+  }, {
     name: "place",
     events: [defaultKeyupHandler],
-  },
-  {
+  }, {
     name: "pLocate",
-  },
-  ];
+  }, ];
 
   (function setupPanels() {
     // console.log("setup panels");
     var stack = [];
-    var currentPanel = function () {
+    var currentPanel = function() {
       return stack.length ? stack[stack.length - 1] : undefined;
     };
-    var panelEventsActive = function (on) {
+    var panelEventsActive = function(on) {
       var p = currentPanel();
       var events = p ? p.events : undefined;
       // console.log("panelEventsActive", on, events);
-      _.each(events, function (e) {
+      _.each(events, function(e) {
         // console.log("panel", p.name, e.type, on ? "on" : "off");
         var f = on ? $(document).on : $(document).off;
         f.call($(document), e.type, e.handler);
       });
     };
-    panels.push = function (name) {
-      var cxt = _.find(panelContexts, function (c) {
+    panels.push = function(name) {
+      var cxt = _.find(panelContexts, function(c) {
         return c.name == name;
       });
       var cp = currentPanel();
@@ -121,7 +120,7 @@ panels = {};
       Session.set("panel", cxt.name);
       // console.log("push", name, stack);
     };
-    panels.pop = function () {
+    panels.pop = function() {
       panelEventsActive(false);
       // console.log("pop panel", currentPanel().name, stack);
       var prv = stack.pop();
@@ -129,7 +128,7 @@ panels = {};
       var cp = currentPanel();
       Session.set("panel", cp ? cp.name : undefined);
     };
-    panels.clear = function () {
+    panels.clear = function() {
       // in case there are external references
       stack.length = 0;
     };

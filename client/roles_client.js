@@ -1,56 +1,56 @@
 roles = {};
 
-;(function () {
+(function() {
 
   "use strict";
 
 
-////////////////////////////////////////////////////////////////////
-// Patches
+  ////////////////////////////////////////////////////////////////////
+  // Patches
 
-// stubs for IE
-if (!window.console) {
-  window.console = {}
-}
+  // stubs for IE
+  if (!window.console) {
+    window.console = {}
+  }
 
-if (!window.console.log) {
-  window.console.log = function (msg) {
-    $('#log').append('<br /><p>' + msg + '</p>')
-  };
-}
+  if (!window.console.log) {
+    window.console.log = function(msg) {
+      $('#log').append('<br /><p>' + msg + '</p>')
+    };
+  }
 
-// fix bootstrap dropdown unclickable issue on iOS
-// https://github.com/twitter/bootstrap/issues/4550
-$(document).on('touchstart.dropdown.data-api', '.dropdown-menu', function (e) {
+  // fix bootstrap dropdown unclickable issue on iOS
+  // https://github.com/twitter/bootstrap/issues/4550
+  $(document).on('touchstart.dropdown.data-api', '.dropdown-menu', function(e) {
     e.stopPropagation();
-});
+  });
 
-////////////////////////////////////////////////////////////////////
-// Subscriptions
+  ////////////////////////////////////////////////////////////////////
+  // Subscriptions
 
-Deps.autorun(function () {
-  // register dependency on user so subscriptions
-  // will update once user has logged in
-  var user = Meteor.user();
-  Meteor.subscribe('users');
-});
+  Deps.autorun(function() {
+    // register dependency on user so subscriptions
+    // will update once user has logged in
+    var user = Meteor.user();
+    Meteor.subscribe('users');
+  });
 
-////////////////////////////////////////////////////////////////////
-// header
+  ////////////////////////////////////////////////////////////////////
+  // header
 
-Template.header.rolesDispName = function (user) {
-  var name;
-  if (!user) {
-    user = Meteor.user();
+  Template.header.rolesDispName = function(user) {
+    var name;
+    if (!user) {
+      user = Meteor.user();
+    }
+    if (!user) return "<missing user>";
+    if (user.profile) {
+      name = user.profile.name;
+    }
+    name = 'string' === typeof name ? name.trim() : null;
+    if (!name && user.emails && user.emails.length > 0) {
+      name = user.emails[0].address;
+    }
+    return name || "<missing name>";
   }
-  if (!user) return "<missing user>";
-  if (user.profile) {
-    name = user.profile.name;
-  }
-  name = 'string' === typeof name ? name.trim() : null;
-  if (!name && user.emails && user.emails.length > 0) {
-    name = user.emails[0].address;
-  }
-  return name || "<missing name>";
-}
 }());

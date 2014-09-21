@@ -5,7 +5,7 @@
 
 collections.Resources.allow({
   insert: function (userId) {
-    return false; 
+    return false;
   },
   update: function (userId) {
     return false;
@@ -17,7 +17,7 @@ collections.Resources.allow({
 
 collections.Tags.allow({
   insert: function (userId) {
-    return false; 
+    return false;
   },
   update: function (userId) {
     return false;
@@ -58,7 +58,7 @@ collections.Places.allow({
     // You can only remove places that you created
     if (place.owner === userId) {
       return true;
-    } 
+    }
     var adminUser = Meteor.users.findOne({ "profile.name": "Admin"});
     // console.log("user", userId, "admin", adminUser._id)
     return userId == adminUser._id;
@@ -85,7 +85,7 @@ Meteor.methods({
     verifyLoggedIn.call(this);
     if (options.placeId) {
       // update existing place
-      collections.Places.update(options.placeId, { 
+      collections.Places.update(options.placeId, {
         $set: {
           title: options.title,
           description: options.description,
@@ -148,7 +148,7 @@ Meteor.methods({
     var tagIdsList = _.map(options.tags, function (tagTitle) {
       var t = collections.Tags.findOne({title: tagTitle});
       if (t) {
-        // bug: only inc popularity if new resource or if tag does not 
+        // bug: only inc popularity if new resource or if tag does not
         // already exist in resource
         t.popularity++;
         // console.log("tag", tagTitle, "exists, popularity:", t.popularity);
@@ -165,8 +165,8 @@ Meteor.methods({
       var resourceId = options.resourceId;
       if (resourceId) {
         // console.log("updating resource", resourceId);
-        collections.Resources.update(resourceId, { 
-          title: options.title, 
+        collections.Resources.update(resourceId, {
+          title: options.title,
           description: options.description,
           public: options.public,
           tags: tagIdsList,
@@ -176,7 +176,7 @@ Meteor.methods({
       else {
         // no resource id -- new resource
         resourceId = collections.Resources.insert({
-          title: options.title, 
+          title: options.title,
           description: options.description,
           public: options.public,
           tags: tagIdsList,
@@ -200,7 +200,7 @@ Meteor.methods({
     var resourceId = options.resourceId;
     // console.log("mtcPlaceResourceAdd", resourceId, placeId);
     if (placeId && resourceId) {
-      collections.Places.update(placeId, { 
+      collections.Places.update(placeId, {
         $addToSet: { resources: resourceId}
       });
       // console.log("added resource", resourceId, "to place", placeId);
@@ -253,7 +253,7 @@ var placeHasResource = function (place, rid) {
   var foundId = _.find(place.resources, function (r) {
     if (r == rid) {
       //         console.log("place has resource", r._id, r.title);
-      return true; 
+      return true;
     }
   });
   return !!foundId;

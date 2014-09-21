@@ -20,7 +20,7 @@ mapProvider = {};
       var isInRange = function(n1, n2, delta) {
           return (n1 - delta) <= n2 && n2 <= (n1 + delta);
         }
-        // Determined by experimenting with leaflet map. 
+        // Determined by experimenting with leaflet map.
         // Not very scientific, I know
       var d = 0.001;
       return isInRange(c1[0], c2[0], d) && isInRange(c1[1], c2[1], d);
@@ -48,7 +48,7 @@ mapProvider = {};
         [b.getEast() + phi, b.getNorth() + phi],
       ];
       if (Session.get("drawBounds")) {
-        // debug 
+        // debug
         if (map.debug.rect) {
           map.handle.removeLayer(map.debug.rect);
           delete map.debug.rect;
@@ -75,9 +75,9 @@ mapProvider = {};
       var coordsGet = function(c) {
           return c ? c.coordinates : undefined;
         }
-        // console.log('map moveend', zoom, 
-        //             coordsGet(center.last), 
-        //             coordsGet(center.current), 
+        // console.log('map moveend', zoom,
+        //             coordsGet(center.last),
+        //             coordsGet(center.current),
         //             coordsGet(center.next));
       map.zoomSet(zoom);
       Session.set('mapCenter', center.current);
@@ -120,7 +120,7 @@ mapProvider = {};
       L.featureGroup([map.userLocationMarker])
         .bindPopup('Your detected location')
         .on('click', function() {
-          // console.log('location marker clicked'); 
+          // console.log('location marker clicked');
         });
       map.userLocationMarker.addTo(map.handle);
       var maxRadius = userLocMarkerOpts.radiusMaxFactor *
@@ -171,7 +171,7 @@ mapProvider = {};
         Session.set('locationAvailable', locateSuccess);
       }
       // console.log(
-      //   'location', locateSuccess ? 'found' : 'unavailable', 
+      //   'location', locateSuccess ? 'found' : 'unavailable',
       //   loc, 'zoom', zoom);
       if (Session.get("panel") == "pLocate") {
         panels.pop();
@@ -262,7 +262,7 @@ mapProvider = {};
         // TBD optimization: update only the markers which change
         //
         // TDB: move selectedPlace to a new Deps.autorun as there's no
-        // need to refilter and search for places when selected place 
+        // need to refilter and search for places when selected place
         // changes. Just redraw two markers
         var selected = client.selectedPlaceId();
         map.markers.each(function(k, m) {
@@ -304,7 +304,7 @@ mapProvider = {};
           }
           m.lmark.setOpacity(opacity);
         });
-        // cleanup - remove markers for all places which 
+        // cleanup - remove markers for all places which
         // disappeared from the map
         var removedMarkers = [];
         map.markers.each(function(k, m) {
@@ -369,7 +369,7 @@ mapProvider = {};
       }
       Session.set('mapNextCenter', center);
       var wrapLongitude = function(d) {
-        // this is kind of a hack to keep the map and all markers 
+        // this is kind of a hack to keep the map and all markers
         // between [-180,180] so that GeoLocation db APIs work
         if (d > 180) {
           d -= 360;

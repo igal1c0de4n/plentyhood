@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // header
 
-Template.header.page2class = function (page, cssClass) {
+Template.header.page2class = function(page, cssClass) {
   var rc = Router.current();
   if (rc && rc.path == ("/" + page)) {
     //     console.log("active page", page);
@@ -10,20 +10,20 @@ Template.header.page2class = function (page, cssClass) {
   return "";
 };
 
-Template.header.getFbUser = function () {
+Template.header.getFbUser = function() {
   var user = Meteor.user();
   //console.log("getFbUser", user);
   var s = user.services;
   return s && s.facebook ? s.facebook.username : undefined;
 };
 
-Template.header.isFullScreen = function () {
+Template.header.isFullScreen = function() {
   // return Session.get("isFullScreen");
   // or - directly query the window state:
-  return document.fullscreenElement ||    // alternative standard method
-      document.mozFullScreenElement ||
-      document.webkitFullscreenElement ||
-      document.msFullscreenElement; // current working methods
+  return document.fullscreenElement || // alternative standard method
+    document.mozFullScreenElement ||
+    document.webkitFullscreenElement ||
+    document.msFullscreenElement; // current working methods
 };
 
 function enterFullScreen() {
@@ -51,14 +51,14 @@ function exitFullScreen() {
 };
 
 Template.header.events({
-  'click #fullscreen-on': function () {
+  'click #fullscreen-on': function() {
     enterFullScreen();
   },
-  'click #fullscreen-off': function () {
+  'click #fullscreen-off': function() {
     exitFullScreen();
   },
-  'click #signout': function () {
-    Meteor.logout(function () {
+  'click #signout': function() {
+    Meteor.logout(function() {
       console.log("signed out");
     });
   },
