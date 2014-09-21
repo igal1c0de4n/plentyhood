@@ -67,14 +67,6 @@ collections.Places.allow({
 
 Meteor.methods({
 
-  mtcIsDevEnv: function() {
-    // console.log(process.env);
-    if(!this.isSimulation){
-      // called from the server
-      return server.isDevEnv();
-    }
-  },
-
   // options should include: title, description, x, y, public
   mtcPlaceUpdate: function (options) {
     options = options || {};

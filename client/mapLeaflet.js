@@ -230,8 +230,8 @@ mapProvider = {};
     Session.set('mapNextCenter', undefined);
     Session.set('mapBounds', undefined);
     this.handleStaticContent = Deps.autorun(function() {
-      if (client.isStaticContentReady()) {
-        var path = client.getResourceUrl("img/leaflet/");
+      if (staticResources.ready()) {
+        var path = staticResources.get("img/leaflet/");
         var markerIcon = L.icon({
           iconUrl: path + "marker-icon.png",
           shadowUrl: path + "marker-shadow.png",

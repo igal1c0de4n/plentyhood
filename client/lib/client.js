@@ -7,19 +7,6 @@ client = {
     ARROW_DOWN: 40,
   },
 
-  isStaticContentReady: function() {
-    return !_.isUndefined(Session.get("staticContentPath"));
-  },
-
-  getResourceUrl: function(path) {
-    if (!this.isStaticContentReady()) {
-      throw new Error("access to static url while provider not set");
-    }
-    var scp = Session.get("staticContentPath");
-    // console.log("getResourceUrl", scp, path);
-    return scp + path;
-  },
-
   displayName: function(user) {
     if (user.profile && user.profile.name)
       return user.profile.name;
@@ -82,6 +69,23 @@ client = {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// static resources
+
+staticResources = {
+  ready: function() {
+    return !_.isUndefined(Session.get("staticContentPath"));
+  },
+  get: function(path) {
+    if (!this.ready()) {
+      throw new Error("access to static url while provider not set");
+    }
+    var scp = Session.get("staticContentPath");
+    // console.log("getResourceUrl", scp, path);
+    return scp + path;
+  },
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // subscriptions
 
 subscriptions = {
@@ -101,7 +105,7 @@ subscriptions = {
   multiRemove: function(list) {
     _.each(list, function(name) {
       if (!this.subs[name]) {
-        throw new Error("uninitialized subscription");
+        throw new Error("uninitialized subscription", name);
       }
       this.subs[name].stop();
       this.subs[name] = undefined;
@@ -132,11 +136,11 @@ subscriptions = {
   ];
   client.sessionUnsetList(sessionVars);
   Meteor.startup(function() {
-    Meteor.call("mtcIsDevEnv", function(error, result) {
-      console.log("app in dev mode: ", result);
-      Session.set("staticContentPath",
-        result ? "" : "https://s3.amazonaws.com/plentyhood/");
-    });
+    var isDev = ("localhost" === window.location.hostname) &&
+      !Session.get("forceProductionMode");
+    console.log("app in dev mode: ", isDev);
+    Session.set("staticContentPath", isDev ?
+      "" : "https://dl.dropboxusercontent.com/u/197233/plentyhood/");
     subscriptions.multiAdd(["directory", "userDetails"]);
   });
 }());

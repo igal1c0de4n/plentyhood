@@ -180,7 +180,7 @@ app = {};
   };
 
   Template.placesMap.canLoadMap = function() {
-    return client.isStaticContentReady();
+    return staticResources.ready();
   };
 
   ///////////////////////////////////////////////////////////////////////////////
