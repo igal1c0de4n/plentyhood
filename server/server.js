@@ -90,5 +90,25 @@
       }
     });
   };
-  // dataMassage();
+
+  function registerService(s) {
+    console.log("resetting login service:", s.service);
+    var loginServices = Accounts.loginServiceConfiguration;
+    loginServices.remove({
+      service: s.service
+    });
+    loginServices.insert(s);
+  }
+
+  Meteor.startup(function() {
+    if (_.isEmpty(Meteor.settings)) {
+      throw new Error("missing environment settings");
+    }
+    console.log("starting", Meteor.settings.public.env, "run");
+    // console.log("settings:", Meteor.settings);
+    _.each(Meteor.settings.loginServices, function(s) {
+      registerService(s);
+    });
+    // dataMassage();
+  });
 }());
