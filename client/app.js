@@ -18,6 +18,16 @@ app = {};
     'click .locateTrig': function() {
       Session.set("userLocateTrigger", true);
     },
+    'click .testFBGraph': function() {
+      console.log("Meteor.user", Meteor.user());
+      Meteor.call('mtcFBGraphTest', function(error) {
+        if (err) {
+          console.log("error: " + err);
+        } else {
+          console.log("call completed");
+        }
+      });
+    },
   });
 
   Template.panelBegin.rendered = function() {

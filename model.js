@@ -228,8 +228,32 @@
         });
       }
     },
+    mtcFBGraphTest: function(options) {
+      if (Meteor.isServer) {
+        var user = Meteor.user();
+        FBGraph.setAccessToken(user.services.facebook.accessToken);
+        fbFriendsGet(user.services.facebook.id);
+      }
+    },
   });
 
+  function fbFriendsGet(id) {
+    var friends = FBGraph.getFriends(id);
+    _.each(friends, function(friendId) {
+      var env = Meteor.bindEnvironment(function(err, res) {
+        if (err) {
+          console.log("fbgraph error:", err);
+        } else {
+          console.log("facebook user", friendId, res);
+        }
+      }, function() {
+        console.log("failed to bind environment");
+      });
+      var request = FBGraph.get(friendId, env);
+      // console.log("facebook request", request);
+      return true;
+    });
+  }
   ///////////////////////////////////////////////////////////////////////////////
 
   var placeGet = function(placeId) {
