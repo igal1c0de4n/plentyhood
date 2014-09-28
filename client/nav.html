@@ -1,77 +1,94 @@
 <template name="notFound">
-<div class="textPage">
-  <h2>Oops, Page Not Found!</h2>
-  <p>It seems that the page you were looking for has gone missing</p>
-</div>
+  <div class="textPage">
+    <h2>Oops, Page Not Found!</h2>
+    <p>It seems that the page you were looking for has gone missing</p>
+  </div>
 </template>
 
 <template name="signin">
-<div class="textPage">
-  <p>Create an account, login with Facebook or use one of the demo users 
-  [psw <em>sharewme</em>]):</p>
-  <ul>
-    <li>user@ph.earth</li>
-    <li>admin@ph.earth</li>
-  </ul>
-  {{> loginButtons}}
-</div>
+  <div class="textPage">
+    <p>Create an account, login with Facebook or use one of the demo users [psw
+      <em>sharewme</em>]):</p>
+    <ul>
+      <li>user@ph.earth</li>
+      <li>admin@ph.earth</li>
+    </ul>
+    {{> loginButtons}}
+  </div>
 </template>
 
 <template name="header">
-<header role="banner">
-  <nav role="navigation">
-    <ul>
-      <li class="{{page2class "" "active"}}">
-      <a href="/"><div>Plentyhood<span></span></div></a>
-      </li>
-      <li class="{{page2class "about" "active"}}">
-      <a href="/about"><div>About</div></a>
-      </li>
-      <li class="{{page2class "placesMap" "active"}}">
-      <a href="/placesMap"><div>Places</div></a>
-      </li>
-      <li>
-      <a href="#" id="fullscreen-on"><div>Fullscreen</div></a>
-      </li>
-      {{#if isInRole 'admin'}}
-      <li class="{{page2class "admin" "active"}}">
-      <a href="/admin"><div>Admin</div></a>
-      </li>
-      {{/if}}
-      <li class="nav-separator"></li>
-      <!-- <a href="#"><div>User Name</div></a> -->
-      {{#if currentUser}}
-      <li>
-      <a href="#" class="userNav">
+  <header role="banner">
+    <nav role="navigation">
+      <ul>
+        <li class="{{page2class " " "active "}}">
+          <a href="/">
+            <div>Plentyhood
+              <span></span>
+            </div>
+          </a>
+        </li>
+        <li class="{{page2class " about " "active "}}">
+          <a href="/about">
+            <div>About</div>
+          </a>
+        </li>
+        <li class="{{page2class " placesMap " "active "}}">
+          <a href="/placesMap">
+            <div>Places</div>
+          </a>
+        </li>
+        <li>
+          <a href="#" id="fullscreen-on">
+            <div>Fullscreen</div>
+          </a>
+        </li>
+        {{#if isInRole 'admin'}}
+        <li class="{{page2class " admin " "active "}}">
+          <a href="/admin">
+            <div>Admin</div>
+          </a>
+        </li>
+        {{/if}}
+        <li class="nav-separator"></li>
+        <!-- <a href="#"><div>User Name</div></a> -->
+        {{#if currentUser}}
+        <li>
+          <a href="#" class="userNav">
         {{#if getFbUser}}
         <img src="//graph.facebook.com/{{getFbUser}}/picture" class="avatar"/>
         {{/if}}
         <div>{{rolesDispName}}</div>
       </a>
-      <div>
-        <ul>
-          <li><a href="#">Settings</a></li>
-          <li><a href="#" id="signout">Sign out</a></li>
-        </ul>
-      </div>
-      </li>
-      {{else}}
-      <li class="{{page2class "signin" "active"}}">
-      <a href="/signin"><div>Sign In</div></a>
-      </li>
-      {{/if}}
-    </ul>
-  </nav>
-</header>
+          <div>
+            <ul>
+              <li><a href="#">Settings</a>
+              </li>
+              <li><a href="#" id="signout">Sign out</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        {{else}}
+        <li class="{{page2class " signin " "active "}}">
+          <a href="/signin">
+            <div>Sign In</div>
+          </a>
+        </li>
+        {{/if}}
+      </ul>
+    </nav>
+  </header>
 </template>
 
 <template name="about">
-<div class="nbox centerBox">
-  <div class="centeredText">
-    <h2>Application is Under Development</h2>
-    <p>While that's the case, expect bugs and missing features.</p>
-    <p>Thanks for taking the time to evaluate!<div> -- the team</div></p>
+  <div class="nbox centerBox">
+    <div class="centeredText">
+      <h2>Application is Under Development</h2>
+      <p>While that's the case, expect bugs and missing features.</p>
+      <p>Thanks for taking the time to evaluate!
+        <div>-- the team</div>
+      </p>
+    </div>
   </div>
-</div>
 </template>
-

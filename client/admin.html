@@ -1,40 +1,37 @@
 <template name="admin">
-{{#if errorExists}}
-<div class="bg-danger">{{getError}}</div>
-{{/if}}
-{{#if info}}
-<div class="alert alert-info">{{info}}</div>
-{{/if}}
-<div class="container">
-  <div class="row">
-  <h2>Tags</h2>
+  {{#if errorExists}}
+  <div class="bg-danger">{{getError}}</div>
+  {{/if}} {{#if info}}
+  <div class="alert alert-info">{{info}}</div>
+  {{/if}}
+  <div class="container">
+    <div class="row">
+      <h2>Tags</h2>
+    </div>
+    <div class="row">
+      <form class="navbar-search" role="form">
+        <input type="text" class="search-query" placeholder="Search tags">
+      </form>
+    </div>
+    <div class="row">
+      {{#if tagSelected}}
+      <hr/>
+      <form class="form-inline" role="form">
+        <label>Popularity</label>
+        <input type="text" class="popularity" placeholder={{tagPopularityGet}}>
+        <input type="button" class="btn btn-default span4 tagRemove" value="Remove Tag">
+      </form>
+      {{/if}}
+    </div>
+    {{> displayUsers}}
   </div>
-  <div class="row">
-    <form class="navbar-search" role="form">
-      <input type="text" class="search-query" placeholder="Search tags">
-    </form>
-  </div>
-  <div class="row">
-    {{#if tagSelected}}
-    <hr/>
-    <form class="form-inline" role="form">
-      <label>Popularity</label>
-      <input type="text" class="popularity" placeholder={{tagPopularityGet}}>
-      <input type="button" 
-      class="btn btn-default span4 tagRemove"
-      value="Remove Tag">
-    </form>
-    {{/if}}
-  </div>
-  {{> displayUsers}}
-</div>
 </template>
 
 <template name="displayUsers">
-<h3>Current Users</h3>
-<ul>
-  {{#each users}}
-  <li>{{email}} - Roles: {{roles}}</li>
-  {{/each}}
-</ul>
+  <h3>Current Users</h3>
+  <ul>
+    {{#each users}}
+    <li>{{email}} - Roles: {{roles}}</li>
+    {{/each}}
+  </ul>
 </template>

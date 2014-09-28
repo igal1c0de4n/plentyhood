@@ -1,6 +1,5 @@
 @import 'flex';
-
-@mixin box-sizing($value: border-box) {
+@mixin box-sizing($value:border-box) {
   -webkit-box-sizing: $value;
   -moz-box-sizing: $value;
   box-sizing: $value;
@@ -15,12 +14,11 @@
 *:after, *:before {
   @include box-sizing;
 }
-article,aside,details,figcaption,figure,footer,header,hgroup,nav,section {
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section {
   display: block;
 }
 // css reset end
-
-img.avatar {
+ img.avatar {
   margin-right: 8px;
   max-height: 30px;
   border-radius: 100px;
@@ -28,17 +26,16 @@ img.avatar {
 .textPage {
   margin: 10px;
 }
-
 // begin new header
-$navColorTop: rgba(0,10,20,1);
-$navColorBottom: rgba(0,100,50,1);
-$menuColorHighlight: rgba(0,140,30,0.3);
-$navColorBg: linear-gradient(to bottom,$navColorTop,$navColorBottom);
-$navColorBgRev: linear-gradient(to top,$navColorTop,$navColorBottom);
-header {
+$navColorTop:rgba(0, 10, 20, 1);
+ $navColorBottom:rgba(0, 100, 50, 1);
+ $menuColorHighlight:rgba(0, 140, 30, 0.3);
+ $navColorBg:linear-gradient(to bottom, $navColorTop, $navColorBottom);
+ $navColorBgRev:linear-gradient(to top, $navColorTop, $navColorBottom);
+ header {
   background: $navColorBg;
-  border-bottom: 1px solid rgba(0,0,0,.1);
-  box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
   display: block;
 }
 header a:hover {
@@ -55,14 +52,14 @@ header > nav > ul {
   padding: 0;
 }
 header > nav > ul > li {
-  @include flex(0,1,auto);
+  @include flex(0, 1, auto);
   margin: 0;
   padding: 0;
   position: relative;
-  transition: all linear 0.1s;	
+  transition: all linear 0.1s;
 }
 header > nav > ul > li.nav-separator {
-  @include flex(1,1,auto);
+  @include flex(1, 1, auto);
 }
 header > nav > ul > li:hover {
   background: $menuColorHighlight;
@@ -70,9 +67,8 @@ header > nav > ul > li:hover {
 header > nav > ul > li.active:hover {
   background: none;
 }
-header > nav > ul > li > a:active,
-header > nav > ul > li > a:focus {
-  outline-style: none; 
+header > nav > ul > li > a:active, header > nav > ul > li > a:focus {
+  outline-style: none;
   text-decoration: none;
   color: white;
 }
@@ -85,7 +81,7 @@ header > nav > ul > li.nav-separator:hover {
 header > nav > ul > li a + div {
   background: $navColorBgRev;
   border-radius: 0 0 5px 5px;
-  box-shadow: 0 5px 10px rgba(0,0,0,.5);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
   font-size: 1.5rem;
   position: absolute;
   width: 100%;
@@ -103,15 +99,15 @@ header > nav > ul > li a + div > ul > li {
   padding: 0;
 }
 header > nav > ul > li a + div > ul > li > a {
-  color: rgba(255,255,255,.7);
-  display: block;	
+  color: rgba(255, 255, 255, .7);
+  display: block;
   padding: 10px;
   text-decoration: none;
   text-transform: capitalize;
   font-weight: 500;
 }
 header > nav > ul > li a + div > ul > li:hover > a {
-  background-color: rgba(0,0,0,.15);	
+  background-color: rgba(0, 0, 0, .15);
 }
 header > nav > ul > li > a {
   @include flexbox();
@@ -123,7 +119,7 @@ header > nav > ul > li > a {
   max-width: 130px;
   padding: 1rem 1.5rem;
   text-decoration: none;
-  text-shadow: 0 1px 1px rgba(0,0,0,.1);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
   transition: all linear 0.1s;
 }
 header > nav > ul > li > a.userNav {
@@ -131,10 +127,10 @@ header > nav > ul > li > a.userNav {
   margin: 10px 15px;
 }
 header > nav > ul > li > a > div > span {
-  color: rgba(255,255,255,.75);
+  color: rgba(255, 255, 255, .75);
   display: block;
   font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: .7rem;	
+  font-size: .7rem;
   font-style: italic;
   line-height: 1rem;
   max-width: 260px;
