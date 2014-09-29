@@ -1,8 +1,10 @@
+/* line 3, ../sass/app.scss */
 html, body {
   height: 100%;
   width: 100%;
 }
 
+/* line 7, ../sass/app.scss */
 #placesMapBox {
   display: -webkit-box;
   display: -webkit-flex;
@@ -18,6 +20,7 @@ html, body {
 }
 
 @media all and (max-width: 640px) {
+  /* line 18, ../sass/app.scss */
   #placesMapBox {
     -webkit-box-direction: normal;
     -webkit-box-orient: vertical;
@@ -28,15 +31,18 @@ html, body {
   }
 }
 @media all and (min-width: 640px) and (max-width: 1280px) {
+  /* line 27, ../sass/app.scss */
   #mainPanel {
     width: 320px;
   }
 }
 @media all and (min-width: 1280px) {
+  /* line 32, ../sass/app.scss */
   #mainPanel {
     width: 426.66667px;
   }
 }
+/* line 36, ../sass/app.scss */
 #rootbox {
   height: 100%;
   display: -webkit-box;
@@ -52,6 +58,7 @@ html, body {
   flex-direction: column;
 }
 
+/* line 41, ../sass/app.scss */
 #rootbox div.nbox {
   -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
@@ -61,6 +68,7 @@ html, body {
   position: relative;
 }
 
+/* line 46, ../sass/app.scss */
 #mainPanel {
   padding: 10px;
   background-color: white;
@@ -79,6 +87,7 @@ html, body {
   align-content: stretch;
 }
 
+/* line 54, ../sass/app.scss */
 #panelSearch {
   -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
@@ -99,6 +108,7 @@ html, body {
   align-items: stretch;
 }
 
+/* line 60, ../sass/app.scss */
 #panelPlace {
   -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
@@ -107,6 +117,7 @@ html, body {
   flex-grow: 1;
 }
 
+/* line 63, ../sass/app.scss */
 #leaflet-map {
   -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
@@ -116,10 +127,12 @@ html, body {
   background: black;
 }
 
+/* line 67, ../sass/app.scss */
 #navcol {
   margin-right: 20px;
 }
 
+/* line 70, ../sass/app.scss */
 .centerBox {
   display: -webkit-box;
   display: -webkit-flex;
@@ -135,6 +148,7 @@ html, body {
   flex-grow: 1;
 }
 
+/* line 76, ../sass/app.scss */
 .disable-select {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -142,108 +156,132 @@ html, body {
   user-select: none;
 }
 
+/* line 82, ../sass/app.scss */
 .indent {
   margin-left: 10px;
 }
 
+/* line 85, ../sass/app.scss */
 .glyphicon {
   margin-right: 6px;
 }
 
+/* line 88, ../sass/app.scss */
 .header {
   padding: 10px 0;
   padding-bottom: 0px;
 }
 
+/* line 92, ../sass/app.scss */
 .invite-row .invite {
   margin: 10px 10px 10px 0;
 }
 
+/* line 95, ../sass/app.scss */
 .sharedPanel {
   margin-bottom: 0px;
 }
 
+/* line 98, ../sass/app.scss */
 .sharedPanel .usersList {
   margin-bottom: 5px;
 }
 
+/* line 101, ../sass/app.scss */
 input.chosen {
   font-weight: bold;
 }
 
+/* line 104, ../sass/app.scss */
 .verticalMargin {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
+/* line 108, ../sass/app.scss */
 .tagsLabel {
   padding-right: 5px;
 }
 
+/* line 111, ../sass/app.scss */
 .bootstrap-tagsinput {
   margin-bottom: 0;
 }
 
+/* line 114, ../sass/app.scss */
 .placeResourceRemove {
   margin-right: 5px;
 }
 
+/* line 117, ../sass/app.scss */
 .marginTop {
   margin-top: 5px !important;
 }
 
+/* line 120, ../sass/app.scss */
 .bottomBorder {
   border-bottom: 1px solid #e5e5e5;
   padding-bottom: 5px;
   margin-bottom: 5px;
 }
 
+/* line 125, ../sass/app.scss */
 h4.inline {
   display: inline !important;
 }
 
+/* line 128, ../sass/app.scss */
 #resourceSelect {
   margin: 7px 0;
 }
 
+/* line 131, ../sass/app.scss */
 button.close {
   margin-left: 10px;
   padding: 5px;
 }
 
+/* line 135, ../sass/app.scss */
 a.btn-link {
   padding: 6px 0;
 }
 
+/* line 138, ../sass/app.scss */
 hr.tight {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
+/* line 142, ../sass/app.scss */
 .selectedRLEntry {
   background-color: #dfb;
 }
 
+/* line 145, ../sass/app.scss */
 .rListContainer {
   height: auto;
   max-height: 75%;
   overflow: hidden;
 }
 
+/* line 151, ../sass/app.scss */
 .rListEntry {
   padding: 5px;
   cursor: pointer;
 }
 
+/* line 155, ../sass/app.scss */
 button.panelBack {
   margin-right: 4px;
 }
 
+/* line 158, ../sass/app.scss */
 .bootstrap-tagsinput {
   width: 100%;
   margin: 5px 0px;
 }
 
+/* line 162, ../sass/app.scss */
 .horizbox {
   display: -webkit-box;
   display: -webkit-flex;
@@ -253,6 +291,7 @@ button.panelBack {
   align-items: stretch;
 }
 
+/* line 166, ../sass/app.scss */
 .panelBegin {
   -webkit-flex-wrap: wrap;
   -moz-flex-wrap: wrap;
@@ -260,6 +299,7 @@ button.panelBack {
   flex-wrap: wrap;
 }
 
+/* line 169, ../sass/app.scss */
 .panelBegin button {
   margin: 3px;
   -webkit-box-flex: 1;
