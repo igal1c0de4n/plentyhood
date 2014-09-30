@@ -54,12 +54,12 @@
         <!-- <a href="#"><div>User Name</div></a> -->
         {{#if currentUser}}
         <li>
-          <a href="#" class="userNav">
-        {{#if getFbUser}}
-        <img src="//graph.facebook.com/{{getFbUser}}/picture" class="avatar"/>
-        {{/if}}
-        <div>{{rolesDispName}}</div>
-      </a>
+          <a href="#" id="navUser">
+            <span id="navUserName">{{rolesDispName}}</span>
+            {{#if getFbUser}}
+              <img id="navUserAvatar" src="//graph.facebook.com/{{getFbUser}}/picture"/>
+            {{/if}}
+          </a>
           <div>
             <ul>
               <li><a href="#">Settings</a>

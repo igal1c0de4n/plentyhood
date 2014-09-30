@@ -21,18 +21,11 @@ article, aside, details, figcaption, figure, footer, header, hgroup, nav, sectio
 }
 
 /* line 21, ../sass/nav.scss */
-img.avatar {
-  margin-right: 8px;
-  max-height: 30px;
-  border-radius: 100px;
-}
-
-/* line 26, ../sass/nav.scss */
 .textPage {
   margin: 10px;
 }
 
-/* line 35, ../sass/nav.scss */
+/* line 30, ../sass/nav.scss */
 header {
   background: linear-gradient(to bottom, #000a14, #006432);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -40,13 +33,13 @@ header {
   display: block;
 }
 
-/* line 41, ../sass/nav.scss */
+/* line 36, ../sass/nav.scss */
 header a:hover {
   color: white;
   text-decoration: none;
 }
 
-/* line 45, ../sass/nav.scss */
+/* line 40, ../sass/nav.scss */
 header > nav > ul {
   display: -webkit-box;
   display: -webkit-flex;
@@ -72,7 +65,7 @@ header > nav > ul {
   padding: 0;
 }
 
-/* line 54, ../sass/nav.scss */
+/* line 49, ../sass/nav.scss */
 header > nav > ul > li {
   -webkit-box-flex: 0;
   -webkit-flex: 0 1 auto;
@@ -86,7 +79,7 @@ header > nav > ul > li {
   transition: all linear 0.1s;
 }
 
-/* line 61, ../sass/nav.scss */
+/* line 56, ../sass/nav.scss */
 header > nav > ul > li.nav-separator {
   -webkit-box-flex: 1;
   -webkit-flex: 1 1 auto;
@@ -96,34 +89,34 @@ header > nav > ul > li.nav-separator {
   flex: 1 1 auto;
 }
 
-/* line 64, ../sass/nav.scss */
+/* line 59, ../sass/nav.scss */
 header > nav > ul > li:hover {
   background: rgba(0, 140, 30, 0.3);
 }
 
-/* line 67, ../sass/nav.scss */
+/* line 62, ../sass/nav.scss */
 header > nav > ul > li.active:hover {
   background: none;
 }
 
-/* line 70, ../sass/nav.scss */
+/* line 65, ../sass/nav.scss */
 header > nav > ul > li > a:active, header > nav > ul > li > a:focus {
   outline-style: none;
   text-decoration: none;
   color: white;
 }
 
-/* line 75, ../sass/nav.scss */
+/* line 70, ../sass/nav.scss */
 header > nav > ul > li.active > a:hover {
   cursor: default;
 }
 
-/* line 78, ../sass/nav.scss */
+/* line 73, ../sass/nav.scss */
 header > nav > ul > li.nav-separator:hover {
   background: none;
 }
 
-/* line 81, ../sass/nav.scss */
+/* line 76, ../sass/nav.scss */
 header > nav > ul > li a + div {
   background: linear-gradient(to top, #000a14, #006432);
   border-radius: 0 0 5px 5px;
@@ -134,24 +127,24 @@ header > nav > ul > li a + div {
   display: none;
 }
 
-/* line 90, ../sass/nav.scss */
+/* line 85, ../sass/nav.scss */
 header > nav > ul > li:hover a + div {
   display: block;
   z-index: 1000;
 }
 
-/* line 94, ../sass/nav.scss */
+/* line 89, ../sass/nav.scss */
 header > nav > ul > li a + div > ul {
   list-style-type: none;
 }
 
-/* line 97, ../sass/nav.scss */
+/* line 92, ../sass/nav.scss */
 header > nav > ul > li a + div > ul > li {
   margin: 0;
   padding: 0;
 }
 
-/* line 101, ../sass/nav.scss */
+/* line 96, ../sass/nav.scss */
 header > nav > ul > li a + div > ul > li > a {
   color: rgba(255, 255, 255, 0.7);
   display: block;
@@ -161,12 +154,12 @@ header > nav > ul > li a + div > ul > li > a {
   font-weight: 500;
 }
 
-/* line 109, ../sass/nav.scss */
+/* line 104, ../sass/nav.scss */
 header > nav > ul > li a + div > ul > li:hover > a {
   background-color: rgba(0, 0, 0, 0.15);
 }
 
-/* line 112, ../sass/nav.scss */
+/* line 107, ../sass/nav.scss */
 header > nav > ul > li > a {
   display: -webkit-box;
   display: -webkit-flex;
@@ -182,20 +175,13 @@ header > nav > ul > li > a {
   font-size: 1.55rem;
   font-weight: 500;
   letter-spacing: 1px;
-  max-width: 130px;
   padding: 1rem 1.5rem;
   text-decoration: none;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   transition: all linear 0.1s;
 }
 
-/* line 125, ../sass/nav.scss */
-header > nav > ul > li > a.userNav {
-  padding: 0px !important;
-  margin: 10px 15px;
-}
-
-/* line 129, ../sass/nav.scss */
+/* line 119, ../sass/nav.scss */
 header > nav > ul > li > a > div > span {
   color: rgba(255, 255, 255, 0.75);
   display: block;
@@ -204,6 +190,22 @@ header > nav > ul > li > a > div > span {
   font-style: italic;
   line-height: 1rem;
   max-width: 260px;
+}
+
+/* line 128, ../sass/nav.scss */
+#navUser {
+  padding: 0px 3px;
+  white-space: nowrap;
+}
+
+/* line 132, ../sass/nav.scss */
+#navUserName {
+  margin: 2px 5px;
+}
+
+/* line 135, ../sass/nav.scss */
+#navUserAvatar {
+  max-height: 35px;
 }
 
 /* line 138, ../sass/nav.scss */
